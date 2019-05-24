@@ -1,12 +1,14 @@
 # Pre-trained language model zoo
 
-This folder contains scripts and source code for obtaining surprisals from five pre-trained language models:
+This folder contains scripts and source code for obtaining surprisals 
+from the following pre-trained language models:
 
 1. [GRNN](https://github.com/facebookresearch/colorlessgreenRNNs) (recurrent neural network trained on Wikipedia)
-2. [JRNN](https://github.com/tensorflow/models/tree/master/research/lm_1b) (recurrent neural network trained on [$
+2. [JRNN](https://github.com/tensorflow/models/tree/master/research/lm_1b) (recurrent neural network trained on Billion Word Benchmark)
 3. [RNNG](https://github.com/clab/rnng) (recurrent neural network grammar)
 4. [Transformer-XL](https://github.com/kimiyoung/transformer-xl)
 5. [Tiny LSTM](https://github.com/pytorch/examples/tree/master/word_language_model)
+6. [KN-smoothed 5gram]
 
 ## Scripts
 
@@ -57,6 +59,7 @@ requirements. The following settings have worked for me in the past:
 | RNNG  | `12G`            | Slow   | No  |
 | Tiny  | `5G`             | Fast   | No  |
 | Trans | `5G`             | Fast   | Yes |
+| ngram | `5G`             | Fast   | No  |
 
 The speed is relative to the other models; for reference, Tiny LSTM takes under 1 minute to calculate
 surprisal for 900 simple sentences (~7 words each), while RNNG takes several hours. 
@@ -66,5 +69,6 @@ If using GPU, remember to request the appropriate resources in your `sbatch` cal
 ## Todo
 
 - [ ] add GPU functionality
+- [ ] add BERT (currently have working pipeline, but pre-processing is a little more involved)
 - [ ] compile stack-only ablated RNNG (Kuncoro et al. 2017) - raised [issue](https://github.com/clab/rnng/issues/17)
 - [ ] add environments to shared folder
