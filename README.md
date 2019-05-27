@@ -3,17 +3,20 @@
 This folder contains scripts and source code for obtaining surprisals 
 from the following pre-trained language models:
 
-1. [GRNN](https://github.com/facebookresearch/colorlessgreenRNNs) (recurrent neural network trained on Wikipedia)
-2. [JRNN](https://github.com/tensorflow/models/tree/master/research/lm_1b) (recurrent neural network trained on Billion Word Benchmark)
-3. [RNNG](https://github.com/clab/rnng) (recurrent neural network grammar)
+1. [GRNN](https://github.com/facebookresearch/colorlessgreenRNNs)
+2. [JRNN](https://github.com/tensorflow/models/tree/master/research/lm_1b)
+3. [RNNG](https://github.com/clab/rnng)
 4. [Transformer-XL](https://github.com/kimiyoung/transformer-xl)
 5. [Tiny LSTM](https://github.com/pytorch/examples/tree/master/word_language_model)
-6. [KN-smoothed 5gram]
+6. KN-smoothed 5-gram
+7. **coming soon**: [BERT](https://github.com/google-research/bert)
+
+![models](models.png)
 
 ## Scripts
 
 The scripts can be found in the `scripts` folder. Each script expects two arguments:
-$1 is the input file containing the sentences, and $2 is the output file to save the surprisals.
+`$1` is the input file containing the sentences, and `$2` is the output file to save the surprisals.
 
 The output file will have the following format:
 ```
@@ -22,7 +25,7 @@ token2 ...
 .      ...
 <eos>  0.0
 ```
-where the second column (separated by whitespace) gives the surprisal in bits of the token.
+where the second column (separated by `\t`) gives the surprisal in bits of the token.
 
 The input file should have each sentence on a new line. For every model except RNNG and Tiny LSTM,
 the sentence should end with an `<eos>` token. 
