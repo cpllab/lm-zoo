@@ -31,7 +31,7 @@ The input file should have each sentence on a new line. For every model except R
 the sentence should end with an `<eos>` token. 
 
 Note that the sentences are also expected to be **tokenized**.
-In the case of RNNG and Tiny LSTM, it also needs to be `UNK`-ified. 
+In the case of RNNG and Tiny LSTM, it also needs to be `UNK`ified. 
 An `UNK`ify function is provided in `rnng-incremental/get_raw.py`, which
 can be used in the following way:
 
@@ -39,6 +39,11 @@ can be used in the following way:
 python2 get_raw.py train.02-21 \
     RAW.txt > UNKIFIED.txt
 ```
+
+Note that the n-gram model is also **uncased**, so you'll have to convert your
+input-file to lowercase to avoid getting `UNK`s. When you run the n-gram model,
+you will also get an extra `.raw` output file that has the raw SRILM output with
+details about word probabilities and backoff.
 
 ## Dependencies
 

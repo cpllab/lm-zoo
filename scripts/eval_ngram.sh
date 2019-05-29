@@ -8,7 +8,7 @@ LMFILE="/om/group/cpl/language-models/kn-ngram/wiki_kn_5gram.lm"
 N=5
 
 echo "Calculating probabilities"
-singularity exec -B /om $CONTAINER $NGRAM ngram \
+singularity exec -B /om -B /om2 $CONTAINER $NGRAM ngram \
     -lm $LMFILE -ppl $1 -debug 2 -order $N \
     > ${2}.raw
 
