@@ -1,5 +1,7 @@
 # Pre-trained language model zoo
 
+![zoo](zoo.png)
+
 This folder contains scripts for obtaining surprisals from the following pre-trained language models:
 
 1. [GRNN](https://github.com/facebookresearch/colorlessgreenRNNs)
