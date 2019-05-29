@@ -16,7 +16,7 @@ The parameters are taken from the standard published version of each model unles
 
 ## Scripts
 
-Surprisals can be obtained from each model using the script `eval_MODEL.sh` in the `scripts` folder. 
+Surprisals can be obtained from each model using the script `eval_<MODEL>.sh` in the `scripts` folder.
 Each script expects two arguments: `$1` is the input file containing the sentences, and 
 `$2` is the output file to save the surprisals.
 
@@ -88,6 +88,8 @@ The speed is relative to the other models; for reference, Tiny LSTM takes under 
 surprisal for 900 simple sentences (~7 words each), while RNNG takes several hours. 
 
 If using GPU, remember to request the appropriate resources in your `sbatch` call.
+
+I may also add sample SLURM scripts if that would be helpful.
 
 ## TODO
 
