@@ -95,9 +95,23 @@ I may also add sample SLURM scripts if that would be helpful.
 
 ## TODO
 
+### Adding models
+
+- [ ] BERT (currently have working pipeline, but pre-processing is a little more involved)
+- [ ] action LSTM / stack-only ablated RNNG ([Kuncoro et al. 2017](https://aclweb.org/anthology/E17-1117)) - see [Issue #17](https://github.com/clab/rnng/issues/17)
+- [ ] [Ordered-Neurons LSTM](https://arxiv.org/pdf/1810.09536.pdf)
+- [ ] MomLSTM
+- [ ] PCFG
+- [ ] add models trained on non-English data
+
+### Improving existing models
+
 - [ ] add GPU functionality
-- [ ] add BERT (currently have working pipeline, but pre-processing is a little more involved)
-- [ ] compile stack-only ablated RNNG (Kuncoro et al. 2017) - raised [issue](https://github.com/clab/rnng/issues/17)
-- [ ] add Ordered-Neurons LSTM
+
+### Ease of use
+
+- [ ] add README to each model folder with hyperparameters, etc.
 - [ ] add script for converting file to lowercase (for n-gram)
+- [ ] add script for tokenization
+- [ ] add SLURM script to submit all models as job array
 - [ ] add environments to shared folder
