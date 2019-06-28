@@ -1,0 +1,3 @@
+[submodule "models/GRNN/colorlessgreenRNNs"]
+	path = models/GRNN/colorlessgreenRNNs
+	url = git://github.com/facebookresearch/colorlessgreenRNNs
