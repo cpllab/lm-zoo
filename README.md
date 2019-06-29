@@ -14,6 +14,17 @@ This folder contains scripts for obtaining surprisals from the following pre-tra
 
 ![models](models.png)
 
+The models use the following tokenizers:
+
+| Model | Tokenizer |
+| :---: | :--------------: |
+| GRNN  | [TreeTagger](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) |
+| JRNN  | [WMT11 tokenizer](http://statmt.org/wmt11/translation-task.html) |
+| RNNG  | [PTB tokenizer](https://www.nltk.org/_modules/nltk/tokenize/treebank.html) |
+| Tiny  | [PTB tokenizer](https://www.nltk.org/_modules/nltk/tokenize/treebank.html) |
+| Trans | Moses ([one implementation](https://github.com/OpenNMT/OpenNMT-py/blob/master/tools/tokenizer.perl)) |
+| ngram | [TreeTagger](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) |
+
 The parameters are taken from the standard published version of each model unless stated otherwise.
 
 ## Scripts
