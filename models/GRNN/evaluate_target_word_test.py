@@ -29,9 +29,9 @@ parser.add_argument('--sentences', type=int, default='-1',
                     help='number of sentences to generate from prefix')
 parser.add_argument('--temperature', type=float, default=1.0,
                     help='temperature - higher will increase diversity')
-parser.add_argument('--outf', type=str, default='generated.txt',
+parser.add_argument('--outf', type=argparse.FileType("w"), default='generated.txt',
                     help='output file for generated text')
-parser.add_argument('--prefixfile', type=str, default='',
+parser.add_argument('--prefixfile', type=str, default='-',
                     help='File with sentence prefix from which to generate continuations')
 parser.add_argument('--surprisalmode', type=bool, default=False,
                     help='Run in surprisal mode; specify sentence with --prefixfile')
@@ -49,7 +49,6 @@ if torch.cuda.is_available():
         torch.cuda.manual_seed(args.seed)
 
 with open(args.checkpoint, 'rb') as f:
-    print("Loading the model")
     if args.cuda:
         model = torch.load(f)
     else:
@@ -62,22 +61,11 @@ if args.cuda:
 else:
     model.cpu()
 
-print("#####HERE###")
-
-eval_batch_size = 1
-seq_len = 20
-
 dictionary = dictionary_corpus.Dictionary(args.data)
 vocab_size = len(dictionary)
-print("Vocab size", vocab_size)
-print("TESTING")
-
-# assuming the mask file contains one number per line indicating the index of the target word
-index_col = 0
-
 
 ###
-prefix = dictionary_corpus.tokenize(dictionary,args.prefixfile)
+prefix = dictionary_corpus.tokenize(dictionary, args.prefixfile)
 #print(prefix.shape)
 #for w in prefix:
 #    print(dictionary.idx2word[w.item()])
@@ -90,7 +78,7 @@ if not args.surprisalmode:
     ntokens = dictionary.__len__()
     device = torch.device("cuda" if args.cuda else "cpu")
     input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
-    with open(args.outf, 'w') as outf:
+    with args.outf as outf:
         for i in range(args.sentences):
             for word in prefix:
                 #print(word)
@@ -118,24 +106,28 @@ if args.surprisalmode:
         if w == eosidx:
             sentences.append(thesentence)
             thesentence = []
-    print(sentences)
     ntokens = dictionary.__len__()
     device = torch.device("cuda" if args.cuda else "cpu")
-    with open(args.outf, 'w') as outf:
-        for sentence in sentences:
+    with args.outf as outf:
+        # write header.
+        outf.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+
+        for i, sentence in enumerate(sentences):
             torch.manual_seed(args.seed)
             hidden = model.init_hidden(1)
             input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
             totalsurprisal = 0.0
             firstword = sentence[0]
             input.fill_(firstword.item())
-            outf.write(dictionary.idx2word[firstword.item()] + "\t0.00\n")
+
+            outf.write("%i\t%i\t%s\t%f\n" % (i, 0, dictionary.idx2word[firstword.item()], 0.))
+
             output, hidden = model(input,hidden)
             word_weights = output.squeeze().div(args.temperature).exp().cpu()
             word_surprisals = -1*torch.log2(word_weights/sum(word_weights))
-            for word in sentence[1:len(prefix)]:
+            for j, word in enumerate(sentence[1:len(prefix)]):
                   word_surprisal = word_surprisals[word].item()
-                  outf.write(dictionary.idx2word[word.item()] + "\t" + str(word_surprisal) + "\n")
+                  outf.write("%i\t%i\t%s\t%f\n" % (i, j + 1, dictionary.idx2word[word.item()], word_surprisal))
                   input.fill_(word.item())
                   output, hidden = model(input, hidden)
                   word_weights = output.squeeze().div(args.temperature).exp().cpu()

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+TOKENIZER_ROOT=/opt/tokenizer
+TOKENIZER=${TOKENIZER_ROOT}/utf8-tokenize.perl
+ABBR_LIST=${TOKENIZER_ROOT}/english-abbreviations
+
+# Tokenizer script operates on one sentence at a time. Input file has one
+# sentence per line.
+while read sentence; do
+  tokenized=$(echo "$sentence" | $TOKENIZER -e -a $ABBR_LIST $* | tr "\n" " ")
+  echo "$tokenized <eos>"
+done < "$1"

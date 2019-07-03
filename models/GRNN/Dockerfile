@@ -1,9 +1,15 @@
 FROM pytorch/pytorch:latest
 
+# Perl is required for TreeTagger tokenizer.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        perl && \
+        rm -rf /var/lib/apt/lists/*
+
 # Set up output volume.
 VOLUME /out
 
-RUN mkdir -p /opt/bin
+# Copy in tokenizer.
+COPY tokenizer /opt/tokenizer
 
 # Copy in source code + pretrained model.
 COPY colorlessgreenRNNs /opt/colorlessgreenRNNs
@@ -17,6 +23,7 @@ COPY vocab.txt /opt/colorlessgreenRNNs/data/wiki
 COPY evaluate_target_word_test.py /opt/colorlessgreenRNNs/src/language_models
 
 # Copy external-facing scripts
-COPY *.sh /opt/bin
+COPY bin /opt/bin
+ENV PATH "/opt/bin:${PATH}"
 
 WORKDIR /opt/bin
