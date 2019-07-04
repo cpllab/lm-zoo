@@ -6,6 +6,7 @@
 #
 
 import argparse
+import sys
 
 import torch
 import torch.nn as nn
@@ -44,7 +45,7 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 if torch.cuda.is_available():
     if not args.cuda:
-        print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+        sys.stderr.write("WARNING: You have a CUDA device, so you should probably run with --cuda\n")
     else:
         torch.cuda.manual_seed(args.seed)
 
