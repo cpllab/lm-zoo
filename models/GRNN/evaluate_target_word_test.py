@@ -120,14 +120,14 @@ if args.surprisalmode:
             firstword = sentence[0]
             input.fill_(firstword.item())
 
-            outf.write("%i\t%i\t%s\t%f\n" % (i, 0, dictionary.idx2word[firstword.item()], 0.))
+            outf.write("%i\t%i\t%s\t%f\n" % (i + 1, 1, dictionary.idx2word[firstword.item()], 0.))
 
             output, hidden = model(input,hidden)
             word_weights = output.squeeze().div(args.temperature).exp().cpu()
             word_surprisals = -1*torch.log2(word_weights/sum(word_weights))
             for j, word in enumerate(sentence[1:len(prefix)]):
                   word_surprisal = word_surprisals[word].item()
-                  outf.write("%i\t%i\t%s\t%f\n" % (i, j + 1, dictionary.idx2word[word.item()], word_surprisal))
+                  outf.write("%i\t%i\t%s\t%f\n" % (i + 1, j + 2, dictionary.idx2word[word.item()], word_surprisal))
                   input.fill_(word.item())
                   output, hidden = model(input, hidden)
                   word_weights = output.squeeze().div(args.temperature).exp().cpu()
