@@ -1,3 +1,9 @@
 [submodule "models/GRNN/colorlessgreenRNNs"]
 	path = models/GRNN/colorlessgreenRNNs
 	url = git://github.com/facebookresearch/colorlessgreenRNNs
+[submodule "models/RNNG/rnng"]
+	path = models/RNNG/rnng
+	url = git://github.com/clab/rnng
+[submodule "tools/gdown"]
+	path = tools/gdown
+	url = git://github.com/circulosmeos/gdown.pl

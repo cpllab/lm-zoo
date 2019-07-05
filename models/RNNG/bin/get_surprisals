@@ -1,0 +1,14 @@
+#!/bin/sh
+RNNG_ROOT="/opt/rnng"
+INPUT_FILE="$1"
+
+/opt/bin/tokenize $1 > /tmp/input_tokenized
+
+${RNNG_ROOT}/build/nt-parser/nt-parser-gen \
+    --dynet-mem 2000 \
+    -x -T ${RNNG_ROOT}/train_gen.oracle \
+    -v $1 \
+    -f $2 \
+    --clusters ${RNNG_ROOT}/clusters-train-berk.txt \
+    --input_dim 256 --lstm_input_dim 256 --hidden_dim 256 \
+    -m ${RNNG_ROOT}/ntparse_gen_D0.3_2_256_256_16_256-pid20681.params
