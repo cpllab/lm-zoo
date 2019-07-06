@@ -93,7 +93,7 @@ if __name__ == '__main__':
                         help='toggle cuda to run on GPU')
     parser.add_argument('--seed', '-seed', type=int, default=1111,
                         help='random seed')
-    parser.add_argument('--outputf', '-outputf', type=argparse.FileType("a"),
+    parser.add_argument('--outputf', '-outputf', type=argparse.FileType("w"),
                         help='output file for generated text')
     parser.add_argument('--inputf', '-inputf', type=str,
                         help='input file with each sentence on a new line')
