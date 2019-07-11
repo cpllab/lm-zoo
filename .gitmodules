@@ -1,6 +1,3 @@
-[submodule "models/RNNG/rnng"]
-	path = models/RNNG/rnng
-	url = git://github.com/clab/rnng
 [submodule "tools/gdown"]
 	path = tools/gdown
 	url = git://github.com/circulosmeos/gdown.pl

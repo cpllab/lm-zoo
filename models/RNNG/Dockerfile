@@ -23,7 +23,7 @@ RUN python -m nltk.downloader punkt
 VOLUME /out
 
 # Copy in source code + model parameters.
-COPY rnng /opt/rnng
+RUN git clone git://github.com/clab/rnng /opt/rnng
 COPY clusters-train-berk.txt /opt/rnng/clusters-train-berk.txt
 COPY gdown.pl .
 RUN perl gdown.pl https://drive.google.com/open?id=1E0lrR5sypgiYsYQmIdYN6TKVds22ApXa /opt/rnng/ntparse_gen_D0.3_2_256_256_16_256-pid64164.params && rm gdown.pl
