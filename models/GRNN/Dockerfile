@@ -12,9 +12,9 @@ VOLUME /out
 COPY tokenizer /opt/tokenizer
 
 # Copy in source code + pretrained model.
-# DEBUG: why isn't this working on Docker hub?
-RUN ls -lh colorlessgreenRNNs
 COPY colorlessgreenRNNs /opt/colorlessgreenRNNs
+# DEBUG: why isn't this working on Docker hub?
+RUN ls -lh /opt/colorlessgreenRNNs
 ADD https://dl.fbaipublicfiles.com/colorless-green-rnns/best-models/English/hidden650_batch128_dropout0.2_lr20.0.pt /opt/colorlessgreenRNNs/
 
 # Copy in Wikipedia vocab file.
@@ -23,6 +23,7 @@ COPY vocab.txt /opt/colorlessgreenRNNs/data/wiki/
 
 # Copy in custom file for surprisal evaluation
 COPY evaluate_target_word_test.py /opt/colorlessgreenRNNs/src/language_models/
+RUN ls -lh /opt/colorlessgreenRNNs
 
 # Copy external-facing scripts
 COPY bin /opt/bin
