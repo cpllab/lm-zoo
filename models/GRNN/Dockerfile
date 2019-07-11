@@ -12,6 +12,8 @@ VOLUME /out
 COPY tokenizer /opt/tokenizer
 
 # Copy in source code + pretrained model.
+# DEBUG: why isn't this working on Docker hub?
+RUN ls -lh colorlessgreenRNNs
 COPY colorlessgreenRNNs /opt/colorlessgreenRNNs
 ADD https://dl.fbaipublicfiles.com/colorless-green-rnns/best-models/English/hidden650_batch128_dropout0.2_lr20.0.pt /opt/colorlessgreenRNNs/
 
