@@ -12,6 +12,7 @@ VOLUME /out
 COPY tokenizer /opt/tokenizer
 
 # Copy in source code + pretrained model.
+RUN git submodule update --init --recursive
 COPY colorlessgreenRNNs /opt/colorlessgreenRNNs
 # DEBUG: why isn't this working on Docker hub?
 RUN ls -lh /opt/colorlessgreenRNNs
