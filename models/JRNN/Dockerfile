@@ -22,7 +22,7 @@ ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt
 ADD http://download.tensorflow.org/models/LM_LSTM_CNN/vocab-2016-09-10.txt /opt/lm_1b
 
 # Copy tokenizer.
-COPY tokenizer.perl /opt/
+COPY tokenizer /opt/tokenizer
 
 # Copy external-facing scripts
 COPY bin /opt/bin
