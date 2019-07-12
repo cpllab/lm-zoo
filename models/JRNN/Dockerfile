@@ -24,6 +24,9 @@ ADD http://download.tensorflow.org/models/LM_LSTM_CNN/vocab-2016-09-10.txt /opt/
 # Copy tokenizer.
 COPY tokenizer /opt/tokenizer
 
+# Copy in test file.
+COPY test.py /opt/test.py
+
 # Copy external-facing scripts
 COPY bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
