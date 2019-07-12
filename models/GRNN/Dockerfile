@@ -24,6 +24,9 @@ COPY vocab.txt /opt/colorlessgreenRNNs/data/wiki/
 # Copy in custom file for surprisal evaluation
 COPY evaluate_target_word_test.py /opt/colorlessgreenRNNs/src/language_models/
 
+# Copy in image test file.
+COPY test.py /opt/test.py
+
 # Copy external-facing scripts
 COPY bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
