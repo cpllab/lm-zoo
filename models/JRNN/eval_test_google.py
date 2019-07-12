@@ -87,6 +87,10 @@ def _EvalTestSents(input_file, vocab, output_file):
 
     result = []
 
+    # print CSV header
+    f = sys.stdout if output_file == "-" else open(output_file, "w")
+    f.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+
     for j in range(len(sents)):
 
         # Just so we know where things stand
@@ -122,14 +126,12 @@ def _EvalTestSents(input_file, vocab, output_file):
 
             surprisal = -1 * np.log2(softmax[0][sent[n+1]])
             total_surprisal += surprisal
-            result.append(vocab.id_to_word(sent[n+1])+"\t"+str(surprisal))
 
-        # Add EOS token and total sentence surprisal to result
-        result.append("<eos>\t0.0")
+            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 1, vocab.id_to_word(sent[n+1]), str(surprisal)))
 
     # Write result to output file
-    f = sys.stdout if output_file == "-" else open(output_file, w)
-    f.writelines([x + "\n" for x in result])
+    if output_file != "-":
+      f.close()
 
 def main(unused_argv):
   vocab = data_utils.CharsVocabulary(FLAGS.vocab_file, MAX_WORD_LEN)
