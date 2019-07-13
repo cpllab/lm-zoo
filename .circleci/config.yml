@@ -1,3 +1,9 @@
+docker_login: &docker_login
+    name: Docker login
+    command: |
+        docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID $DOCKER_HUB_PWD
+
+
 version: 2
 jobs:
     grnn:
@@ -6,10 +12,8 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
-            - &docker_login_run run:
-                name: Docker login
-                command: |
-                    docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID $DOCKER_HUB_PWD
+            - run:
+                <<: *docker_login
             - run:
                 name: Build
                 working_directory: models/GRNN
@@ -29,7 +33,8 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
-            *docker_login_run
+            - run:
+                <<: *docker_login
             - run:
                 name: Build
                 working_directory: models/JRNN
