@@ -6,6 +6,18 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
+            - &docker_login_run run:
+                name: Docker login
+                command: |
+                    docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID $DOCKER_HUB_PWD
+            - run:
+                name: Build
+                working_directory: models/GRNN
+                command: docker-compose -f docker-compose.test.yml build
+            - run:
+                name: Push to Docker Hub
+                working_directory: models/GRNN
+                command: docker-compose -f docker-compose.test.yml push
             - run:
                 name: Run tests
                 working_directory: models/GRNN
@@ -17,6 +29,15 @@ jobs:
         steps:
             - checkout
             - setup_remote_docker
+            *docker_login_run
+            - run:
+                name: Build
+                working_directory: models/JRNN
+                command: docker-compose -f docker-compose.test.yml build
+            - run:
+                name: Push to Docker Hub
+                working_directory: models/JRNN
+                command: docker-compose -f docker-compose.test.yml push
             - run:
                 name: Run tests
                 working_directory: models/JRNN
