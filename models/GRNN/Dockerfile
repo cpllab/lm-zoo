@@ -5,6 +5,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         perl && \
         rm -rf /var/lib/apt/lists/*
 
+# Add test dependencies.
+# TODO: better to handle in a docker-compose setup, I think
+RUN pip install nose rednose
+ENV NOSE_REDNOSE 1
+
 # Set up output volume.
 VOLUME /out
 
