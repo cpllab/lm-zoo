@@ -1,7 +1,7 @@
 docker_login: &docker_login
     name: Docker login
     command: |
-        docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID $DOCKER_HUB_PWD
+        docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
 
 
 version: 2
