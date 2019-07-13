@@ -50,9 +50,55 @@ jobs:
                 working_directory: models/JRNN
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
+    rnng:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                <<: *docker_login
+            - run:
+                name: Build
+                working_directory: models/RNNG
+                command: docker build -t cpllab/language-models:rnng .
+            - run:
+                name: Push to Docker Hub
+                working_directory: models/RNNG
+                command: docker push cpllab/language-models:rnng
+            # - run:
+            #     name: Run tests
+            #     working_directory: models/JRNN
+            #     command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
+    transformer-xl:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                <<: *docker_login
+            - run:
+                name: Build
+                working_directory: models/transformer-xl
+                command: docker build -t cpllab/language-models:transformer-xl .
+            - run:
+                name: Push to Docker Hub
+                working_directory: models/transformer-xl
+                command: docker push cpllab/language-models:transformer-xl
+            # - run:
+            #     name: Run tests
+            #     working_directory: models/JRNN
+            #     command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
 workflows:
     version: 2
     all_tests:
         jobs:
             - grnn
             - jrnn
+            - rnng
+            - transformer-xl
