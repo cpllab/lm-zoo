@@ -17,11 +17,11 @@ jobs:
             - run:
                 name: Build
                 working_directory: models/GRNN
-                command: docker-compose -f docker-compose.test.yml build
+                command: docker build -t cpllab/language-models:grnn .
             - run:
                 name: Push to Docker Hub
                 working_directory: models/GRNN
-                command: docker-compose -f docker-compose.test.yml push
+                command: docker push cpllab/language-models:grnn
             - run:
                 name: Run tests
                 working_directory: models/GRNN
@@ -38,11 +38,11 @@ jobs:
             - run:
                 name: Build
                 working_directory: models/JRNN
-                command: docker-compose -f docker-compose.test.yml build
+                command: docker build -t cpllab/language-models:jrnn .
             - run:
                 name: Push to Docker Hub
                 working_directory: models/JRNN
-                command: docker-compose -f docker-compose.test.yml push
+                command: docker push cpllab/language-models:jrnn
             - run:
                 name: Run tests
                 working_directory: models/JRNN
