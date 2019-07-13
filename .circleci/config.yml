@@ -2,7 +2,7 @@ version: 2
 jobs:
     grnn:
         docker:
-            - image: docker/compose
+            - image: circleci/buildpack-deps
         steps:
             - checkout
             - setup_remote_docker
@@ -13,7 +13,7 @@ jobs:
 
     jrnn:
         docker:
-            - image: docker/compose
+            - image: circleci/buildpack-deps
         steps:
             - checkout
             - setup_remote_docker
