@@ -7,8 +7,9 @@ docker_login: &docker_login
 version: 2
 jobs:
     grnn:
-        docker:
-            - image: circleci/buildpack-deps
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
         steps:
             - checkout
             - setup_remote_docker
@@ -28,8 +29,9 @@ jobs:
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
     jrnn:
-        docker:
-            - image: circleci/buildpack-deps
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
         steps:
             - checkout
             - setup_remote_docker
