@@ -2,7 +2,7 @@
 
 ![zoo](zoo.png)
 
-[![CircleCI](https://circleci.com/gh/cpllab/language-models/tree/docker.svg?style=svg)](https://circleci.com/gh/cpllab/language-models/tree/docker)
+[![CircleCI](https://circleci.com/gh/cpllab/language-models.svg?style=svg&circle-token=d907824249db5ad63c03bfcc3b403c6d9ad845e2)](https://circleci.com/gh/cpllab/language-models)
 
 This folder contains scripts for obtaining surprisals from the following pre-trained language models:
 
