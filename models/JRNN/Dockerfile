@@ -6,20 +6,23 @@ VOLUME /out
 # Copy in source code + pretrained model.
 RUN mkdir -p /opt/lm_1b
 COPY lm_1b_eval.py data_utils.py eval_test_google.py /opt/lm_1b/
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/graph-2016-09-10.pbtxt /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-base /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-char-embedding /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-lstm /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax0 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax1 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax2 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax3 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax4 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax5 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax6 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax7 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax8 /opt/lm_1b
-ADD http://download.tensorflow.org/models/LM_LSTM_CNN/vocab-2016-09-10.txt /opt/lm_1b
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+RUN pushd /opt/lm_1b && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/graph-2016-09-10.pbtxt && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-base && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-char-embedding && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-lstm && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax0 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax1 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax2 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax3 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax4 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax5 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax6 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax7 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax8 && \
+        curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/vocab-2016-09-10.txt && \
+        apt-get remove -y curl && apt-get autoremove -y && popd
 
 # Copy tokenizer.
 COPY tokenizer /opt/tokenizer
