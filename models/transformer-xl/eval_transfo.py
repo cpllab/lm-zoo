@@ -83,7 +83,7 @@ def main(model, cuda, seed, outputf, inputf):
             surprisals, sent_tokens = eval_sentence(sentence, *eval_args)
             # write surprisals for sentence (append to outputf)
             for j in range(len(sent_tokens)):
-                f.write("%i\t%i\t%s\t%f" % (i + 1, j + 1, sent_tokens[j], surprisals[j]))
+                f.write("%i\t%i\t%s\t%f\n" % (i + 1, j + 1, sent_tokens[j], surprisals[j]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Mask-based evaluation: '
