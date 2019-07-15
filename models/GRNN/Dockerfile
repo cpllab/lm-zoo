@@ -20,7 +20,7 @@ COPY tokenizer /opt/tokenizer
 RUN git clone git://github.com/facebookresearch/colorlessgreenRNNs /opt/colorlessgreenRNNs \
         && cd /opt/colorlessgreenRNNs \
         && git checkout 4ffcabc991c866608aeed2ba35059a458ff2845f
-ADD https://dl.fbaipublicfiles.com/colorless-green-rnns/best-models/English/hidden650_batch128_dropout0.2_lr20.0.pt /opt/colorlessgreenRNNs/
+RUN curl -so /opt/colorlessgreenRNNS/hidden650_batch128_dropout0.2_lr20.0.pt https://dl.fbaipublicfiles.com/colorless-green-rnns/best-models/English/hidden650_batch128_dropout0.2_lr20.0.pt
 
 # Copy in Wikipedia vocab file.
 RUN mkdir -p /opt/colorlessgreenRNNs/data/wiki
