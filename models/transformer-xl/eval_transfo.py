@@ -76,12 +76,14 @@ def main(model, cuda, seed, outputf, inputf):
     sentences = readlines(inputf)
 
     logger.info('Getting surprisals...')
-    for sentence in sentences:
-        surprisals, sent_tokens = eval_sentence(sentence, *eval_args)
-        # write surprisals for sentence (append to outputf)
-        with outputf as f:
-            for i in range(len(sent_tokens)):
-                f.write(sent_tokens[i] + '\t' + str(surprisals[i]) + '\n')
+    with outputf as f:
+        f.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+
+        for i, sentence in enumerate(sentences):
+            surprisals, sent_tokens = eval_sentence(sentence, *eval_args)
+            # write surprisals for sentence (append to outputf)
+            for j in range(len(sent_tokens)):
+                f.write("%i\t%i\t%s\t%f" % (i + 1, j + 1, sent_tokens[j], surprisals[j]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Mask-based evaluation: '
