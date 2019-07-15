@@ -5,5 +5,4 @@ tokenize "$1" > /tmp/tokenized_input
 python ${TRANS_ROOT}/eval_transfo.py \
     --model ${TRANS_ROOT}/transfo-xl-wt103 \
     --inputf /tmp/tokenized_input \
-    --outputf - \
-    --cuda
+    --outputf -
