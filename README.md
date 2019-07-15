@@ -2,6 +2,8 @@
 
 ![zoo](zoo.png)
 
+[![CircleCI](https://circleci.com/gh/cpllab/language-models/tree/docker.svg?style=svg)](https://circleci.com/gh/cpllab/language-models/tree/docker)
+
 This folder contains scripts for obtaining surprisals from the following pre-trained language models:
 
 1. [GRNN](https://github.com/facebookresearch/colorlessgreenRNNs)
@@ -30,7 +32,7 @@ The parameters are taken from the standard published version of each model unles
 ## Scripts
 
 Surprisals can be obtained from each model using the script `eval_<MODEL>.sh` in the `scripts` folder.
-Each script expects two arguments: `$1` is the input file containing the sentences, and 
+Each script expects two arguments: `$1` is the input file containing the sentences, and
 `$2` is the output file to save the surprisals.
 
 ### Input file format
@@ -38,10 +40,10 @@ Each script expects two arguments: `$1` is the input file containing the sentenc
 The input file should have each sentence on a new line, and each sentence should be **tokenized**.
 
 There are also some model-specific constraints, although I may try to streamline these later:
-* For every model except RNNG and Tiny LSTM, the sentence should end with an `<eos>` token. 
-* The n-gram model is **uncased**, so you'll have to convert your input file to lowercase 
+* For every model except RNNG and Tiny LSTM, the sentence should end with an `<eos>` token.
+* The n-gram model is **uncased**, so you'll have to convert your input file to lowercase
   to avoid getting `unk`s. I am working on adding a script to do this.
-* For RNNG and Tiny LSTM, the input must be `unk`ified. An `unk`ify function is provided in 
+* For RNNG and Tiny LSTM, the input must be `unk`ified. An `unk`ify function is provided in
   `rnng-incremental/get_raw.py`, which can be used in the following way:
 ```bash
 python2 get_raw.py train.02-21 \
@@ -77,7 +79,7 @@ a Singularity image available with the relevant C++ libraries.
 ### n-gram
 The dependencies for n-gram (SRILM) are also set in a Singularity image called in the script.
 However, by default, you will also need `numpy` to convert the raw SRILM output to the standard
-format. If you don't already have an active conda environment (which has `numpy`), simply use the command 
+format. If you don't already have an active conda environment (which has `numpy`), simply use the command
 `module add openmind/anaconda` before running the n-gram script.
 
 Note that I did not add this line to the top of the `eval_ngram.sh` file because users may want
@@ -98,7 +100,7 @@ requirements. The following settings have worked for me in the past:
 | ngram | `5G`             | Fast   | No  |
 
 The speed is relative to the other models; for reference, Tiny LSTM takes under 1 minute to calculate
-surprisal for 900 simple sentences (~7 words each), while RNNG takes several hours. 
+surprisal for 900 simple sentences (~7 words each), while RNNG takes several hours.
 
 If using GPU, remember to request the appropriate resources in your `sbatch` call.
 
