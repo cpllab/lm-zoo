@@ -8,9 +8,9 @@ VOLUME /out
 # Download source code and pretrained model.
 RUN pip install pytorch-pretrained-bert
 RUN mkdir -p /opt/transformer-xl/transfo-xl-wt103
-RUN curl -o /opt/transformer-xl/transfo-xl-wt103/pytorch_model.bin https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-pytorch_model.bin
-RUN curl -o /opt/transformer-xl/transfo-xl-wt103/vocab.bin https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-vocab.bin
-RUN curl -o /opt/transformer-xl/transfo-xl-wt103/config.json https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-config.json
+RUN curl -so /opt/transformer-xl/transfo-xl-wt103/pytorch_model.bin https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-pytorch_model.bin
+RUN curl -so /opt/transformer-xl/transfo-xl-wt103/vocab.bin https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-vocab.bin
+RUN curl -so /opt/transformer-xl/transfo-xl-wt103/config.json https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-config.json
 
 # Copy in custom file for surprisal evaluation
 COPY eval_transfo.py /opt/transformer-xl
