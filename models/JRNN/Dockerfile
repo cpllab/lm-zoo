@@ -7,7 +7,7 @@ VOLUME /out
 RUN mkdir -p /opt/lm_1b
 COPY lm_1b_eval.py data_utils.py eval_test_google.py /opt/lm_1b/
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-RUN pushd /opt/lm_1b && \
+RUN cd /opt/lm_1b && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/graph-2016-09-10.pbtxt && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-base && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-char-embedding && \
@@ -22,7 +22,7 @@ RUN pushd /opt/lm_1b && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax7 && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax8 && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/vocab-2016-09-10.txt && \
-        apt-get remove -y curl && apt-get autoremove -y && popd
+        apt-get remove -y curl && apt-get autoremove -y && cd -
 
 # Copy tokenizer.
 COPY tokenizer /opt/tokenizer
