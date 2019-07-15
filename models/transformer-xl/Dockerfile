@@ -15,6 +15,9 @@ ADD https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-config.
 # Copy in custom file for surprisal evaluation
 COPY eval_transfo.py /opt/transformer-xl
 
+# Copy in test file
+COPY test.py /opt/test.py
+
 # Copy external-facing scripts
 COPY bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
