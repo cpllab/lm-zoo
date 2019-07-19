@@ -15,10 +15,6 @@ RUN python -m nltk.downloader punkt
 VOLUME /out
 
 # Copy in source code + model parameters.
-ADD id_rsa /root/.ssh/id_rsa
-RUN chown -R root:root /root/.ssh
-RUN chmod -R 600 /root/.ssh
-RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
 RUN git clone git@github.com:cpllab/rnng-incremental.git /opt/rnng-incremental
 RUN cd /opt/rnng-incremental && git checkout docker && cd -
 
