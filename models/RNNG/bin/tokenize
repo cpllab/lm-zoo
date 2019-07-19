@@ -2,7 +2,9 @@
 
 import sys
 import codecs
-from nltk import word_tokenize
+from nltk.tokenize import TreebankWordTokenizer
+
+tokenizer = TreebankWordTokenizer()
 
 for line in codecs.open(sys.argv[1], encoding="utf-8"):
-    print(" ".join(word_tokenize(line)))
+    print(" ".join(tokenizer.tokenize(line.strip())))

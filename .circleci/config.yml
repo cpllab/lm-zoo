@@ -56,6 +56,9 @@ jobs:
             - checkout
             - run:
                 <<: *docker_login
+            - add_ssh_keys:
+                fingerprints:
+                    - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
             - run:
                 name: Build
                 working_directory: models/RNNG
@@ -64,10 +67,10 @@ jobs:
                 name: Push to Docker Hub
                 working_directory: models/RNNG
                 command: docker push cpllab/language-models:rnng
-            # - run:
-            #     name: Run tests
-            #     working_directory: models/JRNN
-            #     command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+            - run:
+                name: Run tests
+                working_directory: models/RNNG
+                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
     transformer-xl:
         machine:
