@@ -15,8 +15,8 @@ RUN python -m nltk.downloader punkt
 VOLUME /out
 
 # Copy in source code + model parameters.
-ARG CPLLAB_GITHUB_TOKEN
-RUN git clone https://${CPLLAB_GITHUB_TOKEN}@github.com/cpllab/rnng-incremental.git /opt/rnng-incremental
+RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config
+RUN git clone cpl@45.79.223.150:rnng-incremental.git /opt/rnng-incremental
 RUN cd /opt/rnng-incremental && git checkout docker && cd -
 
 # Compile source.
