@@ -62,9 +62,7 @@ jobs:
             - run:
                 name: Build
                 working_directory: models/RNNG
-                environment:
-                    CPLLAB_GITHUB_TOKEN: $CPLLAB_GITHUB_TOKEN
-                command: docker build -t cpllab/language-models:rnng --build-arg CPLLAB_GITHUB_TOKEN .
+                command: docker build -t cpllab/language-models:rnng .
             - run:
                 name: Push to Docker Hub
                 working_directory: models/RNNG
