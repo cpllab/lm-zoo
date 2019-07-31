@@ -16,11 +16,9 @@ VOLUME /out
 
 # Build arguments provide SSH keys for accessing private CPL data.
 ARG CPL_SSH_PRV_KEY
-ARG CPL_SSH_PUB_KEY
 RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config \
       && echo "$CPL_SSH_PRV_KEY" > /root/.ssh/id_rsa \
-      && echo "$CPL_SSH_PUB_KEY" > /root/.ssh/id_rsa.pub \
-      && chmod 600 /root/.ssh/id_rsa*
+      && chmod 600 /root/.ssh/id_rsa
 
 # Copy in source code + model parameters.
 RUN git clone cpl@45.79.223.150:rnng-incremental.git /opt/rnng-incremental
