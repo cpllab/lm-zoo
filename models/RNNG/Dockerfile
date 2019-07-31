@@ -7,9 +7,8 @@ FROM continuumio/anaconda
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake zlib1g-dev
 
 # Install NLTK for tokenization and Eigen for modeling.
-RUN conda install --quiet --yes nltk eigen boost \
-  && conda clean --all -f -y
-RUN python -m nltk.downloader punkt
+# TODO Conda cmd only available in login shell .. ?
+RUN bash -lc "conda install --quiet --yes nltk eigen boost && conda clean --all -f -y"
 
 # Set up output volume.
 VOLUME /out
