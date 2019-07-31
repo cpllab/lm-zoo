@@ -14,8 +14,15 @@ RUN python -m nltk.downloader punkt
 # Set up output volume.
 VOLUME /out
 
+# Build arguments provide SSH keys for accessing private CPL data.
+ARG CPL_SSH_PRV_KEY
+ARG CPL_SSH_PUB_KEY
+RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config \
+      && echo "$CPL_SSH_PRV_KEY" > /root/.ssh/id_rsa \
+      && echo "$CPL_SSH_PUB_KEY" > /root/.ssh/id_rsa.pub \
+      && chmod 600 /root/.ssh/id_rsa*
+
 # Copy in source code + model parameters.
-RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config
 RUN git clone cpl@45.79.223.150:rnng-incremental.git /opt/rnng-incremental
 RUN cd /opt/rnng-incremental && git checkout docker && cd -
 
@@ -29,6 +36,9 @@ RUN mkdir build && cd build \
 RUN scp -o "StrictHostKeyChecking=no" \
       cpl@45.79.223.150:/home/cpl/rnng-incremental/{ntparse_gen_D0.3_2_256_256_16_256-pid20681.params,train_gen.oracle} /opt/rnng-incremental/
 COPY vocab.pkl /opt/rnng-incremental/
+
+# Remove SSH information.
+RUN rm -rf /root/.ssh
 
 # Copy external-facing scripts
 COPY bin /opt/bin

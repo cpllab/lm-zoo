@@ -62,7 +62,7 @@ jobs:
             - run:
                 name: Build
                 working_directory: models/RNNG
-                command: docker build -t cpllab/language-models:rnng .
+                command: docker build -t cpllab/language-models:rnng --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa)" --build-arg CPL_SSH_PUB_KEY="$(cat ~/.ssh/id_rsa.pub)" .
             - run:
                 name: Push to Docker Hub
                 working_directory: models/RNNG
