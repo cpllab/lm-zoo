@@ -6,9 +6,12 @@ FROM continuumio/anaconda
 # Anaconda install instead.
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake zlib1g-dev
 
+# TODO Conda cmd not on path .. ? update this
+ENV PATH "/opt/conda/bin:${PATH}"
+
 # Install NLTK for tokenization and Eigen for modeling.
-# TODO Conda cmd only available in login shell .. ?
-RUN bash -lc "conda install --quiet --yes nltk eigen boost && conda clean --all -f -y"
+RUN conda install --quiet --yes nltk eigen boost \
+      && conda clean --all -f -y
 
 # Set up output volume.
 VOLUME /out
