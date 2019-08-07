@@ -11,6 +11,7 @@ from nose.tools import *
 
 TEST_STRING = """This is a test sentence.
 This is another test sentence.
+This is a third sentence with an aorsnarnt token.
 """
 
 SURPRISAL_RE = re.compile(r"sentence_id\ttoken_id\ttoken\tsurprisal\n"
@@ -32,11 +33,17 @@ class LMTest(unittest.TestCase):
             print(cls.tokenized_output)
             print("\n")
 
+            print("== unkify %s" % text_f.name)
+            cls.unkified_output = subprocess.check_output(["unkify", text_f.name]).decode("utf-8")
+            print(cls.unkified_output)
+            print("\n")
+
             print("== get_surprisals %s" % text_f.name)
             cls.surprisals_output = subprocess.check_output(["get_surprisals", text_f.name]).decode("utf-8")
             print(cls.surprisals_output)
 
         cls.tokenized_lines = [line.strip() for line in cls.tokenized_output.strip().split("\n")]
+        cls.unkified_lines = [line.strip() for line in cls.unkified_output.strip().split("\n")]
         cls.surprisal_lines = [line.strip().split("\t") for line in cls.surprisals_output.strip().split("\n")]
 
     @property
@@ -54,13 +61,28 @@ class LMTest(unittest.TestCase):
         surprisals = self._parsed_surprisals
         for i, tokenized_line in enumerate(self.tokenized_lines):
             tokens = tokenized_line.split(" ")
+            if i == 2:
+                # skip this line -- we know it has an unk
+                continue
+
             eq_(tokens, [surprisals[i + 1][j + 1][0] for j in range(len(tokens))], "Token sequences should match exactly")
+
+    def test_unkification(self):
+        # same number of lines as tokenized sentences
+        eq_(len(self.unkified_lines), len(self.tokenized_lines))
+
+        # unkified sequences should match tokenized sequences in length
+        for unk_line, tok_line in zip(self.unkified_lines, self.tokenized_lines):
+            eq_(len(unk_line.split(" ")), len(tok_line.split(" ")))
+
+        # dummy token should definitely be unk for any model!
+        eq_(self.unkified_lines[2].split(" ")[7], "1")
 
     def test_surprisal_output_format(self):
         ok_(SURPRISAL_RE.match(self.surprisals_output))
 
     def test_surprisal_parse(self):
-        eq_(set(int(line[0]) for line in self.surprisal_lines[1:]), {1, 2}, "Both sentences retained")
+        eq_(set(int(line[0]) for line in self.surprisal_lines[1:]), {1, 2, 3}, "Sentences retained")
         for line in self.surprisal_lines[1:]:
             # attempt to parse surprisal
             surp = float(line[3])
