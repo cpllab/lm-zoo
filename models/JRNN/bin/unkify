@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-GRNN_ROOT = "/opt/lm_1b"
-VOCAB_PATH = GRNN_ROOT + "/vocab-2016-09-10.txt"
+JRNN_ROOT = "/opt/lm_1b"
+VOCAB_PATH = JRNN_ROOT + "/vocab-2016-09-10.txt"
 
 import subprocess
 import sys
 
 
 with open(VOCAB_PATH, "r") as vocab_f:
-    vocab = set(line.strip() for line in vocab_f.strip().split("\n"))
+    vocab = set(line.strip() for line in vocab_f if line.strip())
 
 
 tokenized = subprocess.check_output(["tokenize", sys.argv[1]]).decode("utf-8").strip()
