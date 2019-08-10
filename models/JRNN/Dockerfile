@@ -30,7 +30,9 @@ RUN cd /opt/lm_1b && \
 # Copy tokenizer.
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 
-# Copy in test file.
+# Copy in test dependencies.
+RUN pip install nose rednose
+ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
 # Copy external-facing scripts

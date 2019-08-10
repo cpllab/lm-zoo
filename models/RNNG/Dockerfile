@@ -48,7 +48,8 @@ COPY ${MODEL_ROOT}/bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
 
 # Copy test dependencies.
-RUN pip install nose
+RUN pip install nose rednose
+ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
 ENV LD_LIBRARY_PATH "/opt/conda/lib:${LD_LIBRARY_PATH}"
