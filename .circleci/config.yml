@@ -16,15 +16,13 @@ jobs:
                 <<: *docker_login
             - run:
                 name: Build
-                working_directory: models/GRNN
-                command: docker build -t cpllab/language-models:grnn .
+                command: docker build -t cpllab/language-models:grnn -f models/GRNN/Dockerfile .
             - run:
                 name: Run tests
                 working_directory: models/GRNN
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
             - run:
                 name: Push to Docker Hub
-                working_directory: models/GRNN
                 command: docker push cpllab/language-models:grnn
 
     jrnn:
@@ -37,11 +35,9 @@ jobs:
                 <<: *docker_login
             - run:
                 name: Build
-                working_directory: models/JRNN
-                command: docker build -t cpllab/language-models:jrnn .
+                command: docker build -t cpllab/language-models:jrnn -f models/JRNN/Dockerfile .
             - run:
                 name: Push to Docker Hub
-                working_directory: models/JRNN
                 command: docker push cpllab/language-models:jrnn
             - run:
                 name: Run tests
@@ -61,11 +57,9 @@ jobs:
                     - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
             - run:
                 name: Build
-                working_directory: models/RNNG
-                command: docker build -t cpllab/language-models:rnng --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
+                command: docker build -t cpllab/language-models:rnng -f models/RNNG/Dockerfile --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
             - run:
                 name: Push to Docker Hub
-                working_directory: models/RNNG
                 command: docker push cpllab/language-models:rnng
             - run:
                 name: Run tests
@@ -82,15 +76,13 @@ jobs:
                 <<: *docker_login
             - run:
                 name: Build
-                working_directory: models/transformer-xl
-                command: docker build -t cpllab/language-models:transformer-xl .
+                command: docker build -t cpllab/language-models:transformer-xl -f models/transformer-xl/Dockerfile .
             - run:
                 name: Run tests
                 working_directory: models/transformer-xl
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
             - run:
                 name: Push to Docker Hub
-                working_directory: models/transformer-xl
                 command: docker push cpllab/language-models:transformer-xl
 
 workflows:

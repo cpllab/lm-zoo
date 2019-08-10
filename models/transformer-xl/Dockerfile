@@ -1,5 +1,8 @@
 FROM pytorch/pytorch:latest
 
+# Root of model directory relative to the build context.
+ARG MODEL_ROOT=models/transformer-xl
+
 # Set up output volume.
 VOLUME /out
 
@@ -13,7 +16,7 @@ RUN curl -so /opt/transformer-xl/transfo-xl-wt103/vocab.bin https://s3.amazonaws
 RUN curl -so /opt/transformer-xl/transfo-xl-wt103/config.json https://s3.amazonaws.com/models.huggingface.co/bert/transfo-xl-wt103-config.json
 
 # Copy in custom file for surprisal evaluation
-COPY eval_transfo.py /opt/transformer-xl
+COPY ${MODEL_ROOT}/eval_transfo.py /opt/transformer-xl
 
 # Test dependencies
 RUN pip install nose rednose
@@ -21,7 +24,7 @@ ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
 # Copy external-facing scripts
-COPY bin /opt/bin
+COPY ${MODEL_ROOT}/bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
 
 WORKDIR /opt/bin

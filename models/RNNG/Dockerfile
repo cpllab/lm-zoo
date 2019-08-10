@@ -1,5 +1,8 @@
 FROM continuumio/anaconda
 
+# Root of model directory relative to build context.
+ARG MODEL_ROOT=models/RNNG
+
 # Install Boost dependency.
 # Need to build manually -- the standard Debian boost will pull
 # in another install of Python. We'll link Boost to the existing
@@ -35,13 +38,13 @@ RUN mkdir build && cd build \
 # Add parameters + resources.
 RUN scp -o "StrictHostKeyChecking=no" \
       cpl@45.79.223.150:/home/cpl/rnng-incremental/{ntparse_gen_D0.3_2_256_256_16_256-pid20681.params,train_gen.oracle} /opt/rnng-incremental/
-COPY vocab.pkl /opt/rnng-incremental/
+COPY ${MODEL_ROOT}/vocab.pkl /opt/rnng-incremental/
 
 # Remove SSH information.
 RUN rm -rf /root/.ssh
 
 # Copy external-facing scripts
-COPY bin /opt/bin
+COPY ${MODEL_ROOT}/bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
 
 # Copy test dependencies.
