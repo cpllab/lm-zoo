@@ -109,9 +109,10 @@ jobs:
 
 workflows:
     version: 2
-    all_tests:
+    build_all:
         jobs:
             - grnn
             - jrnn
             - rnng
+            - action-lstm
             - transformer-xl
