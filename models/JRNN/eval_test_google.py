@@ -127,7 +127,7 @@ def _EvalTestSents(input_file, vocab, output_file):
             surprisal = -1 * np.log2(softmax[0][sent[n+1]])
             total_surprisal += surprisal
 
-            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 1, vocab.id_to_word(sent[n+1]), str(surprisal)))
+            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 1, vocab.id_to_word(sent[n+1]), surprisal))
 
     # Write result to output file
     if output_file != "-":
