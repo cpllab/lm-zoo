@@ -110,10 +110,10 @@ def _EvalTestSents(input_file, vocab, output_file):
         total_surprisal = 0
 
         # First word in the sentence has a dummy surprisal of 0
-        result.append(vocab.id_to_word(sent[0]) + "\t0.00")
+        result.append("%i\t1\t%s\t0.00\n" % (j + 1, vocab.id_to_word(sent[0])))
         sess.run(t['states_init'])
 
-        for n in range(len(sents[j].split(" "))-2):
+        for n in range(len(sents[j].split(" ")) - 1):
             inputs[0, 0] = samples[0]
             char_ids_inputs[0, 0, :] = char_ids_samples[0]
             samples = samples[1:]
@@ -127,9 +127,11 @@ def _EvalTestSents(input_file, vocab, output_file):
             surprisal = -1 * np.log2(softmax[0][sent[n+1]])
             total_surprisal += surprisal
 
-            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 1, vocab.id_to_word(sent[n+1]), surprisal))
+            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 2, vocab.id_to_word(sent[n+1]), surprisal))
 
     # Write result to output file
+    for line in result:
+      f.write(line)
     if output_file != "-":
       f.close()
 
