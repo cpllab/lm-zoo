@@ -1,0 +1,11 @@
+#!/bin/sh
+MODEL_ROOT="/opt/Ordered-Neurons"
+MODEL_CHECKPOINT="/opt/Ordered-Neurons/1234.pt"
+MODEL_CORPUS="/opt/Ordered-Neurons/corpus.data"
+INPUT_FILE="$1"
+
+/opt/bin/tokenize $1 > /tmp/input_tokenized
+
+python ${MODEL_ROOT}/get_surprisals.py \
+    "$MODEL_CHECKPOINT" /tmp/input_tokenized \
+    --corpus_file "$MODEL_CORPUS" --no-cuda
