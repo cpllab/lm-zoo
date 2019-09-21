@@ -53,6 +53,8 @@ RUN pip install nose rednose
 ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
+ENV PYTHONIOENCODING utf-8
+
 ENV LD_LIBRARY_PATH "/opt/conda/lib:${LD_LIBRARY_PATH}"
 
 WORKDIR /opt/bin
