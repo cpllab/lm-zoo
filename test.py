@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 from collections import defaultdict
 import re
@@ -12,6 +13,7 @@ from nose.tools import *
 TEST_STRING = """This is a test sentence.
 This is another test sentence.
 This is a third sentence with an aorsnarnt token.
+This is a sentence with a special \u201c token.
 """
 
 SURPRISAL_RE = re.compile(r"sentence_id\ttoken_id\ttoken\tsurprisal\n"
@@ -24,7 +26,7 @@ class LMTest(unittest.TestCase):
     def setUpClass(cls):
         # super(LMTest, cls).setUpClass()
 
-        with NamedTemporaryFile("w") as text_f:
+        with NamedTemporaryFile("w", encoding="utf-8") as text_f:
             text_f.write(TEST_STRING)
             text_f.flush()
 
@@ -82,7 +84,7 @@ class LMTest(unittest.TestCase):
         ok_(SURPRISAL_RE.match(self.surprisals_output))
 
     def test_surprisal_parse(self):
-        eq_(set(int(line[0]) for line in self.surprisal_lines[1:]), {1, 2, 3}, "Sentences retained")
+        eq_(set(int(line[0]) for line in self.surprisal_lines[1:]), {1, 2, 3, 4}, "Sentences retained")
         for line in self.surprisal_lines[1:]:
             # attempt to parse surprisal
             surp = float(line[3])
