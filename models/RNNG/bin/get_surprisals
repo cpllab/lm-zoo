@@ -6,7 +6,7 @@ INPUT_FILE="$1"
 python ${RNNG_ROOT}/get_raw.py --vocab_file ${RNNG_ROOT}/vocab.pkl /tmp/input_tokenized > /tmp/input_unkified
 
 ${RNNG_ROOT}/build/nt-parser/nt-parser-gen \
-    --dynet-mem 2000 \
+    --dynet-mem 5000 \
     -x -T ${RNNG_ROOT}/train_gen.oracle \
     -v /tmp/input_unkified \
     -f /dev/stdout \
