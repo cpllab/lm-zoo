@@ -110,6 +110,40 @@ jobs:
                 working_directory: models/ordered-neurons
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
+    pytorch-transformers:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - run:
+                <<: *docker_login
+            - run:
+                name: Build
+                command: docker build -t cpllab/language-models:pytorch-transformers -f models/pytorch-transformers/Dockerfile .
+            - run:
+                name: Push to Docker Hub
+                command: docker push cpllab/language-models:pytorch-transformers
+
+    gpt2:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - run:
+                <<: *docker_login
+            - run:
+                name: Build
+                command: docker build -t cpllab/language-models:gpt2 -f models/gpt2/Dockerfile .
+            - run:
+                name: Run tests
+                working_directory: models/gpt2
+                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+            - run:
+                name: Push to Docker Hub
+                command: docker push cpllab/language-models:gpt2
+
     transformer-xl:
         machine:
             image: circleci/classic:latest
@@ -139,4 +173,6 @@ workflows:
             - rnng
             - action-lstm
             - ordered-neurons
+            - pytorch-transformers
+            - gpt2
             - transformer-xl

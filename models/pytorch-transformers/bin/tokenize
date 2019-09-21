@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+python /opt/pytorch-transformers/tokenizer.py -m tokenize \
+       "$1" \
+       --model_type "$PYTORCH_TRANSFORMER_MODEL_TYPE" \
+       --model_path "$PYTORCH_TRANSFORMER_MODEL_PATH"
