@@ -41,15 +41,15 @@ def eval_sentence(sentence, tokenizer, model, device):
     tokens_tensor = tokens_tensor.to(device)
 
     with torch.no_grad():
-        logits = model(tokens_tensor)[0]
+        log_probs = model(tokens_tensor)[0].log_softmax(dim=1).numpy()
 
     # initial token gets surprisal 0
     surprisals = [0.0]
     for i in range(1, len(sent_tokens)):
         cur_idx = indexed_tokens[i]
-        log_p_word = logits[0, i-1, cur_idx].item()
+        log_prob = log_probs[0, i-1, cur_idx].item()
         # convert to surprisal
-        surprisal = -log_p_word / np.log(2)
+        surprisal = -log_prob / np.log(2)
         surprisals.append(surprisal)
 
     return surprisals, sent_tokens
