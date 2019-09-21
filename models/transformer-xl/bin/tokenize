@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+
+# The built-in huggingface tokenizer is basically a no-op -- it just runs
+# `.strip()`. Put a reasonable tokenizer in front of the model instead.
+
+import sys
+import codecs
+from nltk.tokenize import TreebankWordTokenizer
+
+tokenizer = TreebankWordTokenizer()
+
+for line in codecs.open(sys.argv[1], encoding="utf-8"):
+    print(" ".join(tokenizer.tokenize(line.strip())))
