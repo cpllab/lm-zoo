@@ -26,8 +26,16 @@ class LMTest(unittest.TestCase):
     def setUpClass(cls):
         # super(LMTest, cls).setUpClass()
 
-        with NamedTemporaryFile("w") as text_f:
-            text_f.write(TEST_STRING.encode("utf-8"))
+        if sys.version_info[0] == 2:
+            text_f = NamedTemporaryFile("w")
+        else:
+            text_f = NamedTemporaryFile("w", encoding="utf-8")
+
+        with text_f:
+            test_string = TEST_STRING
+            if sys.version_info[0] == 2:
+                test_string = TEST_STRING.encode("utf-8")
+            text_f.write(test_string)
             text_f.flush()
 
             print("== tokenize %s" % text_f.name)
