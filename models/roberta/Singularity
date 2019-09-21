@@ -1,0 +1,5 @@
+Bootstrap: docker
+From: cpllab/language-models:roberta
+
+%post
+    chmod -R 755 /opt

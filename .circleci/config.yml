@@ -163,6 +163,25 @@ jobs:
                 name: Push to Docker Hub
                 command: docker push cpllab/language-models:transformer-xl
 
+    roberta:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - run:
+                <<: *docker_login
+            - run:
+                name: Build
+                command: docker build -t cpllab/language-models:roberta -f models/roberta/Dockerfile .
+            - run:
+                name: Push to Docker Hub
+                command: docker push cpllab/language-models:roberta
+            - run:
+                name: Run tests
+                working_directory: models/roberta
+                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
 
 workflows:
     version: 2
@@ -176,3 +195,4 @@ workflows:
             - pytorch-transformers
             - gpt2
             - transformer-xl
+            - roberta
