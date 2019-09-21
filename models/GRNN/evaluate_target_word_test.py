@@ -1,3 +1,4 @@
+# coding=utf-8
 # Copyright (c) 2018-present, Facebook, Inc.
 # All rights reserved.
 #
@@ -30,13 +31,12 @@ parser.add_argument('--sentences', type=int, default='-1',
                     help='number of sentences to generate from prefix')
 parser.add_argument('--temperature', type=float, default=1.0,
                     help='temperature - higher will increase diversity')
-parser.add_argument('--outf', type=argparse.FileType("w"), default='generated.txt',
+parser.add_argument('--outf', type=argparse.FileType("w", encoding="utf-8"), default=sys.stdout,
                     help='output file for generated text')
 parser.add_argument('--prefixfile', type=str, default='-',
                     help='File with sentence prefix from which to generate continuations')
 parser.add_argument('--surprisalmode', type=bool, default=False,
                     help='Run in surprisal mode; specify sentence with --prefixfile')
-
 
 args = parser.parse_args()
 

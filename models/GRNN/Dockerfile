@@ -39,5 +39,6 @@ COPY test.py /opt/test.py
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin
 ENV PATH "/opt/bin:${PATH}"
+ENV PYTHONIOENCODING utf-8
 
 WORKDIR /opt/bin
