@@ -26,7 +26,7 @@ class LMTest(unittest.TestCase):
     def setUpClass(cls):
         # super(LMTest, cls).setUpClass()
 
-        with NamedTemporaryFile("w", encoding="utf-8") as text_f:
+        with NamedTemporaryFile("w") as text_f:
             text_f.write(TEST_STRING)
             text_f.flush()
 
