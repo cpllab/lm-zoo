@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+tokenize "$1" > /tmp/input_tokenized
+/opt/srilm/bin/i686-m64/ngram -lm /opt/srilm/wiki_kn_5gram.lm \
+        -ppl /tmp/input_tokenized -debug 2 -order 5 \
+        | gawk -f /opt/get_surprisals.awk

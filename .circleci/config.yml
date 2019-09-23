@@ -6,6 +6,27 @@ docker_login: &docker_login
 
 version: 2
 jobs:
+    ngram:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - run:
+                <<: *docker_login
+            - add_ssh_keys:
+                fingerprints:
+                    - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
+            - run:
+                name: Build
+                command: docker build -t cpllab/language-models:ngram -f models/ngram/Dockerfile --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
+            - run:
+                name: Push to Docker Hub
+                command: docker push cpllab/language-models:ngram
+            - run:
+                name: Run tests
+                working_directory: models/ngram
+                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
     grnn:
         machine:
             image: circleci/classic:latest
