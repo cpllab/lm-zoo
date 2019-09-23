@@ -27,13 +27,14 @@ parser.set_defaults(cuda=True)
 args = parser.parse_args()
 
 # Set the random seed manually for reproducibility.
-np.random.seed(args.seed)
-torch.manual_seed(args.seed)
-if torch.cuda.is_available():
-    if not args.cuda:
-        print("WARNING: You have a CUDA device, so you should probably run with --cuda")
-    else:
-        torch.cuda.manual_seed(args.seed)
+def set_seed(seed):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        if not args.cuda:
+            print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+        else:
+            torch.cuda.manual_seed(seed)
 
 
 def model_load(fn):
@@ -52,23 +53,21 @@ def get_batch(data_source, i, window):
     return data, target
 
 
-def get_surprisals(sentences, corpus, outf):
+def get_surprisals(sentences, corpus, outf, seed):
     # Turn on evaluation mode which disables dropout.
     model.eval()
+    unk_id = corpus.dictionary.word2idx["<unk>"]
 
     outf.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
 
     for i, sentence in enumerate(sentences):
+        set_seed(seed)
         outf.write("%i\t%i\t%s\t%f\n" % (i + 1, 1, sentence[0], 0.0))
 
         sentence = sentence
         data_source = torch.LongTensor(len(sentence))
         for j, token in enumerate(sentence):
-            try:
-                idx = corpus.dictionary.word2idx[token.lower()]
-            except KeyError:
-                idx = corpus.dictionary.word2idx["<unk>"]
-            data_source[j] = idx
+            data_source[j] = corpus.dictionary.word2idx.get(token.lower(), unk_id)
         # model expects T * batch_size array
         data_source = data_source.unsqueeze(1)
 
@@ -79,7 +78,7 @@ def get_surprisals(sentences, corpus, outf):
                 output, hidden = model(data, hidden)
                 logprobs = torch.nn.functional.log_softmax(
                         torch.nn.functional.linear(output, model.decoder.weight, bias=model.decoder.bias),
-                        dim=0)
+                        dim=1)
 
                 # Convert to numpy and change to log2.
                 logprobs = logprobs.detach().numpy()
@@ -96,4 +95,4 @@ def get_surprisals(sentences, corpus, outf):
 corpus = torch.load(args.corpus_file)
 model_load(args.model_checkpoint)
 sentences = [line.strip().split(" ") for line in args.file.readlines() if line.strip()]
-get_surprisals(sentences, corpus, args.outf)
+get_surprisals(sentences, corpus, args.outf, args.seed)
