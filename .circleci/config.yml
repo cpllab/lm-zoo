@@ -182,6 +182,25 @@ jobs:
                 working_directory: models/roberta
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
+    tiny-lstm:
+        machine:
+            image: circleci/classic:latest
+            docker_layer_caching: true
+        steps:
+            - checkout
+            - run:
+                <<: *docker_login
+            - run:
+                name: Build
+                command: docker build -t cpllab/language-models:tiny-lstm -f models/tiny-LSTM/Dockerfile .
+            - run:
+                name: Run tests
+                working_directory: models/tiny-LSTM
+                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+            - run:
+                name: Push to Docker Hub
+                command: docker push cpllab/language-models:tiny-lstm
+
 
 workflows:
     version: 2
@@ -196,3 +215,4 @@ workflows:
             - gpt2
             - transformer-xl
             - roberta
+            - tiny-lstm

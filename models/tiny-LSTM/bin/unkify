@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
-RNNG_ROOT = "/opt/rnng-incremental"
-VOCAB_PATH = RNNG_ROOT + "/vocab.pkl"
+TINY_ROOT = "/opt/tinylstm"
+VOCAB_PATH = TINY_ROOT + "/vocab.pkl"
 
 import pickle
 import subprocess
 import sys
 
-
 with open(VOCAB_PATH, "rb") as vocab_f:
     vocab = set(pickle.load(vocab_f))
-
 
 tokenized = subprocess.check_output(["tokenize", sys.argv[1]]).decode("utf-8").strip()
 for line in tokenized.strip().split("\n"):
