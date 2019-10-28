@@ -1,0 +1,5 @@
+Bootstrap: docker
+From: cpllab/language-models:transformer-xl
+
+%post
+    chmod -R 755 /opt

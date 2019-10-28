@@ -1,0 +1,3 @@
+sut:
+    image: cpllab/language-models:jrnn
+    command: python /opt/test.py

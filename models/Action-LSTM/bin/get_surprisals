@@ -1,0 +1,15 @@
+#!/bin/sh
+RNNG_ROOT="/opt/rnng-incremental"
+INPUT_FILE="$1"
+
+/opt/bin/tokenize $1 > /tmp/input_tokenized
+python ${RNNG_ROOT}/get_raw.py --vocab_file ${RNNG_ROOT}/vocab.pkl /tmp/input_tokenized > /tmp/input_unkified
+
+${RNNG_ROOT}/build/nt-parser/nt-parser-gen-action-only \
+    --dynet-mem 2000 \
+    -x -T ${RNNG_ROOT}/train_gen.oracle \
+    -v /tmp/input_unkified \
+    -f /dev/stdout \
+    --clusters ${RNNG_ROOT}/clusters-train-berk.txt \
+    --input_dim 256 --lstm_input_dim 256 --hidden_dim 256 \
+    -m ${RNNG_ROOT}/ntparse_gen_D0.3_2_256_256_256_256-pid18099.params

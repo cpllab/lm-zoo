@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Pre-tokenize using custom tokenizer.
+tokenize "$1" > /tmp/tokenized_input
+python /opt/pytorch-transformers/tokenizer.py -m unkify \
+       /tmp/tokenized_input \
+       --model_type "$PYTORCH_TRANSFORMER_MODEL_TYPE" \
+       --model_path "$PYTORCH_TRANSFORMER_MODEL_PATH"

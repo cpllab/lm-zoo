@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+import re
+import sys
+import codecs
+from nltk.tokenize import TreebankWordTokenizer
+
+tokenizer = TreebankWordTokenizer()
+punct_re = re.compile(r"^[-.?!,\*]+$")
+
+for line in codecs.open(sys.argv[1], encoding="utf-8"):
+    if not line.strip():
+        print()
+        continue
+
+    toks = tokenizer.tokenize(line.strip())
+    toks = [tok for tok in toks if not punct_re.match(tok)]
+    print(" ".join(toks).lower() + " <eos>")

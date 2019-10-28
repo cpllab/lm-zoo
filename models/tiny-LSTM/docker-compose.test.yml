@@ -1,0 +1,3 @@
+sut:
+    image: cpllab/language-models:tiny-lstm
+    command: python /opt/test.py

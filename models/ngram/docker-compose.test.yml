@@ -1,0 +1,3 @@
+sut:
+    image: cpllab/language-models:ngram
+    command: python3 /opt/test.py

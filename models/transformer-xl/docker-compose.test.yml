@@ -1,0 +1,3 @@
+sut:
+    image: cpllab/language-models:transformer-xl
+    command: python /opt/test.py
