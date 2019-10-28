@@ -1,0 +1,26 @@
+#!/bin/sh
+#SBATCH -p cpl
+#SBATCH --time=7-0    # -- first number is days requested, second number is hours
+#SBATCH --gres=gpu:titan-x:1  #  -- request the number of gpus.
+#SBATCH -c 1                  #  -- request number of cores
+#SBATCH --mem=4G              #  -- request memory
+#SBATCH --mail-user=jennhu@mit.edu # -- use this to send an automated email when:
+#SBATCH --mail-type=end            # -- your job completes successfully
+#SBATCH --mail-type=fail           # -- or if your job fails
+
+ROOT="/om/group/cpl/language-models/Ordered-Neurons"
+MODEL_DIR="/om/group/cpl/language-models/syntaxgym/models/${MODEL_KEY}"
+mkdir -p $MODEL_DIR
+MODEL_NAME="${MODEL_KEY}_${CORPUS}_${SEED}.pt"
+DATA="/om/group/cpl/language-models/syntaxgym/data/${CORPUS}/unk"
+
+# Make sure data is tokenized and unkified!
+source activate neural-nlp
+python ${ROOT}/main.py \
+    --cuda \
+    --batch_size 20 --dropout 0.45 --dropouth 0.3 --dropouti 0.5 \
+    --wdrop 0.45 --chunk_size 10 --seed 141 --epoch 1000 \
+    --data ${DATA} \
+    --save ${MODEL_DIR}/${MODEL_NAME} \
+    --seed ${SEED} \
+    --log ${LOGS}/${MODEL_KEY}_${CORPUS}_${SEED}.txt
