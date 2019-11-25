@@ -27,8 +27,9 @@ RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config \
       && chmod 600 /root/.ssh/id_rsa
 
 # Copy in model parameters.
+ARG CHECKPOINT_NAME=fredashi-20190919
 RUN scp -o "StrictHostKeyChecking=no" \
-      cpl@45.79.223.150:/home/cpl/ordered-neurons/models/fredashi-20190919/{1234.pt,corpus.data} \
+      cpl@45.79.223.150:/home/cpl/ordered-neurons/models/$CHECKPOINT_NAME/{model.pt,corpus.data} \
       /opt/Ordered-Neurons
 
 # Remove SSH information.

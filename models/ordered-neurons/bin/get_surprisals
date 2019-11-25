@@ -1,6 +1,6 @@
 #!/bin/sh
 MODEL_ROOT="/opt/Ordered-Neurons"
-MODEL_CHECKPOINT="/opt/Ordered-Neurons/1234.pt"
+MODEL_CHECKPOINT="/opt/Ordered-Neurons/model.pt"
 MODEL_CORPUS="/opt/Ordered-Neurons/corpus.data"
 INPUT_FILE="$1"
 
