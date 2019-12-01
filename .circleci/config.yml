@@ -9,9 +9,11 @@ jobs:
     ngram:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
+            - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
             - run:
                 <<: *docker_login
             - add_ssh_keys:
