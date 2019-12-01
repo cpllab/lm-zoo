@@ -35,6 +35,9 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+            - run:
                 <<: *docker_login
             - run:
                 name: Build
@@ -53,6 +56,9 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+            - run:
                 <<: *docker_login
             - run:
                 name: Build
@@ -70,6 +76,10 @@ jobs:
             image: circleci/classic:latest
         steps:
             - checkout
+            - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
             - run:
                 <<: *docker_login
             - add_ssh_keys:
@@ -92,6 +102,10 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
+            - run:
                 <<: *docker_login
             - add_ssh_keys:
                 fingerprints:
@@ -112,6 +126,10 @@ jobs:
             image: circleci/classic:latest
         steps:
             - checkout
+            - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
             - run:
                 <<: *docker_login
             - add_ssh_keys:
@@ -134,6 +152,10 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
+            - run:
                 <<: *docker_login
             - add_ssh_keys:
                 fingerprints:
@@ -151,6 +173,10 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
+            - run:
                 <<: *docker_login
             - run:
                 name: Build
@@ -164,6 +190,10 @@ jobs:
             image: circleci/classic:latest
         steps:
             - checkout
+            - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
             - run:
                 <<: *docker_login
             - run:
@@ -183,6 +213,10 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
+            - run:
                 <<: *docker_login
             - run:
                 name: Build
@@ -201,6 +235,10 @@ jobs:
         steps:
             - checkout
             - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
+            - run:
                 <<: *docker_login
             - run:
                 name: Build
@@ -218,6 +256,10 @@ jobs:
             image: circleci/classic:latest
         steps:
             - checkout
+            - run:
+                name: Check for relevant code updates
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+
             - run:
                 <<: *docker_login
             - add_ssh_keys:
