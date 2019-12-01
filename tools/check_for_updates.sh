@@ -17,4 +17,4 @@ current_sha=$CIRCLECI_SHA1
 echo "Checking for changes from $previous_sha...$current_sha in $model_dir"
 
 # Exit with error code if there have been no changes.
-[ -z $(git --no-pager diff $previous_sha $current_sha $model_dir) ] && echo "No changes to model $1; aborting job." && exit 1
+[ -z $(git --no-pager diff $previous_sha $current_sha $model_dir) ] && echo "No changes to model $1; aborting job." && circleci-agent step halt
