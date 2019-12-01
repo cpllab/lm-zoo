@@ -36,7 +36,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
             - run:
                 <<: *docker_login
             - run:
@@ -57,7 +57,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
             - run:
                 <<: *docker_login
             - run:
@@ -78,7 +78,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -103,7 +103,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -128,7 +128,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -153,7 +153,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -174,7 +174,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -192,7 +192,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -214,7 +214,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -236,7 +236,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
@@ -258,7 +258,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
 
             - run:
                 <<: *docker_login
