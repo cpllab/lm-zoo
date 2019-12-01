@@ -4,7 +4,7 @@ docker_login: &docker_login
         echo $DOCKER_HUB_PWD | docker login -u $DOCKER_HUB_USER_ID --password-stdin
 
 
-version: 2
+version: 2.1
 jobs:
     ngram:
         machine:
