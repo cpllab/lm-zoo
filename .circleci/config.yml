@@ -32,7 +32,6 @@ jobs:
     grnn:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -51,7 +50,6 @@ jobs:
     jrnn:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -70,7 +68,6 @@ jobs:
     rnng:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -92,7 +89,6 @@ jobs:
     action-lstm:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -114,7 +110,6 @@ jobs:
     ordered-neurons:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -136,7 +131,6 @@ jobs:
     ordered-neurons-cased-ptb:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -154,7 +148,6 @@ jobs:
     pytorch-transformers:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -169,7 +162,6 @@ jobs:
     gpt2:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -188,7 +180,6 @@ jobs:
     transformer-xl:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -207,7 +198,6 @@ jobs:
     roberta:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
@@ -226,7 +216,6 @@ jobs:
     tiny-lstm:
         machine:
             image: circleci/classic:latest
-            docker_layer_caching: true
         steps:
             - checkout
             - run:
