@@ -153,5 +153,12 @@ def get_surprisals(sentences, corpus, outf, seed):
 
 corpus = torch.load(args.corpus_file)
 model_load(args.model_checkpoint)
+
+# Check for model -- corpus match.
+vocab_size = len(corpus.dictionary)
+n_embs = model.encoder.weight.shape[0]
+assert vocab_size == n_embs, \
+        "Model--vocab mismatch: %i vocabulary items in corpus data but %i embeddings in model" % (vocab_size, n_embs)
+
 sentences = [line.strip().split(" ") for line in args.file.readlines() if line.strip()]
 get_surprisals(sentences, corpus, args.outf, args.seed)
