@@ -19,7 +19,7 @@ RUN scp -o "StrictHostKeyChecking=no" \
 RUN rm -rf /root/.ssh
 
 # Copy in custom file for surprisal evaluation
-COPY ${SUBMODEL_ROOT}/bin/tokenize /opt/bin/tokenize
 COPY ${SUBMODEL_ROOT}/get_surprisals.py /opt/Ordered-Neurons/get_surprisals.py
+COPY ${SUBMODEL_ROOT}/bin/tokenize /opt/bin/tokenize
 
 WORKDIR /opt/bin

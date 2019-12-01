@@ -113,8 +113,6 @@ def get_surprisals(sentences, corpus, outf, seed):
     model.eval()
 
     outf.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
-    print(len(corpus.dictionary.word2idx))
-    print(model.encoder.weight.size())
 
     for i, sentence in enumerate(sentences):
         set_seed(seed)
