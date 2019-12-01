@@ -13,7 +13,7 @@ jobs:
             - checkout
             - run:
                 name: Check for relevant code updates
-                command: ./tools/check_for_updates.sh $CIRCLE_JOB
+                command: ./tools/check_for_updates.sh $CIRCLE_JOB $CIRCLE_COMPARE_URL $CIRCLE_SHA1
             - run:
                 <<: *docker_login
             - add_ssh_keys:

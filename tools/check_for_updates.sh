@@ -4,15 +4,15 @@
 #
 # Run from project root with:
 #
-#   ./tools/check_for_updates.sh <model_name>
+#   ./tools/check_for_updates.sh <model_name> <circle_compare_url> <current_sha1>
 #
 # where <model_name> corresponds to a directory in the `models` directory of this project.
 model_dir="models/$1"
+compare_url="$2"
+current_sha="$3"
 
 # Get previous commit sha from CIRCLE_COMPARE_URL
-previous_sha=$(echo "$CIRCLE_COMPARE_URL" | grep -Po "(?<=compare/)[a-f0-9]+(?=\^)")
-
-current_sha=$CIRCLECI_SHA1
+previous_sha=$(echo "$compare_url" | grep -Po "(?<=compare/)[a-f0-9]+(?=\^)")
 
 echo "Checking for changes from $previous_sha...$current_sha in $model_dir"
 
