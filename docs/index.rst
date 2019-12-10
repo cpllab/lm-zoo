@@ -7,6 +7,7 @@ Welcome to LM Zoo's documentation!
 ==================================
 
 .. toctree::
+   api
    :maxdepth: 2
    :caption: Contents:
 

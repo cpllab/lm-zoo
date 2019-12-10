@@ -1,0 +1,149 @@
+ {
+   "definitions": {},
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "http://docs.syntaxgym.org/schemas/language_model_spec.json",
+   "type": "object",
+   "title": "Language model specification schema",
+   "required": [
+     "name",
+     "ref_url",
+     "image",
+     "vocabulary"
+   ],
+   "properties": {
+     "name": {
+       "$id": "#/properties/name",
+       "type": "string",
+       "description": "Human-readable name of the language model",
+       "examples": [
+         "Vanilla LSTM"
+       ]
+     },
+     "ref_url": {
+       "$id": "#/properties/ref_url",
+       "type": "string",
+       "format": "uri",
+       "description": "A canonical reference URL (website, arXiv paper, GitHub implementation)"
+     },
+     "image": {
+       "$id": "#/properties/image",
+       "type": "object",
+       "required": [
+         "maintainer",
+         "version",
+         "datetime"
+       ],
+       "properties": {
+         "maintainer": {
+           "$id": "#/properties/image/properties/maintainer",
+           "type": "string",
+           "format": "email",
+           "description": "Email address of the image's creator / maintainer"
+         },
+         "version": {
+           "$id": "#/properties/image/properties/version",
+           "type": "string",
+           "description": "Alphanumeric string denoting the current version of this language model image, usually a SHA1 identifier"
+         },
+         "datetime": {
+           "$id": "#/properties/image/properties/datetime",
+           "type": "string",
+           "description": "Datetime of last update of this image",
+           "format": "datetime"
+         },
+         "gpu": {
+           "$id": "#/properties/image/properties/gpu",
+           "type": "object",
+           "properties": {
+             "supported": {
+               "$id": "#/properties/image/properties/gpu/properties/supported",
+               "type": "boolean",
+               "description": "If true, this image supports running on GPU devices.",
+               "default": false
+             },
+             "required": {
+               "$id": "#/properties/image/properties/gpu/properties/required",
+               "type": "boolean",
+               "description": "If true, this image requires running on GPU devices."
+             }
+           }
+         }
+       }
+     },
+     "vocabulary": {
+       "$id": "#/properties/vocabulary",
+       "type": "object",
+       "description": "Metadata about this model's vocabulary",
+       "required": [
+         "items",
+         "unk_types",
+         "prefix_types",
+         "suffix_types",
+         "special_types"
+       ],
+       "properties": {
+         "items": {
+           "$id": "#/properties/vocabulary/properties/items",
+           "type": "array",
+           "description": "An ordered list of all vocabulary types, including special tokens such as UNKs and boundary tokens. The model's tokenizer should only ever output tokens which are members of this list.",
+           "items": {
+             "$id": "#/properties/vocabulary/properties/items/items",
+             "type": "string",
+             "examples": [
+               "<bos>",
+               "<eos>",
+               "<unk>",
+               "a",
+               "an"
+             ]
+           }
+         },
+         "unk_types": {
+           "$id": "#/properties/vocabulary/properties/unk_types",
+           "type": "array",
+           "description": "A list of vocabulary types which are UNK tokens. May be empty.",
+           "items": {
+             "$id": "#/properties/vocabulary/properties/unk_types/items",
+             "type": "string",
+             "examples": [
+               "<unk>"
+             ]
+           }
+         },
+         "prefix_types": {
+           "$id": "#/properties/vocabulary/properties/prefix_types",
+           "type": "array",
+           "description": "A list of vocabulary types which are prefixed at the start of sentences. May be empty.",
+           "items": {
+             "$id": "#/properties/vocabulary/properties/prefix_types/items",
+             "type": "string",
+             "examples": [
+               "<bos>"
+             ]
+           }
+         },
+         "suffix_types": {
+           "$id": "#/properties/vocabulary/properties/suffix_types",
+           "type": "array",
+           "description": "A list of vocabulary types which are suffixed at the end of sentences. May be empty.",
+           "items": {
+             "$id": "#/properties/vocabulary/properties/suffix_types/items",
+             "type": "string",
+             "examples": [
+               "<eos>"
+             ]
+           }
+         },
+         "special_types": {
+           "$id": "#/properties/vocabulary/properties/special_types",
+           "type": "array",
+           "description": "Other special types in the vocabulary. May be empty.",
+           "items": {
+              "$id": "#/properties/vocabulary/properties/special_types/items",
+              "type": "string"
+           }
+         }
+       }
+     }
+   }
+ }
