@@ -1,0 +1,21 @@
+{
+    "name": "GRNN",
+    "ref_url": "TODO",
+
+    "image": {
+        "maintainer": "jon@gauthiers.net",
+        "version": "<image.sha1>",
+        "datetime": "<image.datetime>",
+        "gpu": {
+            "required": false,
+            "supported": false
+        }
+    },
+
+    "vocabulary": {
+        "unk_types": ["<unk>"],
+        "prefix_types": [],
+        "suffix_types": ["<eos>"],
+        "special_types": []
+    }
+}

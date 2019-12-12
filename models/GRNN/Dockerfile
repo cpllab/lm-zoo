@@ -2,6 +2,14 @@ FROM pytorch/pytorch:latest
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/GRNN
+# Current git commit of build repository
+ARG COMMIT
+
+# Prepare spec.
+COPY spec.template.json /tmp/spec.template.json
+RUN cat /tmp/spec.template.json && \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image.datetime>/${BUILD_DATETIME}" \
+            > /opt/spec.json
 
 # Perl is required for TreeTagger tokenizer.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,9 +20,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # TODO: better to handle in a docker-compose setup, I think
 RUN pip install nose rednose
 ENV NOSE_REDNOSE 1
-
-# Set up output volume.
-VOLUME /out
 
 # Copy in tokenizer.
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
