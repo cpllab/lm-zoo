@@ -1,0 +1,19 @@
+{
+    "models": [
+        {
+            "shortname": "grnn",
+            "name": "GRNN",
+            "ref_url": "TODO",
+            "image": {
+                "uri": "docker://cpllab/language-models:grnn",
+                "maintainer": "jon@gauthiers.net",
+                "version": "TODO",
+                "datetime": "TODO",
+                "gpu": {
+                    "supported": false,
+                    "required": false
+                }
+            }
+        }
+    ]
+}

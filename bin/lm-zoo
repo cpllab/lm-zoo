@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+
+import click
+from clint import puts, colored, indent, join
+import docker
+import requests
+
+
+REGISTRY_URI = "https://cpllab.github.io/language-models/registry.json"
+
+
+def get_registry():
+    return requests.get(REGISTRY_URI).json()
+
+
+@click.group()
+def lm_zoo(): pass
+
+
+@lm_zoo.command()
+@click.option("--short", is_flag=True, default=False,
+              help="Output just a list of shortnames rather than a pretty list")
+def list(short):
+    """
+    List language models available in the central repository.
+    """
+    show_props = [
+        ("name", "Full name"),
+        ("ref_url", "Reference URL"),
+        ("maintainer", "Maintainer"),
+        ("datetime", "Last updated"),
+    ]
+
+    for model in get_registry()["models"]:
+        if short:
+            puts(model["shortname"])
+        else:
+            puts(colored.bold(model["shortname"]))
+            with indent(4):
+                for key, label in show_props:
+                    puts(join(colored.bold(label + ":"), model[key]))
+
+
+if __name__ == "__main__":
+    lm_zoo()

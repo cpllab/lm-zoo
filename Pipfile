@@ -1,0 +1,5 @@
+[packages]
+click = "*"
+clint = "*"
+docker = "*"
+requests = "*"
