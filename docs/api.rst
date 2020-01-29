@@ -35,6 +35,10 @@ The ``spec`` binary outputs relevant metadata describing the language model imag
 :stdout format: TSV
 :stderr: Not specified
 
+The output of ``get_surprisals`` is a tab-separated file with the following
+columns (including headings on the first line):
+
+.. jsonschema:: schemas/get_surprisals_output.json
 
 ``tokenize``
 ^^^^^^^^^^^^
@@ -78,14 +82,14 @@ The following constraints must hold on the output of ``unkify``:
    exactly the same number of tokens (when splitting on whitespace).
 
 
-``get_predictions``
-^^^^^^^^^^^^^^^^^^^
+.. ``get_predictions``
+.. ^^^^^^^^^^^^^^^^^^^
 
-:Arguments:
-   1. Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line
-:stdout: Description of full next-word predictive distributions for each token in the input
-:stdout format: JSON
-:stderr: Not specified
+.. :Arguments:
+..    1. Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line
+.. :stdout: Description of full next-word predictive distributions for each token in the input
+.. :stdout format: JSON
+.. :stderr: Not specified
 
-TODO JSON spec
+.. TODO JSON spec
 

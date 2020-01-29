@@ -1,5 +1,4 @@
  {
-   "definitions": {},
    "$schema": "http://json-schema.org/draft-07/schema#",
    "$id": "http://docs.syntaxgym.org/schemas/language_model_spec.json",
    "type": "object",
