@@ -85,6 +85,7 @@ todo_include_todos = False
 #
 html_theme = 'press'
 html_logo = '_static/logo.png'
+html_favicon = '_static/favicon.ico'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
