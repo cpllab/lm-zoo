@@ -21,6 +21,7 @@ LM Zoo is maintained by the
 
 
 .. toctree::
+   quickstart
    api
    models
    thanks
