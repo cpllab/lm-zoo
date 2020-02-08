@@ -123,5 +123,23 @@ def tokenize(model, in_file):
                       stdin=in_file)
 
 
+@lm_zoo.command()
+@click.argument("model")
+@click.argument("in_file", type=click.File("rb"))
+def get_surprisals(model, in_file):
+    # TODO document.
+    run_model_command(model, "get_surprisals /dev/stdin",
+                      stdin=in_file)
+
+
+@lm_zoo.command()
+@click.argument("model")
+@click.argument("in_file", type=click.File("rb"))
+def unkify(model, in_file):
+    run_model_command(model, "unkify /dev/stdin",
+                      stdin=in_file)
+
+
+
 if __name__ == "__main__":
     lm_zoo()
