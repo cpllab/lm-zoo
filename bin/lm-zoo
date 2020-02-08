@@ -3,7 +3,7 @@
 
 
 import click
-from clint import puts, colored, indent, join
+import crayons
 import docker
 import requests
 
@@ -35,12 +35,12 @@ def list(short):
 
     for model in get_registry()["models"]:
         if short:
-            puts(model["shortname"])
+            click.echo(model["shortname"])
         else:
-            puts(colored.bold(model["shortname"]))
-            with indent(4):
-                for key, label in show_props:
-                    puts(join(colored.bold(label + ":"), model[key]))
+            click.echo(crayons.normal(model["shortname"], bold=True))
+            for key, label in show_props:
+                click.echo("\t" + crayons.normal(label + ": ", bold=True)
+                           + model.get(key, "None"))
 
 
 if __name__ == "__main__":

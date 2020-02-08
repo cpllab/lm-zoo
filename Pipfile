@@ -1,5 +1,5 @@
 [packages]
 click = "*"
-clint = "*"
+crayons = "*"
 docker = "*"
 requests = "*"
