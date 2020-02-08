@@ -5,7 +5,9 @@
             "name": "GRNN",
             "ref_url": "TODO",
             "image": {
-                "uri": "docker://cpllab/language-models:grnn",
+                "registry": "docker.io",
+                "image": "cpllab/language-models",
+                "tag": "grnn",
                 "maintainer": "jon@gauthiers.net",
                 "version": "TODO",
                 "datetime": "TODO",
