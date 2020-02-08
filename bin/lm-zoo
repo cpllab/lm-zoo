@@ -38,6 +38,52 @@ class Model(object):
         return "%s/%s:%s" % (self.image["registry"], self.image["image"], self.image["tag"])
 
 
+def run_model_command(model, command_str, pull=True,
+                      stdin=None, stdout=sys.stdout, stderr=sys.stderr):
+    """
+    Run the given shell command inside a container instantiating the given
+    model.
+    """
+    try:
+        model = get_model_dict()[model]
+    except KeyError:
+        raise click.UsageError(f"Model {model} not found.")
+
+    client = get_docker_client()
+
+    # First pull the latest version of the image.
+    # TODO make configurable
+    registry = model.image["registry"]
+    image, tag = model.image["image"], model.image["tag"]
+    click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
+    try:
+        image = client.pull(f"{registry}/{image}", tag=tag)
+    except docker.errors.NotFound:
+        raise RuntimeException("Image not found.")
+
+    container = client.create_container(image, stdin_open=True,
+                                        command=command_str)
+    client.start(container)
+
+    if stdin is not None:
+        # Send file contents to stdin of container.
+        in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
+        in_stream._sock.send(file_path.read())
+        in_stream.close()
+
+    # Stop container and collect results.
+    client.stop(container)
+    client.wait(container)
+
+    # Collect output.
+    stdout = client.logs(container, stdout=True, stderr=False)
+    stderr = client.logs(container, stdout=False, stderr=True)
+
+    client.remove_container(container)
+    stdout.buffer.write(stdout)
+    stderr.buffer.write(stderr)
+
+
 @click.group()
 def lm_zoo(): pass
 
@@ -71,47 +117,10 @@ def list(short):
 
 @lm_zoo.command()
 @click.argument("model")
-@click.argument("file_path", type=click.File("rb"))
-def tokenize(model, file_path):
-    try:
-        model = get_model_dict()[model]
-    except KeyError:
-        raise click.UsageError(f"Model {model} not found.")
-
-    client = get_docker_client()
-
-    # First pull the latest version of the image.
-    # TODO make configurable
-    registry = model.image["registry"]
-    image, tag = model.image["image"], model.image["tag"]
-    click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
-    try:
-        image = client.images.pull(f"{registry}/{image}", tag=tag)
-    except docker.errors.ImageNotFound:
-        raise RuntimeException("Image not found.")
-
-    click.echo("Running command.", err=True)
-    container = client.create_container(image, stdin_open=True,
-                                        command="tokenize /dev/stdin")
-    client.start(container)
-
-    # Send file contents to stdin of container.
-    in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
-    in_stream._sock.send(file_path.read())
-    in_stream.close()
-
-    # Stop container and collect results.
-    client.stop(container)
-    client.wait(container)
-
-    # Collect output.
-    stdout = client.logs(container, stdout=True, stderr=False)
-    stderr = client.logs(container, stdout=False, stderr=True)
-
-    client.remove_container(container)
-    sys.stdout.buffer.write(stdout)
-    sys.stderr.buffer.write(stderr)
-
+@click.argument("in_file", type=click.File("rb"))
+def tokenize(model, in_file):
+    run_model_command(model, "tokenize /dev/stdin",
+                      stdin=in_file)
 
 
 if __name__ == "__main__":
