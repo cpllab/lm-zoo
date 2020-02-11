@@ -2,6 +2,7 @@
 
 GRNN_ROOT = "/opt/colorlessgreenRNNs"
 DATA = GRNN_ROOT + "/data/wiki"
+UNK_TOKEN = "<unk>"
 
 import subprocess
 import sys
@@ -14,5 +15,5 @@ corpus = dictionary_corpus.Dictionary(DATA)
 
 tokenized = subprocess.check_output(["tokenize", sys.argv[1]]).decode("utf-8").strip()
 for line in tokenized.strip().split("\n"):
-    unks = [0 if token in corpus.word2idx else 1 for token in line.strip(" ").split(" ")]
+    unks = [0 if token != UNK_TOKEN else 1 for token in line.strip(" ").split(" ")]
     print(" ".join(map(str, unks)))

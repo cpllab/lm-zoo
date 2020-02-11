@@ -2,12 +2,14 @@
 # coding=utf-8
 
 from collections import defaultdict
+import json
 import re
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 import unittest
 
+import jsonschema
 from nose.tools import *
 
 TEST_STRING = """This is a test sentence.
@@ -16,15 +18,31 @@ This is a third sentence with an aorsnarnt token.
 This is a sentence with a special \u201c token.
 """
 
+with open("/schemas/language_model_spec.json", "r") as spec_f:
+    LANGUAGE_MODEL_SPEC_SCHEMA = json.load(spec_f)
+
 SURPRISAL_RE = re.compile(r"sentence_id\ttoken_id\ttoken\tsurprisal\n"
                            "(\d+\s+\d+\s+[\w.<>]+\s+[-\d.]+\n)+(\d+\s+\d+\s+[\w.<>]+\s+[-\d.]+)",
                           flags=re.MULTILINE)
 
-class LMTest(unittest.TestCase):
+
+def get_spec():
+    return json.loads(subprocess.check_output(["spec"]).decode("utf-8"))
+
+
+def test_spec():
+    """
+    Container should return a valid specification.
+    """
+    jsonschema.validate(instance=get_spec(), schema=LANGUAGE_MODEL_SPEC_SCHEMA)
+
+
+class LMProcessingTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         # super(LMTest, cls).setUpClass()
+        cls.spec = get_spec()
 
         if sys.version_info[0] == 2:
             text_f = NamedTemporaryFile("w")
@@ -65,7 +83,13 @@ class LMTest(unittest.TestCase):
 
         return surprisals
 
-    def test_tokenization(self):
+    def test_tokenize(self):
+        for tokenized_line in self.tokenized_lines:
+            for token in tokenized_line.split(" "):
+                assert token in self.spec["vocabulary"]["items"], \
+                        "%s missing from model vocabulary spec, but output by tokenize" % token
+
+    def test_tokenization_match_surprisals(self):
         # token sequence output from `get_surprisals` should match token
         # sequences from `tokenize`
         surprisals = self._parsed_surprisals
@@ -86,6 +110,8 @@ class LMTest(unittest.TestCase):
             eq_(len(unk_line.split(" ")), len(tok_line.split(" ")))
 
         # dummy token should definitely be unk for any model!
+        # TODO assumes no prefix token
+        print(self.unkified_lines[2])
         eq_(self.unkified_lines[2].split(" ")[7], "1")
 
     def test_surprisal_output_format(self):
