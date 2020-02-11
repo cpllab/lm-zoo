@@ -51,37 +51,36 @@ def run_model_command(model, command_str, pull=True,
 
     client = get_docker_client()
 
-    # First pull the latest version of the image.
-    # TODO make configurable
-    registry = model.image["registry"]
-    image, tag = model.image["image"], model.image["tag"]
-    click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
-    try:
-        image = client.pull(f"{registry}/{image}", tag=tag)
-    except docker.errors.NotFound:
-        raise RuntimeException("Image not found.")
+    if pull:
+        # First pull the image.
+        registry = model.image["registry"]
+        image, tag = model.image["image"], model.image["tag"]
+        click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
+        try:
+            image_ret = client.pull(f"{registry}/{image}", tag=tag)
+        except docker.errors.NotFound:
+            raise RuntimeError("Image not found.")
 
-    container = client.create_container(image, stdin_open=True,
+    container = client.create_container(f"{image}:{tag}", stdin_open=True,
                                         command=command_str)
     client.start(container)
 
     if stdin is not None:
         # Send file contents to stdin of container.
         in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
-        in_stream._sock.send(file_path.read())
+        in_stream._sock.send(stdin.read())
         in_stream.close()
 
     # Stop container and collect results.
     client.stop(container)
-    client.wait(container)
 
     # Collect output.
-    stdout = client.logs(container, stdout=True, stderr=False)
-    stderr = client.logs(container, stdout=False, stderr=True)
+    container_stdout = client.logs(container, stdout=True, stderr=False)
+    container_stderr = client.logs(container, stdout=False, stderr=True)
 
     client.remove_container(container)
-    stdout.buffer.write(stdout)
-    stderr.buffer.write(stderr)
+    stdout.buffer.write(container_stdout)
+    stderr.buffer.write(container_stderr)
 
 
 @click.group()
