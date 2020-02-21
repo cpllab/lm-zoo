@@ -76,8 +76,11 @@ class LMProcessingTest(unittest.TestCase):
 
     @property
     def _parsed_surprisals(self):
+        return self._get_parsed_surprisals(self.surprisal_lines)
+
+    def _get_parsed_surprisals(self, surprisal_lines):
         surprisals = defaultdict(dict)
-        for line in self.surprisal_lines[1:]:
+        for line in surprisal_lines[1:]:
             sentence_id, token_id, token, surprisal = line
             surprisals[int(sentence_id)][int(token_id)] = (token, float(surprisal))
 
@@ -123,6 +126,13 @@ class LMProcessingTest(unittest.TestCase):
             # attempt to parse surprisal
             surp = float(line[3])
             ok_(surp >= 0, "valid surprisal")
+
+    def test_surprisal_determinism(self):
+        """
+        Test that `get_surprisals` output is consistent across multiple calls.
+        """
+        # TODO
+        ...
 
 
 if __name__ == "__main__":
