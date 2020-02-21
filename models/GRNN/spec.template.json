@@ -1,6 +1,6 @@
 {
     "name": "GRNN",
-    "ref_url": "TODO",
+    "ref_url": "https://github.com/facebookresearch/colorlessgreenRNNs",
 
     "image": {
         "maintainer": "jon@gauthiers.net",
