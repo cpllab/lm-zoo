@@ -33,6 +33,7 @@ COPY ${MODEL_ROOT}/evaluate_target_word_test.py /opt/colorlessgreenRNNs/src/lang
 
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin
+COPY shared/unkify /opt/bin/unkify
 ENV PATH "/opt/bin:${PATH}"
 ENV PYTHONIOENCODING utf-8
 
