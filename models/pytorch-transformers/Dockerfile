@@ -2,6 +2,7 @@ FROM pytorch/pytorch:latest
 
 # Root of model directory relative to the build context.
 ARG MODEL_ROOT=models/pytorch-transformers
+ARG COMMIT
 
 # Set up output volume.
 VOLUME /out
@@ -9,12 +10,11 @@ VOLUME /out
 #RUN git clone https://github.com/NVIDIA/apex.git && cd apex && python setup.py install --cuda_ext --cpp_ext
 
 # Test dependencies
-RUN pip install nose rednose
+RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
-COPY test.py /opt/test.py
 
 # Download source code and pretrained model.
-RUN pip install pytorch_transformers
+RUN pip install transformers
 
 # Copy in custom file for surprisal evaluation
 RUN mkdir /opt/pytorch-transformers

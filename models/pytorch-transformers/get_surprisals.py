@@ -63,8 +63,8 @@ def main(args):
     if args.input_is_tokenized:
         tokenizer = lambda s: s.split(" ")
     else:
-        tokenizer = tokenizer_class.from_pretrained(args.model_path)
-    model = model_class.from_pretrained(args.model_path)
+        tokenizer = tokenizer_class.from_pretrained(str(args.model_path))
+    model = model_class.from_pretrained(str(args.model_path))
 
     device = torch.device('cuda' if args.cuda else 'cpu')
     model.to(device)

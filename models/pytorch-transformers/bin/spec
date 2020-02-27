@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import json
+import os
+import sys
+
+import torch
+
+sys.path.append("/opt/pytorch-transformers")
+from model_meta import MODEL_CLASSES
+
+# Load spec template.
+with open("/opt/spec.json", "r") as spec_f:
+    spec = json.load(spec_f)
+
+# Load tokenizer.
+model_type = os.environ["PYTORCH_TRANSFORMER_MODEL_TYPE"]
+model_path = os.environ["PYTORCH_TRANSFORMER_MODEL_PATH"]
+_, tokenizer_class = MODEL_CLASSES[model_type]
+tokenizer = tokenizer_class.from_pretrained(model_path)
+
+def filter_none(xs):
+    return [x for x in xs if x is not None]
+
+# Set spec vocabulary information from tokenizer.
+special_tokens = set(tokenizer.all_special_tokens) - \
+        {tokenizer.bos_token, tokenizer.eos_token, tokenizer.unk_token}
+
+spec["vocabulary"] = {
+    "items": list(tokenizer.get_vocab().keys()),
+
+    "prefix_types": filter_none([tokenizer.bos_token]),
+    "suffix_types": filter_none([tokenizer.eos_token]),
+    "unk_types": filter_none([tokenizer.unk_token]),
+    "special_types": list(special_tokens),
+}
+
+json.dump(spec, sys.stdout)

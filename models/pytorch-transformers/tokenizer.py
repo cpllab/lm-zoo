@@ -36,7 +36,7 @@ def unkify_sentence(sentence, tokenizer):
 def main(args):
     logger.info("Loading tokenizer")
     _, tokenizer_class = MODEL_CLASSES[args.model_type]
-    tokenizer = tokenizer_class.from_pretrained(args.model_path)
+    tokenizer = tokenizer_class.from_pretrained(str(args.model_path))
 
     logger.info("Reading sentences from %s", args.inputf)
     sentences = readlines(args.inputf)

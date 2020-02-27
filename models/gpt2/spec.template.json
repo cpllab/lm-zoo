@@ -1,0 +1,21 @@
+{
+    "name": "gpt2",
+    "ref_url": "https://openai.com/blog/better-language-models/",
+
+    "image": {
+        "maintainer": "jon@gauthiers.net",
+        "version": "<image.sha1>",
+        "datetime": "<image.datetime>",
+        "gpu": {
+            "required": false,
+            "supported": false
+        }
+    },
+
+    "vocabulary": {
+        "unk_types": [],
+        "prefix_types": [],
+        "suffix_types": ["</s>"],
+        "special_types": []
+    }
+}
