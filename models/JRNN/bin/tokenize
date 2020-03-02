@@ -1,3 +1,24 @@
-#!/bin/sh
+#!/usr/bin/env python
+# coding: utf-8
 
-perl /opt/tokenizer/tokenizer.perl -l en < $1
+import subprocess
+import sys
+
+MODEL_ROOT = "/opt/lm_1b"
+sys.path.append(MODEL_ROOT)
+import data_utils
+
+
+BOS_TOKEN = "<S>"
+EOS_TOKEN = "</S>"
+UNK_TOKEN = "<UNK>"
+MAX_WORD_LEN = 50
+
+vocabulary = data_utils.CharsVocabulary(MODEL_ROOT + "/vocab-2016-09-10.txt", MAX_WORD_LEN)
+
+tokenized = subprocess.check_output(["tokenize_inner", sys.argv[1]]).decode("utf-8").strip()
+for line in tokenized.split("\n"):
+  tokens = [BOS_TOKEN] + \
+      [token if token in vocabulary._word_to_id else UNK_TOKEN for token in line.split(" ")] + \
+      [EOS_TOKEN]
+  print(" ".join(tokens))

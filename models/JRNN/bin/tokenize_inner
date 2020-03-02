@@ -1,0 +1,3 @@
+#!/bin/sh
+
+perl /opt/tokenizer/tokenizer.perl -l en < $1

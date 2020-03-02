@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import json
+import sys
+
+VOCAB_PATH = "/opt/lm_1b/vocab-2016-09-10.txt"
+
+with open("/opt/spec.json", "r") as spec_f:
+    spec = json.load(spec_f)
+
+with open(VOCAB_PATH, "r") as vocab_f:
+    vocab = [line.strip() for line in vocab_f if line.strip()]
+
+# Extract vocabulary information from corpus data.
+special_items = [token for list_name in ["unk_types", "prefix_types", "suffix_types", "special_types"]
+                 for token in spec["vocabulary"][list_name]]
+all_items = set(special_items) | set(vocab)
+
+spec["vocabulary"]["items"] = list(all_items)
+
+json.dump(spec, sys.stdout)

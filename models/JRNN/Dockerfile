@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:1.15.2
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/JRNN
@@ -31,12 +31,14 @@ COPY ${MODEL_ROOT}/lm_1b_eval.py ${MODEL_ROOT}/data_utils.py ${MODEL_ROOT}/eval_
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 
 # Copy in test dependencies.
-RUN pip install nose rednose
+RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
 # Copy external-facing scripts
+COPY ${MODEL_ROOT}/spec.template.json /opt/spec.json
 COPY ${MODEL_ROOT}/bin /opt/bin
+COPY shared/unkify /opt/bin
 ENV PATH "/opt/bin:${PATH}"
 
 WORKDIR /opt/bin
