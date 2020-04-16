@@ -125,6 +125,11 @@ class LMProcessingTest(unittest.TestCase):
             eq_(len(unk_line.split(" ")), len(tok_line.split(" ")))
 
         # dummy token should definitely be unk for any model!
+        dummy_idx = 7
+        # HACK: we should ideally have the spec specify exactly how many tokens
+        # get prepended (if multiple)
+        if len(self.spec["vocabulary"]["prefix_types"]) > 0:
+            dummy_idx += 1
         eq_(self.unkified_lines[2].split(" ")[7], "1")
 
     def test_surprisal_output_format(self):
