@@ -105,6 +105,9 @@ class LMProcessingTest(unittest.TestCase):
             eq_(tokens, [surprisals[i + 1][j + 1][0] for j in range(len(tokens))], "Token sequences should match exactly")
 
     def test_unkification(self):
+        if self.spec["tokenizer"]["type"] != "word":
+            return
+
         # same number of lines as tokenized sentences
         eq_(len(self.unkified_lines), len(self.tokenized_lines))
 
@@ -113,8 +116,6 @@ class LMProcessingTest(unittest.TestCase):
             eq_(len(unk_line.split(" ")), len(tok_line.split(" ")))
 
         # dummy token should definitely be unk for any model!
-        # TODO assumes no prefix token
-        print(self.unkified_lines[2])
         eq_(self.unkified_lines[2].split(" ")[7], "1")
 
     def test_surprisal_output_format(self):
