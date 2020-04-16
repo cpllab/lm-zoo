@@ -34,7 +34,16 @@ def test_spec():
     """
     Container should return a valid specification.
     """
-    jsonschema.validate(instance=get_spec(), schema=LANGUAGE_MODEL_SPEC_SCHEMA)
+    try:
+        jsonschema.validate(instance=get_spec(), schema=LANGUAGE_MODEL_SPEC_SCHEMA)
+    except jsonschema.exceptions.ValidationError as e:
+        # Avoid printing enormous schema JSONs.
+        from pprint import pformat
+        pinstance = pformat(e.instance, width=72)
+        if len(pinstance) > 1000:
+            pinstance = pinstance[:1000] + "..."
+
+        raise ValueError("Spec validation failed for spec instance: %s" % pinstance)
 
 
 class LMProcessingTest(unittest.TestCase):
