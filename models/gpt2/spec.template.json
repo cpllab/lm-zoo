@@ -17,5 +17,12 @@
         "prefix_types": [],
         "suffix_types": ["</s>"],
         "special_types": []
+    },
+
+    "tokenizer": {
+        "type": "subword",
+        "cased": true,
+        "sentinel_position": "initial",
+        "sentinel_pattern": "Ġ"
     }
 }

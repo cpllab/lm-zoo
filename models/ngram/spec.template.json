@@ -17,5 +17,10 @@
         "prefix_types": [],
         "suffix_types": ["</s>"],
         "special_types": []
+    },
+
+    "tokenizer": {
+        "type": "word",
+        "cased": true
     }
 }
