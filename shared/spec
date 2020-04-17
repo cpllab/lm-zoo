@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+# coding: utf-8
+"""
+Handy `spec` tool which takes a spec template and auto-inserts model
+vocabulary.
+"""
+
+import json
+import sys
+
+VOCAB_PATH = "/opt/vocab"
+SPEC_TEMPLATE_PATH = "/opt/spec.template.json"
+
+with open(SPEC_TEMPLATE_PATH, "r") as spec_f:
+    spec = json.load(spec_f)
+
+with open(VOCAB_PATH, "r") as vocab_f:
+    vocab = [line.strip() for line in vocab_f]
+
+# Prepare vocabulary information.
+special_items = [token for list_name in ["unk_types", "prefix_types", "suffix_types", "special_types"]
+                 for token in spec["vocabulary"][list_name]]
+all_items = set(special_items) | set(vocab)
+
+spec["vocabulary"]["items"] = list(all_items)
+
+json.dump(spec, sys.stdout)
