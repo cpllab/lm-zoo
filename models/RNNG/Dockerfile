@@ -1,4 +1,4 @@
-FROM continuumio/anaconda
+FROM continuumio/miniconda
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/RNNG
