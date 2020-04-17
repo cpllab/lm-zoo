@@ -130,7 +130,7 @@ class LMProcessingTest(unittest.TestCase):
         # get prepended (if multiple)
         if len(self.spec["vocabulary"]["prefix_types"]) > 0:
             dummy_idx += 1
-        eq_(self.unkified_lines[2].split(" ")[7], "1")
+        eq_(self.unkified_lines[2].split(" ")[dummy_idx], "1")
 
     def test_surprisal_output_format(self):
         ok_(SURPRISAL_RE.match(self.surprisals_output))
