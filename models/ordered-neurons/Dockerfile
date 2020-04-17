@@ -9,7 +9,7 @@ RUN conda install nltk
 RUN apt-get update && apt-get install -y --no-install-recommends git
 
 # Add test dependencies.
-RUN pip install nose rednose
+RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
 
 # Set up output volume.
@@ -32,6 +32,11 @@ RUN scp -o "StrictHostKeyChecking=no" \
       cpl@45.79.223.150:/home/cpl/ordered-neurons/models/$CHECKPOINT_NAME/{model.pt,corpus.data} \
       /opt/Ordered-Neurons
 
+# Cache vocab list for easy access from `spec`, etc.
+RUN PYTHONPATH="/opt/Ordered-Neurons:$PYTHONPATH" python \
+                -c 'import torch; corpus = torch.load("/opt/Ordered-Neurons/corpus.data"); \
+                    f = open("/opt/vocab", "w"); f.write("\n".join(corpus.dictionary.word2idx.keys()));'
+
 # Remove SSH information.
 RUN rm -rf /root/.ssh
 
@@ -43,6 +48,14 @@ COPY test.py /opt/test.py
 
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin
+COPY shared/unkify /opt/bin/unkify
+COPY shared/spec /opt/bin/spec
 ENV PATH "/opt/bin:${PATH}"
+
+# Prepare spec.
+COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
+RUN cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.template.json
 
 WORKDIR /opt/bin
