@@ -1,5 +1,5 @@
 """
-Tokenization utilities for a pytorch-transformers model.
+Tokenization utilities for a transformers model.
 """
 
 import argparse

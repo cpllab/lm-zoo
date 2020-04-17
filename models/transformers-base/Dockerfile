@@ -1,7 +1,7 @@
 FROM pytorch/pytorch:latest
 
 # Root of model directory relative to the build context.
-ARG MODEL_ROOT=models/pytorch-transformers
+ARG MODEL_ROOT=models/transformers-base
 ARG COMMIT
 
 # Set up output volume.
@@ -17,10 +17,9 @@ ENV NOSE_REDNOSE 1
 RUN pip install transformers
 
 # Copy in custom file for surprisal evaluation
-RUN mkdir /opt/pytorch-transformers
-COPY ${MODEL_ROOT}/get_surprisals.py /opt/pytorch-transformers/get_surprisals.py
-COPY ${MODEL_ROOT}/tokenizer.py /opt/pytorch-transformers/tokenizer.py
-COPY ${MODEL_ROOT}/model_meta.py /opt/pytorch-transformers/model_meta.py
+RUN mkdir /opt/transformers
+COPY ${MODEL_ROOT}/get_surprisals.py /opt/transformers/get_surprisals.py
+COPY ${MODEL_ROOT}/tokenizer.py /opt/transformers/tokenizer.py
 
 ENV PYTHONIOENCODING utf-8:surrogateescape
 

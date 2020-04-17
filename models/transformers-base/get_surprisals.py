@@ -1,5 +1,5 @@
 """
-Get surprisal estimates for a pytorch-transformers model.
+Get surprisal estimates for a transformers model.
 """
 
 import argparse

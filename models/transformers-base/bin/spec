@@ -6,18 +6,15 @@ import sys
 
 import torch
 
-sys.path.append("/opt/pytorch-transformers")
-from model_meta import MODEL_CLASSES
+from transformers import AutoTokenizer
 
 # Load spec template.
 with open("/opt/spec.json", "r") as spec_f:
     spec = json.load(spec_f)
 
 # Load tokenizer.
-model_type = os.environ["PYTORCH_TRANSFORMER_MODEL_TYPE"]
-model_path = os.environ["PYTORCH_TRANSFORMER_MODEL_PATH"]
-_, tokenizer_class = MODEL_CLASSES[model_type]
-tokenizer = tokenizer_class.from_pretrained(model_path)
+model_path = os.environ["TRANSFORMER_MODEL_PATH"]
+tokenizer = AutoTokenizer.from_pretrained(model_path)
 
 def filter_none(xs):
     return [x for x in xs if x is not None]
