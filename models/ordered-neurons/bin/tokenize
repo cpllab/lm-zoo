@@ -14,7 +14,7 @@ with open("/opt/vocab", "r") as f:
 UNK_TOKEN = "<unk>"
 
 tokenizer = TreebankWordTokenizer()
-punct_re = re.compile(r"^[-.?!,\*]+$")
+punct_re = re.compile(r"^[-.?!,]+$")
 
 for line in codecs.open(sys.argv[1], encoding="utf-8"):
     if not line.strip():
