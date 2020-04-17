@@ -11,9 +11,8 @@ import sys
 import torch
 import numpy as np
 
+from transformers import AutoTokenizer
 
-sys.path.append("/opt/pytorch-transformers")
-from model_meta import MODEL_CLASSES
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,8 +34,7 @@ def unkify_sentence(sentence, tokenizer):
 
 def main(args):
     logger.info("Loading tokenizer")
-    _, tokenizer_class = MODEL_CLASSES[args.model_type]
-    tokenizer = tokenizer_class.from_pretrained(str(args.model_path))
+    tokenizer = AutoTokenizer.from_pretrained(str(args.model_path))
 
     logger.info("Reading sentences from %s", args.inputf)
     sentences = readlines(args.inputf)

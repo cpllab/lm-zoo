@@ -11,9 +11,7 @@ import sys
 import torch
 import numpy as np
 
-
-sys.path.append("/opt/pytorch-transformers")
-from model_meta import MODEL_CLASSES
+from transformers import AutoModel, AutoTokenizer
 
 
 logging.basicConfig(level=logging.INFO)
@@ -58,13 +56,11 @@ def main(args):
     set_seed(args.seed, cuda=args.cuda)
 
     logger.info('Importing tokenizer and pre-trained model...')
-    model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
-
     if args.input_is_tokenized:
         tokenizer = lambda s: s.split(" ")
     else:
-        tokenizer = tokenizer_class.from_pretrained(str(args.model_path))
-    model = model_class.from_pretrained(str(args.model_path))
+        tokenizer = AutoTokenizer.from_pretrained(str(args.model_path))
+    model = AutoModel.from_pretrained(str(args.model_path))
 
     device = torch.device('cuda' if args.cuda else 'cpu')
     model.to(device)
