@@ -4,11 +4,15 @@
 
 from argparse import ArgumentParser
 import json
+import logging
 from pathlib import Path
 import subprocess
 import sys
 
 import docker
+from tqdm import tqdm
+
+L = logging.getLogger(__name__)
 
 
 # Remove these keys from specs when building the registry.
@@ -19,10 +23,14 @@ def main(args):
     registry = {}
     client = docker.from_env()
 
-    for docker_image in args.docker_images:
-        image_spec = client.containers.run(docker_image, command="spec", remove=True,
-                                           detach=False, stdout=True, stderr=False)
-        image_spec = json.loads(image_spec)
+    for docker_image in tqdm(args.docker_images):
+        try:
+            image_spec = client.containers.run(docker_image, command="spec", remove=True,
+                                               detach=False, stdout=True, stderr=False)
+            image_spec = json.loads(image_spec)
+        except Exception as e:
+            L.error("Error fetching spec from image %s", docker_image, exc_info=e)
+            continue
 
         for key in REMOVE_KEYS:
             del image_spec[key]

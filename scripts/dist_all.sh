@@ -11,4 +11,6 @@ for ref in ${image_refs[*]}; do
 done
 
 # Build new registry
-python tools/build_registry.py ${image_refs[@]}
+echo "========= Building registry"
+python tools/build_registry.py ${image_refs[@]} > registry.json
+echo "Saved registry to ./registry.json"
