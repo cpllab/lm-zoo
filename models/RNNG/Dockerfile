@@ -67,7 +67,7 @@ ARG FILES_SHA1
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
 RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
             sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
-            > /opt/spec.json
+            > /opt/spec.template.json
 
 ENV PYTHONIOENCODING utf-8
 
