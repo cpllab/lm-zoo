@@ -2,11 +2,6 @@ FROM continuumio/miniconda3
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/RNNG
-# Current git commit of build repository
-ARG COMMIT
-# sha1 checksum of build directory
-ARG FILES_SHA1
-
 
 # Install Boost dependency.
 # Need to build manually -- the standard Debian boost will pull
@@ -62,6 +57,11 @@ RUN cut -f2 /opt/rnng-incremental/clusters-train-berk.txt > /opt/vocab
 RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
+
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
