@@ -2,6 +2,10 @@ FROM continuumio/miniconda3:latest
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/ordered-neurons
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 RUN conda install pytorch=0.4.1 -c pytorch
 RUN conda install nltk
@@ -54,8 +58,9 @@ ENV PATH "/opt/bin:${PATH}"
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
+RUN export BUILD_DATETIME=$(date)
 RUN cat /tmp/spec.template.json | \
-            sed "s/<image\.sha1>/$COMMIT/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
-            > /opt/spec.template.json
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.json
 
 WORKDIR /opt/bin

@@ -4,6 +4,8 @@ FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
 ARG MODEL_ROOT=models/GRNN
 # Current git commit of build repository
 ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Perl is required for TreeTagger tokenizer.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -39,8 +41,8 @@ ENV PYTHONIOENCODING utf-8
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
-RUN cat /tmp/spec.template.json | \
-            sed "s/<image\.sha1>/$COMMIT/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
             > /opt/spec.json
 
 WORKDIR /opt/bin

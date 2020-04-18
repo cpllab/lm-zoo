@@ -2,6 +2,11 @@ FROM continuumio/miniconda3
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/RNNG
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
+
 
 # Install Boost dependency.
 # Need to build manually -- the standard Debian boost will pull
@@ -60,9 +65,9 @@ COPY test.py /opt/test.py
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
-RUN cat /tmp/spec.template.json | \
-            sed "s/<image\.sha1>/$COMMIT/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
-            > /opt/spec.template.json
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.json
 
 ENV PYTHONIOENCODING utf-8
 

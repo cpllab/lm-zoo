@@ -5,6 +5,7 @@
     "image": {
         "maintainer": "jon@gauthiers.net",
         "version": "<image.sha1>",
+        "checksum": "<image.files_sha1>",
         "datetime": "<image.datetime>",
         "gpu": {
             "required": false,
