@@ -26,6 +26,9 @@
                 "version": {
                     "type": "string"
                 },
+                "checksum": {
+                    "type": "string"
+                },
                 "size": {
                     "type": "integer"
                 },
