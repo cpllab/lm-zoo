@@ -49,8 +49,6 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("inputf", type=argparse.FileType("r", encoding="utf-8"), help="Input file")
     p.add_argument("-m", "--mode", choices=["tokenize", "unkify"])
-    p.add_argument("--model_type", default=None, type=str, required=True,
-                   help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()))
     p.add_argument("--model_path", default=None, type=Path, required=True,
                    help="Path to model directory containing checkpoint, vocabulary, config, etc.")
     p.add_argument('--outputf', '-o', type=argparse.FileType("w"), default=sys.stdout,

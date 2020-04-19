@@ -11,7 +11,7 @@ import sys
 import torch
 import numpy as np
 
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModelWithLMHead, AutoTokenizer
 
 
 logging.basicConfig(level=logging.INFO)
@@ -60,7 +60,7 @@ def main(args):
         tokenizer = lambda s: s.split(" ")
     else:
         tokenizer = AutoTokenizer.from_pretrained(str(args.model_path))
-    model = AutoModel.from_pretrained(str(args.model_path))
+    model = AutoModelWithLMHead.from_pretrained(str(args.model_path))
 
     device = torch.device('cuda' if args.cuda else 'cpu')
     model.to(device)
@@ -84,8 +84,6 @@ if __name__ == '__main__':
     parser.add_argument("inputf", type=argparse.FileType("r", encoding="utf-8"),
                         help="Input file")
     parser.add_argument("--input_is_tokenized", default=False, action="store_true")
-    parser.add_argument("--model_type", default=None, type=str, required=True,
-                        help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()))
     parser.add_argument("--model_path", default=None, type=Path, required=True,
                         help="Path to model directory containing checkpoint, vocabulary, config, etc.")
     parser.add_argument('--cuda', default=False, action='store_true',

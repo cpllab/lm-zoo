@@ -1,7 +1,6 @@
 FROM cpllab/language-models:transformers-base
 
 ARG MODEL_ROOT=models/gpt2
-ARG COMMIT
 
 RUN mkdir -p /opt/transformers/models/gpt2
 RUN cd /opt/transformers/models/gpt2 && \
@@ -13,9 +12,14 @@ RUN cd /opt/transformers/models/gpt2 && \
 ENV TRANSFORMER_MODEL_TYPE gpt2
 ENV TRANSFORMER_MODEL_PATH /opt/transformers/models/gpt2
 
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
+
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
-RUN cat /tmp/spec.template.json | \
-            sed "s/<image\.sha1>/$COMMIT/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
             > /opt/spec.json
 
