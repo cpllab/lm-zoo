@@ -19,7 +19,7 @@ setup(
     name="lm-zoo",
     packages=[],
     scripts=["bin/lm-zoo"],
-    version="0.1pre",
+    version="0.1rc1",
     license="MIT",
     description="Command-line interface with state-of-the-art neural network language models",
     author="Jon Gauthier",

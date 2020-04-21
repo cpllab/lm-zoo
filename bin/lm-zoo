@@ -20,7 +20,7 @@ def get_registry():
 
 def get_model_dict():
     registry = get_registry()
-    return {m["shortname"]: Model(m) for m in registry["models"]}
+    return {key: Model(m) for key, m in registry.items()}
 
 
 def get_docker_client():
@@ -35,7 +35,8 @@ class Model(object):
 
     @property
     def image_uri(self):
-        return "%s/%s:%s" % (self.image["registry"], self.image["image"], self.image["tag"])
+        return "%s/%s:%s" % (self.image.get("registry", DOCKER_REGISTRY),
+                             self.image["name"], self.image["tag"])
 
 
 def run_model_command(model, command_str, pull=True,
@@ -54,7 +55,7 @@ def run_model_command(model, command_str, pull=True,
     if pull:
         # First pull the image.
         registry = model.image["registry"]
-        image, tag = model.image["image"], model.image["tag"]
+        image, tag = model.image["name"], model.image["tag"]
         click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
         try:
             image_ret = client.pull(f"{registry}/{image}", tag=tag)
