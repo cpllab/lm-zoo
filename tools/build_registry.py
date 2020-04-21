@@ -32,7 +32,10 @@ def main(args):
             L.error("Error fetching spec from image %s", docker_image, exc_info=e)
             continue
 
-        registry[image_spec["name"]] = image_spec
+        image_spec["shortname"] = image_spec["name"]
+        del image_spec["name"]
+
+        registry[image_spec["shortname"]] = image_spec
 
     json.dump(registry, sys.stdout, indent=2)
 

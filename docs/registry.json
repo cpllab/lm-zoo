@@ -1,6 +1,5 @@
 {
   "gpt2": {
-    "name": "gpt2",
     "ref_url": "https://openai.com/blog/better-language-models/",
     "image": {
       "maintainer": "jon@gauthiers.net",
@@ -17,10 +16,10 @@
       "cased": true,
       "sentinel_position": "initial",
       "sentinel_pattern": "\u0120"
-    }
+    },
+    "shortname": "gpt2"
   },
   "RNNG": {
-    "name": "RNNG",
     "ref_url": "TODO",
     "image": {
       "maintainer": "jon@gauthiers.net",
@@ -34,10 +33,10 @@
     "tokenizer": {
       "type": "word",
       "cased": true
-    }
+    },
+    "shortname": "RNNG"
   },
   "ordered-neurons": {
-    "name": "ordered-neurons",
     "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
     "image": {
       "maintainer": "jon@gauthiers.net",
@@ -53,28 +52,10 @@
       "type": "word",
       "cased": false,
       "drop_token_pattern": "^[-.?!,]+$"
-    }
-  },
-  "ngram": {
-    "name": "ngram",
-    "ref_url": "http://www.speech.sri.com/projects/srilm",
-    "image": {
-      "maintainer": "jon@gauthiers.net",
-      "version": "b07a3e74895ff818a12fa0acb597c9c95cc4cc2e",
-      "checksum": "122464763ffd0ac290fe285843671aa9b22f5522",
-      "datetime": "",
-      "gpu": {
-        "required": false,
-        "supported": false
-      }
     },
-    "tokenizer": {
-      "type": "word",
-      "cased": true
-    }
+    "shortname": "ordered-neurons"
   },
   "JRNN": {
-    "name": "JRNN",
     "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
     "image": {
       "maintainer": "jon@gauthiers.net",
@@ -89,10 +70,10 @@
     "tokenizer": {
       "type": "word",
       "cased": true
-    }
+    },
+    "shortname": "JRNN"
   },
   "GRNN": {
-    "name": "GRNN",
     "ref_url": "https://github.com/facebookresearch/colorlessgreenRNNs",
     "image": {
       "maintainer": "jon@gauthiers.net",
@@ -107,6 +88,25 @@
     "tokenizer": {
       "type": "word",
       "cased": true
-    }
+    },
+    "shortname": "GRNN"
+  },
+  "ngram": {
+    "ref_url": "http://www.speech.sri.com/projects/srilm",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "b07a3e74895ff818a12fa0acb597c9c95cc4cc2e",
+      "checksum": "122464763ffd0ac290fe285843671aa9b22f5522",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    },
+    "shortname": "ngram"
   }
 }
