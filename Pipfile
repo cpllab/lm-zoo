@@ -3,3 +3,7 @@ click = "*"
 crayons = "*"
 docker = "*"
 requests = "*"
+
+[dev-packages]
+nose = "*"
+pipenv-setup = "*"
