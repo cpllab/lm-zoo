@@ -9,7 +9,7 @@ import requests
 import sys
 
 
-REGISTRY_URI = "http://localhost:8000/registry.json"
+REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
 
 DOCKER_REGISTRY = "docker.io"
 

@@ -7,3 +7,4 @@ requests = "*"
 [dev-packages]
 nose = "*"
 pipenv-setup = "*"
+twine = "*"
