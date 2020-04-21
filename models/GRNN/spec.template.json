@@ -1,0 +1,27 @@
+{
+    "name": "GRNN",
+    "ref_url": "https://github.com/facebookresearch/colorlessgreenRNNs",
+
+    "image": {
+        "maintainer": "jon@gauthiers.net",
+        "version": "<image.sha1>",
+        "checksum": "<image.files_sha1>",
+        "datetime": "<image.datetime>",
+        "gpu": {
+            "required": false,
+            "supported": false
+        }
+    },
+
+    "vocabulary": {
+        "unk_types": ["<unk>"],
+        "prefix_types": [],
+        "suffix_types": ["<eos>"],
+        "special_types": []
+    },
+
+    "tokenizer": {
+        "type": "word",
+        "cased": true
+    }
+}

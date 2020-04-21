@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+python /opt/transformers/get_surprisals.py \
+       "$1" \
+       --model_path "$TRANSFORMER_MODEL_PATH"

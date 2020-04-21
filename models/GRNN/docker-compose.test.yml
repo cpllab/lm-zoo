@@ -1,3 +1,0 @@
-sut:
-    image: cpllab/language-models:grnn
-    command: python /opt/test.py

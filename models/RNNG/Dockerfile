@@ -1,4 +1,4 @@
-FROM continuumio/anaconda
+FROM continuumio/miniconda3
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/RNNG
@@ -46,12 +46,28 @@ RUN rm -rf /root/.ssh
 
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin
+COPY shared/spec /opt/bin/spec
+COPY shared/unkify /opt/bin/unkify
 ENV PATH "/opt/bin:${PATH}"
 
+# Get model vocab from clusters file.
+RUN cut -f2 /opt/rnng-incremental/clusters-train-berk.txt > /opt/vocab
+
 # Copy test dependencies.
-RUN pip install nose rednose
+RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
+
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
+
+# Prepare spec.
+COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.template.json
 
 ENV PYTHONIOENCODING utf-8
 

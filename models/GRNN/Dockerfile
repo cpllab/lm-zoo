@@ -1,7 +1,11 @@
-FROM pytorch/pytorch:latest
+FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/GRNN
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Perl is required for TreeTagger tokenizer.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -9,12 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         rm -rf /var/lib/apt/lists/*
 
 # Add test dependencies.
-# TODO: better to handle in a docker-compose setup, I think
-RUN pip install nose rednose
+RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
-
-# Set up output volume.
-VOLUME /out
 
 # Copy in tokenizer.
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
@@ -33,12 +33,16 @@ COPY ${MODEL_ROOT}/vocab.txt /opt/colorlessgreenRNNs/data/wiki/
 # Copy in custom file for surprisal evaluation
 COPY ${MODEL_ROOT}/evaluate_target_word_test.py /opt/colorlessgreenRNNs/src/language_models/
 
-# Copy in shared tests.
-COPY test.py /opt/test.py
-
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin
+COPY shared/unkify /opt/bin/unkify
 ENV PATH "/opt/bin:${PATH}"
 ENV PYTHONIOENCODING utf-8
+
+# Prepare spec.
+COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.json
 
 WORKDIR /opt/bin

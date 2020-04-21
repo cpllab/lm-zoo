@@ -1,7 +1,11 @@
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:1.15.2
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/JRNN
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Set up output volume.
 VOLUME /out
@@ -31,12 +35,19 @@ COPY ${MODEL_ROOT}/lm_1b_eval.py ${MODEL_ROOT}/data_utils.py ${MODEL_ROOT}/eval_
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 
 # Copy in test dependencies.
-RUN pip install nose rednose
+RUN pip install nose rednose jsonschema
 ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin
+COPY shared/unkify /opt/bin
 ENV PATH "/opt/bin:${PATH}"
+
+# Prepare spec.
+COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.json
 
 WORKDIR /opt/bin

@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 
+import codecs
+from pathlib import Path
 import re
 import sys
-import codecs
+
 from nltk.tokenize import TreebankWordTokenizer
+import torch
+
+with open("/opt/vocab", "r") as f:
+    vocab = set(line.strip() for line in f)
+
+UNK_TOKEN = "<unk>"
 
 tokenizer = TreebankWordTokenizer()
-punct_re = re.compile(r"^[-.?!,\*]+$")
+punct_re = re.compile(r"^[-.?!,]+$")
 
 for line in codecs.open(sys.argv[1], encoding="utf-8"):
     if not line.strip():
@@ -14,5 +22,6 @@ for line in codecs.open(sys.argv[1], encoding="utf-8"):
         continue
 
     toks = tokenizer.tokenize(line.strip())
-    toks = [tok for tok in toks if not punct_re.match(tok)]
+    toks = [tok if tok in vocab else UNK_TOKEN
+            for tok in toks if not punct_re.match(tok)]
     print(" ".join(toks).lower() + " <eos>")

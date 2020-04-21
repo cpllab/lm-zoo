@@ -1,0 +1,28 @@
+{
+    "name": "ordered-neurons",
+    "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
+
+    "image": {
+        "maintainer": "jon@gauthiers.net",
+        "version": "<image.sha1>",
+        "checksum": "<image.files_sha1>",
+        "datetime": "<image.datetime>",
+        "gpu": {
+            "required": false,
+            "supported": false
+        }
+    },
+
+    "vocabulary": {
+        "unk_types": ["<unk>"],
+        "prefix_types": ["<eos>"],
+        "suffix_types": ["<eos>"],
+        "special_types": []
+    },
+
+    "tokenizer": {
+        "type": "word",
+        "cased": false,
+        "drop_token_pattern": "^[-.?!,]+$"
+    }
+}

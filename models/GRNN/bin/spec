@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+GRNN_ROOT = "/opt/colorlessgreenRNNs"
+DATA = GRNN_ROOT + "/data/wiki"
+
+import json
+import sys
+
+sys.path.append(GRNN_ROOT + "/src")
+
+from language_models import dictionary_corpus
+
+corpus = dictionary_corpus.Dictionary(DATA)
+
+with open("/opt/spec.json", "r") as spec_f:
+    spec = json.load(spec_f)
+
+# Extract vocabulary information from corpus data.
+special_items = [token for list_name in ["unk_types", "prefix_types", "suffix_types", "special_types"]
+                 for token in spec["vocabulary"][list_name]]
+all_items = set(special_items) | set(corpus.word2idx.keys())
+
+spec["vocabulary"]["items"] = list(all_items)
+
+json.dump(spec, sys.stdout)

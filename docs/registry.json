@@ -1,0 +1,112 @@
+{
+  "gpt2": {
+    "name": "gpt2",
+    "ref_url": "https://openai.com/blog/better-language-models/",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "6ea60eb2de8b2c67d6f083eff8240ed1eac91573",
+      "checksum": "d3136a879bbe858753928826babd9baee6773a20",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "subword",
+      "cased": true,
+      "sentinel_position": "initial",
+      "sentinel_pattern": "\u0120"
+    }
+  },
+  "RNNG": {
+    "name": "RNNG",
+    "ref_url": "TODO",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "daf803d7122105aebc90422117a204456b5179f0",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    }
+  },
+  "ordered-neurons": {
+    "name": "ordered-neurons",
+    "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "a975a0de22b2acab1eae40dcd01d6e4929c1a933",
+      "checksum": "f90bfb0d728fd550f159f11070f2894fd1a2a47b",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": false,
+      "drop_token_pattern": "^[-.?!,]+$"
+    }
+  },
+  "ngram": {
+    "name": "ngram",
+    "ref_url": "http://www.speech.sri.com/projects/srilm",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "b07a3e74895ff818a12fa0acb597c9c95cc4cc2e",
+      "checksum": "122464763ffd0ac290fe285843671aa9b22f5522",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    }
+  },
+  "JRNN": {
+    "name": "JRNN",
+    "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "b07a3e74895ff818a12fa0acb597c9c95cc4cc2e",
+      "checksum": "d6112e7463c540c99800bda44813cf76a3926662",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    }
+  },
+  "GRNN": {
+    "name": "GRNN",
+    "ref_url": "https://github.com/facebookresearch/colorlessgreenRNNs",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "b07a3e74895ff818a12fa0acb597c9c95cc4cc2e",
+      "checksum": "7064aaeef832e85518f56e4f0efb4946aa3550c5",
+      "datetime": "",
+      "gpu": {
+        "required": false,
+        "supported": false
+      }
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    }
+  }
+}

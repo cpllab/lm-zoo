@@ -1,11 +1,25 @@
-FROM cpllab/language-models:pytorch-transformers
+FROM cpllab/language-models:transformers-base
 
-RUN mkdir -p /opt/pytorch-transformers/models/gpt2
-RUN cd /opt/pytorch-transformers/models/gpt2 && \
+ARG MODEL_ROOT=models/gpt2
+
+RUN mkdir -p /opt/transformers/models/gpt2
+RUN cd /opt/transformers/models/gpt2 && \
         curl -so config.json https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-config.json && \
         curl -so pytorch_model.bin https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-pytorch_model.bin && \
         curl -so vocab.json https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-vocab.json && \
         curl -so merges.txt https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-merges.txt
 
-ENV PYTORCH_TRANSFORMER_MODEL_TYPE gpt2
-ENV PYTORCH_TRANSFORMER_MODEL_PATH /opt/pytorch-transformers/models/gpt2
+ENV TRANSFORMER_MODEL_TYPE gpt2
+ENV TRANSFORMER_MODEL_PATH /opt/transformers/models/gpt2
+
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
+
+# Prepare spec.
+COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
+RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
+            sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
+            > /opt/spec.json
+

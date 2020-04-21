@@ -1,0 +1,27 @@
+{
+    "name": "JRNN",
+    "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
+
+    "image": {
+        "maintainer": "jon@gauthiers.net",
+        "version": "<image.sha1>",
+        "checksum": "<image.files_sha1>",
+        "datetime": "<image.datetime>",
+        "gpu": {
+            "required": false,
+            "supported": false
+        }
+    },
+
+    "vocabulary": {
+        "unk_types": ["<UNK>"],
+        "prefix_types": ["<S>"],
+        "suffix_types": ["</S>"],
+        "special_types": []
+    },
+
+    "tokenizer": {
+        "type": "word",
+        "cased": true
+    }
+}

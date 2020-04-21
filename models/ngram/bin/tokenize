@@ -1,12 +1,12 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 
-TOKENIZER_ROOT=/opt/tokenizer
-TOKENIZER=${TOKENIZER_ROOT}/utf8-tokenize.perl
-ABBR_LIST=${TOKENIZER_ROOT}/english-abbreviations
+with open("/opt/vocab.txt", "r") as f:
+    vocab = set(l.strip() for l in f)
 
-# Tokenizer script operates on one sentence at a time. Input file has one
-# sentence per line.
-while read sentence; do
-  tokenized=$(echo "${sentence,,}" | $TOKENIZER -e -a $ABBR_LIST | tr "\n" " ")
-  echo "$tokenized</s>"
-done < "$1"
+import subprocess
+import sys
+
+tokenized = subprocess.check_output(["tokenize_inner", sys.argv[1]]).decode("utf-8").strip()
+for line in tokenized.strip().split("\n"):
+    unks = [token if token in vocab else "<unk>" for token in line.strip(" ").split(" ")]
+    print(" ".join(map(str, unks)))

@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+import json
+import sys
+
+with open("/opt/spec.json", "r") as spec_f:
+    spec = json.load(spec_f)
+
+with open("/opt/vocab.txt", "r") as f:
+    vocab = set(l.strip() for l in f)
+
+# Insert vocabulary information.
+spec["vocabulary"]["items"] = spec["vocabulary"]["unk_types"] + list(vocab)
+
+json.dump(spec, sys.stdout)

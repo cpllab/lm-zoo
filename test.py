@@ -2,12 +2,14 @@
 # coding=utf-8
 
 from collections import defaultdict
+import json
 import re
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 import unittest
 
+import jsonschema
 from nose.tools import *
 
 TEST_STRING = """This is a test sentence.
@@ -16,15 +18,40 @@ This is a third sentence with an aorsnarnt token.
 This is a sentence with a special \u201c token.
 """
 
+with open("/schemas/language_model_spec.json", "r") as spec_f:
+    LANGUAGE_MODEL_SPEC_SCHEMA = json.load(spec_f)
+
 SURPRISAL_RE = re.compile(r"sentence_id\ttoken_id\ttoken\tsurprisal\n"
                            "(\d+\s+\d+\s+[\w.<>]+\s+[-\d.]+\n)+(\d+\s+\d+\s+[\w.<>]+\s+[-\d.]+)",
                           flags=re.MULTILINE)
 
-class LMTest(unittest.TestCase):
+
+def get_spec():
+    return json.loads(subprocess.check_output(["spec"]).decode("utf-8"))
+
+
+def test_spec():
+    """
+    Container should return a valid specification.
+    """
+    try:
+        jsonschema.validate(instance=get_spec(), schema=LANGUAGE_MODEL_SPEC_SCHEMA)
+    except jsonschema.exceptions.ValidationError as e:
+        # Avoid printing enormous schema JSONs.
+        from pprint import pformat
+        pinstance = pformat(e.instance, width=72)
+        if len(pinstance) > 1000:
+            pinstance = pinstance[:1000] + "..."
+
+        raise ValueError("Spec validation failed for spec instance: %s" % pinstance)
+
+
+class LMProcessingTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         # super(LMTest, cls).setUpClass()
+        cls.spec = get_spec()
 
         if sys.version_info[0] == 2:
             text_f = NamedTemporaryFile("w")
@@ -58,14 +85,23 @@ class LMTest(unittest.TestCase):
 
     @property
     def _parsed_surprisals(self):
+        return self._get_parsed_surprisals(self.surprisal_lines)
+
+    def _get_parsed_surprisals(self, surprisal_lines):
         surprisals = defaultdict(dict)
-        for line in self.surprisal_lines[1:]:
+        for line in surprisal_lines[1:]:
             sentence_id, token_id, token, surprisal = line
             surprisals[int(sentence_id)][int(token_id)] = (token, float(surprisal))
 
         return surprisals
 
-    def test_tokenization(self):
+    def test_tokenize(self):
+        for tokenized_line in self.tokenized_lines:
+            for token in tokenized_line.split(" "):
+                assert token in self.spec["vocabulary"]["items"], \
+                        "%s missing from model vocabulary spec, but output by tokenize" % token
+
+    def test_tokenization_match_surprisals(self):
         # token sequence output from `get_surprisals` should match token
         # sequences from `tokenize`
         surprisals = self._parsed_surprisals
@@ -78,6 +114,9 @@ class LMTest(unittest.TestCase):
             eq_(tokens, [surprisals[i + 1][j + 1][0] for j in range(len(tokens))], "Token sequences should match exactly")
 
     def test_unkification(self):
+        if self.spec["tokenizer"]["type"] != "word":
+            return
+
         # same number of lines as tokenized sentences
         eq_(len(self.unkified_lines), len(self.tokenized_lines))
 
@@ -86,7 +125,12 @@ class LMTest(unittest.TestCase):
             eq_(len(unk_line.split(" ")), len(tok_line.split(" ")))
 
         # dummy token should definitely be unk for any model!
-        eq_(self.unkified_lines[2].split(" ")[7], "1")
+        dummy_idx = 7
+        # HACK: we should ideally have the spec specify exactly how many tokens
+        # get prepended (if multiple)
+        if len(self.spec["vocabulary"]["prefix_types"]) > 0:
+            dummy_idx += 1
+        eq_(self.unkified_lines[2].split(" ")[dummy_idx], "1")
 
     def test_surprisal_output_format(self):
         ok_(SURPRISAL_RE.match(self.surprisals_output))
@@ -97,6 +141,13 @@ class LMTest(unittest.TestCase):
             # attempt to parse surprisal
             surp = float(line[3])
             ok_(surp >= 0, "valid surprisal")
+
+    def test_surprisal_determinism(self):
+        """
+        Test that `get_surprisals` output is consistent across multiple calls.
+        """
+        # TODO
+        ...
 
 
 if __name__ == "__main__":

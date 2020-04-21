@@ -1,12 +1,19 @@
-#!/bin/sh
+#!/usr/bin/env python
 
-TOKENIZER_ROOT=/opt/tokenizer
-TOKENIZER=${TOKENIZER_ROOT}/utf8-tokenize.perl
-ABBR_LIST=${TOKENIZER_ROOT}/english-abbreviations
+GRNN_ROOT = "/opt/colorlessgreenRNNs"
+DATA = GRNN_ROOT + "/data/wiki"
+UNK_TOKEN = "<unk>"
 
-# Tokenizer script operates on one sentence at a time. Input file has one
-# sentence per line.
-while read sentence; do
-  tokenized=$(echo "$sentence" | $TOKENIZER -e -a $ABBR_LIST | tr "\n" " ")
-  echo "$tokenized<eos>"
-done < "$1"
+import subprocess
+import sys
+sys.path.append(GRNN_ROOT + "/src")
+
+from language_models import dictionary_corpus
+
+
+corpus = dictionary_corpus.Dictionary(DATA)
+
+tokenized = subprocess.check_output(["tokenize_inner", sys.argv[1]]).decode("utf-8").strip()
+for line in tokenized.strip().split("\n"):
+  unked = [token if token in corpus.word2idx else UNK_TOKEN for token in line.strip(" ").split(" ")]
+  print(" ".join(unked))
