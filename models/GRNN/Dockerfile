@@ -2,10 +2,6 @@ FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/GRNN
-# Current git commit of build repository
-ARG COMMIT
-# sha1 checksum of build directory
-ARG FILES_SHA1
 
 # Perl is required for TreeTagger tokenizer.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -38,6 +34,11 @@ COPY ${MODEL_ROOT}/bin /opt/bin
 COPY shared/unkify /opt/bin/unkify
 ENV PATH "/opt/bin:${PATH}"
 ENV PYTHONIOENCODING utf-8
+
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json

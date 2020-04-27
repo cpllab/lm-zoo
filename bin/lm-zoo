@@ -53,10 +53,10 @@ def run_model_command(model, command_str, pull=True,
 
     client = get_docker_client()
 
+    image, tag = model.image["name"], model.image["tag"]
     if pull:
         # First pull the image.
         registry = model.image["registry"]
-        image, tag = model.image["name"], model.image["tag"]
         click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
         try:
             image_ret = client.pull(f"{registry}/{image}", tag=tag)
