@@ -74,7 +74,8 @@ def run_model_command(model, command_str, pull=True,
         os.close(in_stream._sock.fileno())
 
     # Stop container and collect results.
-    client.stop(container)
+    # TODO parameterize timeout
+    client.stop(container, timeout=60)
 
     # Collect output.
     container_stdout = client.logs(container, stdout=True, stderr=False)
