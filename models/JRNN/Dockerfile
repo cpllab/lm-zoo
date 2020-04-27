@@ -2,10 +2,6 @@ FROM tensorflow/tensorflow:1.15.2
 
 # Root of model directory relative to build context.
 ARG MODEL_ROOT=models/JRNN
-# Current git commit of build repository
-ARG COMMIT
-# sha1 checksum of build directory
-ARG FILES_SHA1
 
 # Set up output volume.
 VOLUME /out
@@ -43,6 +39,11 @@ COPY test.py /opt/test.py
 COPY ${MODEL_ROOT}/bin /opt/bin
 COPY shared/unkify /opt/bin
 ENV PATH "/opt/bin:${PATH}"
+
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
