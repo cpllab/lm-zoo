@@ -22,6 +22,7 @@ for line in codecs.open(sys.argv[1], encoding="utf-8"):
         continue
 
     toks = tokenizer.tokenize(line.strip())
+    toks = [tok.lower() for tok in toks]
     toks = [tok if tok in vocab else UNK_TOKEN
             for tok in toks if not punct_re.match(tok)]
-    print(" ".join(toks).lower() + " <eos>")
+    print(" ".join(toks) + " <eos>")
