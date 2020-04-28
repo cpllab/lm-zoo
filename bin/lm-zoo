@@ -169,8 +169,9 @@ def list(short):
                 crayons.normal("Image URI: ", bold=True),
                 model.image_uri))
             for key, label in show_props:
-                click.echo("\t" + crayons.normal(label + ": ", bold=True)
-                           + getattr(model, key, "None"))
+                if hasattr(model, key):
+                    click.echo("\t" + crayons.normal(label + ": ", bold=True)
+                                + getattr(model, key))
 
 
 @lm_zoo.command()
