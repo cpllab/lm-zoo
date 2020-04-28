@@ -1,18 +1,89 @@
 Quickstart
 ==================
 
-Installation
-^^^^^^^^^^^^^
+Requirements
+^^^^^^^^^^^^
 
-LM Zoo will be released as a package on the 
-`Python Package Index <https://pypi.org>`_,
-allowing for an easy ``pip install``. Please check back soon for updates.
+`lm-zoo` is supported for Windows, OS X, and Linux systems. It requires `Docker
+<https://docs.docker.com/get-docker/>` to run language model images.
+
+Language models can be large (4--8 GB in disk space per model) and require a
+substantial amount of RAM (2--8 GB). Some language models may require a
+reliable desktop machine or a computing cluster to run.
+
+Installation
+^^^^^^^^^^^^
+
+You can install LM Zoo using the Python package manager ``pip``:::
+
+  pip install lm-zoo
+
 
 Getting started
 ^^^^^^^^^^^^^^^^
 
-Coming soon!
+List language models
 
-.. figure:: _static/under-construction.png
-   :width: 20%
-   :align: center
+Tokenize some data::
+
+  $ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
+  $ head -n3 metamorphosis.txt
+  Pulling latest Docker image for cpllab/language-models:rnng.
+  One morning , when UNK-INITC UNK-INITC woke from troubled dreams , he found himself transformed in his bed into a horrible UNK-LC .
+  He lay on his UNK-LC-DASH back , and if he lifted his head a little he could see his brown UNK-LC-ly , slightly UNK-LC-ed and divided by UNK-LC-s into stiff sections .
+  The UNK-LC-ing was hardly able to cover it and seemed ready to slide off any moment .
+  ...
+
+  $ lm-zoo tokenize ngram metamorphosis.txt
+  Pulling latest Docker image for cpllab/language-models:ngram.
+  one morning , when gregor <unk> woke from troubled dreams , he found himself transformed in his bed into a horrible <unk> . </s>
+  he lay on his <unk> back , and if he lifted his head a little he could see his brown belly , slightly domed and divided by arches into stiff sections . </s>
+  the bedding was hardly able to cover it and seemed ready to slide off any moment . </s>
+  ...
+
+  $ lm-zoo tokenize RNNG metamorphosis.txt
+  Pulling latest Docker image for cpllab/language-models:rnng.
+  One morning , when UNK-INITC UNK-INITC woke from troubled dreams , he found himself transformed in his bed into a horrible UNK-LC .
+  He lay on his UNK-LC-DASH back , and if he lifted his head a little he could see his brown UNK-LC-ly , slightly UNK-LC-ed and divided by UNK-LC-s into stiff sections .
+  The UNK-LC-ing was hardly able to cover it and seemed ready to slide off any moment .
+  ...
+
+  $ lm-zoo tokenize gpt2 metamorphosis.txt
+  Pulling latest Docker image for cpllab/language-models:gpt2.
+  One Ġmorning , Ġwhen ĠGreg or ĠSam sa Ġwoke Ġfrom Ġtroubled Ġdreams , Ġhe Ġfound Ġhimself Ġtransformed Ġin Ġhis Ġbed Ġinto Ġa Ġhorrible Ġver min .
+  He Ġlay Ġon Ġhis Ġarmour - like Ġback , Ġand Ġif Ġhe Ġlifted Ġhis Ġhead Ġa Ġlittle Ġhe Ġcould Ġsee Ġhis Ġbrown Ġbelly , Ġslightly Ġdom ed Ġand Ġdivided Ġby Ġar ches Ġinto Ġstiff Ġsections .
+  The Ġbed ding Ġwas Ġhardly Ġable Ġto Ġcover Ġit Ġand Ġseemed Ġready Ġto Ġslide Ġoff Ġany Ġmoment .
+  ...
+
+
+Get surprisals for some data::
+
+  $ lm-zoo get-surprisals ngram metamorphosis.txt
+  sentence_id     token_id        token   surprisal
+  1       1       one     7.76847
+  1       2       morning 9.40638
+  1       3       ,       1.05009
+  1       4       when    7.08489
+  1       5       gregor  18.8963
+  1       6       <unk>   4.27466
+  1       7       woke    19.0607
+  1       8       from    10.3404
+  1       9       troubled        17.478
+  1       10      dreams  10.671
+  1       11      ,       3.39374
+  1       12      he      5.99193
+  1       13      found   8.07358
+  1       14      himself 2.92718
+  1       15      transformed     16.7328
+  1       16      in      5.32057
+  1       17      his     7.26454
+  1       18      bed     9.78166
+  1       19      into    8.90954
+  1       20      a       3.72355
+  1       21      horrible        14.2477
+  1       22      <unk>   3.56907
+  1       23      .       3.90242
+  1       24      </s>    22.8395
+  2       1       he      4.43708
+  2       2       lay     14.1721
+  ...
