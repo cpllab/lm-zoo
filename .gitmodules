@@ -1,3 +1,0 @@
-[submodule "tools/gdown"]
-	path = tools/gdown
-	url = git://github.com/circulosmeos/gdown.pl
