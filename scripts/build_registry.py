@@ -40,7 +40,7 @@ def main(args):
             L.error("Error fetching spec from image %s", docker_image, exc_info=e)
             continue
 
-        image_obj = client.images.get(image_obj)
+        image_obj = client.images.get(docker_image)
 
         image_spec["shortname"] = image_spec["name"]
         del image_spec["name"]

@@ -12,5 +12,5 @@ done
 
 # Build new registry
 echo "========= Building registry"
-python tools/build_registry.py ${image_refs[@]} > registry.json
-echo "Saved registry to ./registry.json"
+python scripts/build_registry.py ${image_refs[@]} > docs/registry.json
+echo "Saved registry to ./docs/registry.json"

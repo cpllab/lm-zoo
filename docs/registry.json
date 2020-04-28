@@ -1,10 +1,27 @@
 {
+  "ngram": {
+    "ref_url": "http://www.speech.sri.com/projects/srilm",
+    "image": {
+      "registry": "docker.io",
+      "name": "cpllab/language-models",
+      "tag": "ngram",
+      "size": 1371496579,
+      "datetime": "2020-04-28T03:32:35.85949433Z"
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    },
+    "shortname": "ngram"
+  },
   "gpt2": {
     "ref_url": "https://openai.com/blog/better-language-models/",
     "image": {
       "registry": "docker.io",
       "name": "cpllab/language-models",
-      "tag": "gpt2"
+      "tag": "gpt2",
+      "size": 4808648849,
+      "datetime": "2020-04-28T03:25:31.144373918Z"
     },
     "tokenizer": {
       "type": "subword",
@@ -14,25 +31,14 @@
     },
     "shortname": "gpt2"
   },
-  "RNNG": {
-    "ref_url": "TODO",
-    "image": {
-      "registry": "docker.io",
-      "name": "cpllab/language-models",
-      "tag": "rnng"
-    },
-    "tokenizer": {
-      "type": "word",
-      "cased": true
-    },
-    "shortname": "RNNG"
-  },
   "ordered-neurons": {
     "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
     "image": {
       "registry": "docker.io",
       "name": "cpllab/language-models",
-      "tag": "ordered-neurons"
+      "tag": "ordered-neurons",
+      "size": 3288891598,
+      "datetime": "2020-04-28T00:11:09.254001171Z"
     },
     "tokenizer": {
       "type": "word",
@@ -41,25 +47,29 @@
     },
     "shortname": "ordered-neurons"
   },
-  "JRNN": {
-    "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
+  "RNNG": {
+    "ref_url": "TODO",
     "image": {
       "registry": "docker.io",
       "name": "cpllab/language-models",
-      "tag": "jrnn"
+      "tag": "rnng",
+      "size": 2795633122,
+      "datetime": "2020-04-28T00:10:27.030399065Z"
     },
     "tokenizer": {
       "type": "word",
       "cased": true
     },
-    "shortname": "JRNN"
+    "shortname": "RNNG"
   },
   "GRNN": {
     "ref_url": "https://github.com/facebookresearch/colorlessgreenRNNs",
     "image": {
       "registry": "docker.io",
       "name": "cpllab/language-models",
-      "tag": "grnn"
+      "tag": "grnn",
+      "size": 4755765452,
+      "datetime": "2020-04-27T23:51:04.41132364Z"
     },
     "tokenizer": {
       "type": "word",
@@ -67,17 +77,19 @@
     },
     "shortname": "GRNN"
   },
-  "ngram": {
-    "ref_url": "http://www.speech.sri.com/projects/srilm",
+  "JRNN": {
+    "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
     "image": {
       "registry": "docker.io",
       "name": "cpllab/language-models",
-      "tag": "ngram"
+      "tag": "jrnn",
+      "size": 5371431181,
+      "datetime": "2020-04-27T22:17:55.281781327Z"
     },
     "tokenizer": {
       "type": "word",
       "cased": true
     },
-    "shortname": "ngram"
+    "shortname": "JRNN"
   }
 }
