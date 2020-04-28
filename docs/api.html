@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Language model API</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Official models" href="models.html" />
+  <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <img class="logo" src="_static/logo.png" alt="doit logo"/>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">Documentation</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 "><a href="quickstart.html" class="reference internal ">Quickstart</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Language model API</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#spec" class="reference internal">spec</a></li>
+                
+                  <li class="toctree-l2"><a href="#get-surprisals" class="reference internal">get_surprisals</a></li>
+                
+                  <li class="toctree-l2"><a href="#tokenize" class="reference internal">tokenize</a></li>
+                
+                  <li class="toctree-l2"><a href="#unkify" class="reference internal">unkify</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="models.html" class="reference internal ">Official models</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="thanks.html" class="reference internal ">Acknowledgments</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Language model API</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="quickstart.html"
+       title="previous chapter">← Quickstart</a>
+  </li>
+  <li class="next">
+    <a href="models.html"
+       title="next chapter">Official models →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <div class="section" id="language-model-api">
+<span id="api"></span><h1>Language model API<a class="headerlink" href="#language-model-api" title="Permalink to this headline">¶</a></h1>
+<p>Each language model in the LM Zoo is a Docker container which provides various
+binaries for running and probing the internal model. This document specifies
+the exact API for accessing and using these language models.</p>
+<p>Each container makes available the following binaries, which communicate via
+<cite>stdout</cite> and <cite>stderr</cite> with the host:</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#spec" id="id1"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a></p>
+<ul>
+<li><p><a class="reference internal" href="#schema" id="id2">schema</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#get-surprisals" id="id3"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></p>
+<ul>
+<li><p><a class="reference internal" href="#get-surprisals-output-format" id="id4">get_surprisals output format</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#tokenize" id="id5"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></p></li>
+<li><p><a class="reference internal" href="#unkify" id="id6"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></p></li>
+</ul>
+</div>
+<div class="section" id="spec">
+<h2><a class="toc-backref" href="#id1"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a><a class="headerlink" href="#spec" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">stdout</dt>
+<dd class="field-even"><p>Description of language model and relevant metadata</p>
+</dd>
+<dt class="field-odd">stdout format</dt>
+<dd class="field-odd"><p>JSON</p>
+</dd>
+<dt class="field-even">stderr</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p>The <code class="docutils literal notranslate"><span class="pre">spec</span></code> binary outputs relevant metadata describing the language model image:</p>
+<div class="section" id="schema">
+<h3><a class="toc-backref" href="#id2">schema</a><a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="4"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="5"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="15"><ul class="simple">
+<li><p><strong>image</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>datetime</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>datetime</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>gpu</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>required</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>supported</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>maintainer</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>email</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><strong>version</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>checksum</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>size</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>max_memory</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>max_gpu_memory</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p><strong>name</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>ref_url</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="3"><p>uri</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="17"><ul class="simple">
+<li><p><strong>vocabulary</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>items</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>items</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p><strong>prefix_types</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>items</p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>special_types</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>items</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p><strong>suffix_types</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>items</p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>unk_types</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>items</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="7"><ul class="simple">
+<li><p><strong>tokenizer</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p><strong>cased</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><strong>type</strong></p></li>
+</ul>
+</td>
+<td><p>enum</p></td>
+<td colspan="2"><p>word, subword, character</p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>sentinel_pattern</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>sentinel_position</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>drop_token_pattern</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em> / <em>null</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="get-surprisals">
+<h2><a class="toc-backref" href="#id3"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a><a class="headerlink" href="#get-surprisals" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ol class="arabic simple">
+<li><p>Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line</p></li>
+</ol>
+</dd>
+<dt class="field-even">stdout</dt>
+<dd class="field-even"><p>Per-word surprisal values</p>
+</dd>
+<dt class="field-odd">stdout format</dt>
+<dd class="field-odd"><p>TSV</p>
+</dd>
+<dt class="field-even">stderr</dt>
+<dd class="field-even"><p>Not specified</p>
+</dd>
+</dl>
+<p>The output of <code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code> is a tab-separated file with the following
+columns (including headings on the first line):</p>
+<div class="section" id="get-surprisals-output-format">
+<h3><a class="toc-backref" href="#id4">get_surprisals output format</a><a class="headerlink" href="#get-surprisals-output-format" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>sentence_id</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Index of current sentence within input sentence file (1-indexed)</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>token_id</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Index of current token within sentence (1-indexed)</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>token</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Content of current token</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p><strong>surprisal</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p>Model surprisal at current token (base 2)</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="tokenize">
+<h2><a class="toc-backref" href="#id5"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a><a class="headerlink" href="#tokenize" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ol class="arabic simple">
+<li><p>Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line</p></li>
+</ol>
+</dd>
+<dt class="field-even">stdout</dt>
+<dd class="field-even"><p>Tokenized text, one sentence per line</p>
+</dd>
+<dt class="field-odd">stdout format</dt>
+<dd class="field-odd"><p>plain text</p>
+</dd>
+<dt class="field-even">stderr</dt>
+<dd class="field-even"><p>Not specified</p>
+</dd>
+</dl>
+<p>The following constraints must hold on the output of <code class="docutils literal notranslate"><span class="pre">tokenize</span></code>:</p>
+<ol class="arabic simple">
+<li><p>All tokens (when splitting on whitespace) are elements of the language
+model’s vocabulary, as given in <code class="docutils literal notranslate"><span class="pre">vocabulary.items</span></code> of the language model
+specification (see <a class="reference internal" href="#spec">spec</a>).</p></li>
+<li><p>If the model produces UNK tokens, all the UNK tokens must be part of the
+declared <code class="docutils literal notranslate"><span class="pre">vocabulary.unk_types</span></code> list of the language model specification
+(see <a class="reference internal" href="#spec">spec</a>).</p></li>
+<li><p>The model may prepend/insert/append sentence boundary tokens and other
+special tokens, so long as they are members of the relevant special type
+lists declared in the language model specification (see
+<code class="docutils literal notranslate"><span class="pre">vocabulary.prefix_types</span></code>, <code class="docutils literal notranslate"><span class="pre">vocabulary.suffix_types</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">vocabulary.special_types</span></code> in <a class="reference internal" href="#spec">spec</a>).</p></li>
+</ol>
+</div>
+<div class="section" id="unkify">
+<h2><a class="toc-backref" href="#id6"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a><a class="headerlink" href="#unkify" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ol class="arabic simple">
+<li><p>Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line</p></li>
+</ol>
+</dd>
+<dt class="field-even">stdout</dt>
+<dd class="field-even"><p>Sequence of mask values, one sentence per line (<code class="docutils literal notranslate"><span class="pre">0</span></code> if the
+corresponding token is known by the model, and <code class="docutils literal notranslate"><span class="pre">1</span></code> otherwise)</p>
+</dd>
+<dt class="field-odd">stdout format</dt>
+<dd class="field-odd"><p>plain text</p>
+</dd>
+<dt class="field-even">stderr</dt>
+<dd class="field-even"><p>Not specified</p>
+</dd>
+</dl>
+<p>The following constraints must hold on the output of <code class="docutils literal notranslate"><span class="pre">unkify</span></code>:</p>
+<ol class="arabic simple">
+<li><p>Each line is composed only of <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> values separated by spaces.</p></li>
+<li><p>Each line corresponds to a sentence line as output by <a class="reference internal" href="#tokenize">tokenize</a>, with
+exactly the same number of tokens (when splitting on whitespace).</p></li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="quickstart.html"
+       title="previous chapter">← Quickstart</a>
+  </li>
+  <li class="next">
+    <a href="models.html"
+       title="next chapter">Official models →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>

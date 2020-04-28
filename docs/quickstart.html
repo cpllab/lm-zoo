@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Quickstart</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Language model API" href="api.html" />
+  <link rel="prev" title="Welcome to LM Zoo" href="index.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <img class="logo" src="_static/logo.png" alt="doit logo"/>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">Documentation</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Quickstart</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#requirements" class="reference internal">Requirements</a></li>
+                
+                  <li class="toctree-l2"><a href="#installation" class="reference internal">Installation</a></li>
+                
+                  <li class="toctree-l2"><a href="#getting-started" class="reference internal">Getting started</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model API</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="models.html" class="reference internal ">Official models</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="thanks.html" class="reference internal ">Acknowledgments</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Quickstart</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="index.html"
+       title="previous chapter">← Welcome to LM Zoo</a>
+  </li>
+  <li class="next">
+    <a href="api.html"
+       title="next chapter">Language model API →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p><cite>lm-zoo</cite> is supported for Windows, OS X, and Linux systems. It requires <cite>Docker
+&lt;https://docs.docker.com/get-docker/&gt;</cite> to run language model images.</p>
+<p>Language models can be large (4–8 GB in disk space per model) and require a
+substantial amount of RAM (2–8 GB). Some language models may require a
+reliable desktop machine or a computing cluster to run.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>You can install LM Zoo using the Python package manager <code class="docutils literal notranslate"><span class="pre">pip</span></code>::</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">lm</span><span class="o">-</span><span class="n">zoo</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>List language models</p>
+<p>Tokenize some data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
+$ head -n3 metamorphosis.txt
+Pulling latest Docker image for cpllab/language-models:rnng.
+One morning , when UNK-INITC UNK-INITC woke from troubled dreams , he found himself transformed in his bed into a horrible UNK-LC .
+He lay on his UNK-LC-DASH back , and if he lifted his head a little he could see his brown UNK-LC-ly , slightly UNK-LC-ed and divided by UNK-LC-s into stiff sections .
+The UNK-LC-ing was hardly able to cover it and seemed ready to slide off any moment .
+...
+
+$ lm-zoo tokenize ngram metamorphosis.txt
+Pulling latest Docker image for cpllab/language-models:ngram.
+one morning , when gregor &lt;unk&gt; woke from troubled dreams , he found himself transformed in his bed into a horrible &lt;unk&gt; . &lt;/s&gt;
+he lay on his &lt;unk&gt; back , and if he lifted his head a little he could see his brown belly , slightly domed and divided by arches into stiff sections . &lt;/s&gt;
+the bedding was hardly able to cover it and seemed ready to slide off any moment . &lt;/s&gt;
+...
+
+$ lm-zoo tokenize RNNG metamorphosis.txt
+Pulling latest Docker image for cpllab/language-models:rnng.
+One morning , when UNK-INITC UNK-INITC woke from troubled dreams , he found himself transformed in his bed into a horrible UNK-LC .
+He lay on his UNK-LC-DASH back , and if he lifted his head a little he could see his brown UNK-LC-ly , slightly UNK-LC-ed and divided by UNK-LC-s into stiff sections .
+The UNK-LC-ing was hardly able to cover it and seemed ready to slide off any moment .
+...
+
+$ lm-zoo tokenize gpt2 metamorphosis.txt
+Pulling latest Docker image for cpllab/language-models:gpt2.
+One Ġmorning , Ġwhen ĠGreg or ĠSam sa Ġwoke Ġfrom Ġtroubled Ġdreams , Ġhe Ġfound Ġhimself Ġtransformed Ġin Ġhis Ġbed Ġinto Ġa Ġhorrible Ġver min .
+He Ġlay Ġon Ġhis Ġarmour - like Ġback , Ġand Ġif Ġhe Ġlifted Ġhis Ġhead Ġa Ġlittle Ġhe Ġcould Ġsee Ġhis Ġbrown Ġbelly , Ġslightly Ġdom ed Ġand Ġdivided Ġby Ġar ches Ġinto Ġstiff Ġsections .
+The Ġbed ding Ġwas Ġhardly Ġable Ġto Ġcover Ġit Ġand Ġseemed Ġready Ġto Ġslide Ġoff Ġany Ġmoment .
+...
+</pre></div>
+</div>
+<p>Get surprisals for some data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ lm-zoo get-surprisals ngram metamorphosis.txt
+sentence_id     token_id        token   surprisal
+1       1       one     7.76847
+1       2       morning 9.40638
+1       3       ,       1.05009
+1       4       when    7.08489
+1       5       gregor  18.8963
+1       6       &lt;unk&gt;   4.27466
+1       7       woke    19.0607
+1       8       from    10.3404
+1       9       troubled        17.478
+1       10      dreams  10.671
+1       11      ,       3.39374
+1       12      he      5.99193
+1       13      found   8.07358
+1       14      himself 2.92718
+1       15      transformed     16.7328
+1       16      in      5.32057
+1       17      his     7.26454
+1       18      bed     9.78166
+1       19      into    8.90954
+1       20      a       3.72355
+1       21      horrible        14.2477
+1       22      &lt;unk&gt;   3.56907
+1       23      .       3.90242
+1       24      &lt;/s&gt;    22.8395
+2       1       he      4.43708
+2       2       lay     14.1721
+...
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="index.html"
+       title="previous chapter">← Welcome to LM Zoo</a>
+  </li>
+  <li class="next">
+    <a href="api.html"
+       title="next chapter">Language model API →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>
