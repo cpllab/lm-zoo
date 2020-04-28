@@ -1,14 +1,10 @@
 FROM debian:latest
 
 ARG MODEL_ROOT=models/ngram
-# Current git commit of build repository
-ARG COMMIT
-# sha1 checksum of build directory
-ARG FILES_SHA1
 
 RUN apt update && apt install -y --no-install-recommends \
           build-essential openssh-client \
-          gawk python3 python3-pip python3-setuptools
+          libgomp1 libgetopt-complete-perl gawk python3 python3-pip python3-setuptools
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN mkdir -p /opt/srilm
@@ -36,7 +32,7 @@ ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
 
 # Remove build dependencies.
-RUN apt remove -y openssh-client build-essential
+RUN apt purge --auto-remove -y openssh-client build-essential
 
 COPY ${MODEL_ROOT}/vocab.txt /opt/vocab.txt
 COPY ${MODEL_ROOT}/get_surprisals.awk /opt/get_surprisals.awk
@@ -46,6 +42,11 @@ COPY shared/unkify /opt/bin/unkify
 
 ENV PATH "/opt/bin:${PATH}"
 ENV PYTHONIOENCODING utf-8
+
+# Current git commit of build repository
+ARG COMMIT
+# sha1 checksum of build directory
+ARG FILES_SHA1
 
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
