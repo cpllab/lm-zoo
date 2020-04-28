@@ -8,6 +8,7 @@ import click
 import crayons
 import docker
 import requests
+import tqdm
 
 
 REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
@@ -40,8 +41,57 @@ class Model(object):
                              self.image["name"], self.image["tag"])
 
 
+def _update_progress(line, progress_bars):
+    """
+    Process a progress update line from the Docker API for push/pull
+    operations, writing to `progress_bars`.
+    """
+    # From https://github.com/neuromation/platform-client-python/pull/201/files#diff-2d85e2a65d4d047287bea6267bd3826dR771
+    try:
+        if "id" in line:
+            status = line["status"]
+            if status == "Pushed" or status == "Download complete":
+                if line["id"] in progress_bars:
+                    progress = progress_bars[line["id"]]
+                    delta = progress["total"] - progress["current"]
+                    if delta < 0:
+                        delta = 0
+                    progress["progress"].update(delta)
+                    progress["progress"].close()
+            elif status == "Pushing" or status == "Downloading":
+                if line["id"] not in progress_bars:
+                    if "progressDetail" in line:
+                        progress_details = line["progressDetail"]
+                        total_progress = progress_details.get(
+                            "total", progress_details.get("current", 1)
+                        )
+                        if total_progress > 0:
+                            progress_bars[line["id"]] = {
+                                "progress": tqdm.tqdm(
+                                    total=total_progress,
+                                    leave=False,
+                                    unit="B",
+                                    unit_scale=True,
+                                ),
+                                "current": 0,
+                                "total": total_progress,
+                            }
+                if "progressDetail" in line and "current" in line["progressDetail"]:
+                    delta = (
+                        line["progressDetail"]["current"]
+                        - progress_bars[line["id"]]["current"]
+                    )
+                    if delta < 0:
+                        delta = 0
+                    progress_bars[line["id"]]["current"] = line["progressDetail"]["current"]
+                    progress_bars[line["id"]]["progress"].update(delta)
+    except BaseException:
+        pass
+
+
 def run_model_command(model, command_str, pull=True,
-                      stdin=None, stdout=sys.stdout, stderr=sys.stderr):
+                      stdin=None, stdout=sys.stdout, stderr=sys.stderr,
+                      progress_stream=sys.stderr):
     """
     Run the given shell command inside a container instantiating the given
     model.
@@ -59,7 +109,13 @@ def run_model_command(model, command_str, pull=True,
         registry = model.image["registry"]
         click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
         try:
-            image_ret = client.pull(f"{registry}/{image}", tag=tag)
+            progress_bars = {}
+            for line in client.pull(f"{registry}/{image}", tag=tag, stream=True, decode=True):
+                if progress_stream is not None:
+                    # Write pull progress on the given stream.
+                    _update_progress(line, progress_bars)
+                else:
+                    pass
         except docker.errors.NotFound:
             raise RuntimeError("Image not found.")
 
