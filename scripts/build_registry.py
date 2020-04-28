@@ -25,7 +25,7 @@ DOCKER_REFERENCE_RE = re.compile(r"^((?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z
 
 def main(args):
     registry = {}
-    client = docker.from_env()
+    client = docker.from_env(timeout=60)
 
     for docker_image in tqdm(args.docker_images):
         try:
@@ -40,6 +40,8 @@ def main(args):
             L.error("Error fetching spec from image %s", docker_image, exc_info=e)
             continue
 
+        image_obj = client.images.get(image_obj)
+
         image_spec["shortname"] = image_spec["name"]
         del image_spec["name"]
 
@@ -48,6 +50,8 @@ def main(args):
             "registry": DOCKER_DEFAULT_REGISTRY,
             "name": reference_match.group(1),
             "tag": reference_match.group(2) or DOCKER_DEFAULT_TAG,
+            "size": image_obj.attrs["VirtualSize"],
+            "datetime": image_obj.attrs["Created"],
         }
 
         registry[image_spec["shortname"]] = image_spec
