@@ -2,129 +2,104 @@
 
 ![zoo-logo](docs/_static/logo.png)
 
-[![CircleCI](https://circleci.com/gh/cpllab/language-models.svg?style=svg&circle-token=d907824249db5ad63c03bfcc3b403c6d9ad845e2)](https://circleci.com/gh/cpllab/language-models)
+[![CircleCI](https://circleci.com/gh/cpllab/lm-zoo/tree/master.svg?style=svg&circle-token=d907824249db5ad63c03bfcc3b403c6d9ad845e2)](https://circleci.com/gh/cpllab/lm-zoo/tree/master)
 
-This folder contains scripts for obtaining surprisals from the following pre-trained language models:
+The Language Model Zoo is an open-source repository of state-of-the-art
+language models, designed to support black-box access to model predictions and
+representations. It provides the command line tool `lm-zoo`, a standard
+interface for interacting with language models.
 
-1. [GRNN](https://github.com/facebookresearch/colorlessgreenRNNs)
-2. [JRNN](https://github.com/tensorflow/models/tree/master/research/lm_1b)
-3. [RNNG](https://github.com/clab/rnng)
-4. [Transformer-XL](https://github.com/kimiyoung/transformer-xl)
-5. [Tiny LSTM](https://github.com/pytorch/examples/tree/master/word_language_model)
-6. 5-gram with Kneser-Ney smoothing
-7. **coming soon**: [BERT](https://github.com/google-research/bert)
+You can use `lm-zoo` to
 
-![models](models.png)
+1. extract token-level surprisal data, and
+2. preprocess corpora according to a language model's particular tokenization
+   standards.
 
-The models use the following tokenizers:
+## Getting started
 
-| Model | Tokenizer |
-| :---: | :--------------: |
-| GRNN  | [TreeTagger](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) |
-| JRNN  | [WMT11 tokenizer](http://statmt.org/wmt11/translation-task.html) |
-| RNNG  | [PTB tokenizer](https://www.nltk.org/_modules/nltk/tokenize/treebank.html) |
-| Tiny  | [PTB tokenizer](https://www.nltk.org/_modules/nltk/tokenize/treebank.html) |
-| Trans | Moses ([one implementation](https://github.com/OpenNMT/OpenNMT-py/blob/master/tools/tokenizer.perl)) |
-| ngram | [TreeTagger](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/) |
+Running language models from this repository requires [Docker][1].
 
-The parameters are taken from the standard published version of each model unless stated otherwise.
+You can install the `lm-zoo` via `pip`:
 
-## Scripts
+    $ pip install lm-zoo
 
-Surprisals can be obtained from each model using the script `eval_<MODEL>.sh` in the `scripts` folder.
-Each script expects two arguments: `$1` is the input file containing the sentences, and
-`$2` is the output file to save the surprisals.
+List available language models:
 
-### Input file format
+    $ lm-zoo list
+    gpt2
+            Image URI:  docker.io/cpllab/language-models:gpt2
+            Full name: None
+            Reference URL: https://openai.com/blog/better-language-models/
+            Maintainer: None
+            Last updated: None
+    RNNG
+            Image URI:  docker.io/cpllab/language-models:rnng
+            Full name: None
+            Reference URL: TODO
+            Maintainer: None
+            Last updated: None
+    ordered-neurons
+            Image URI:  docker.io/cpllab/language-models:ordered-neurons
+            Full name: None
+            Reference URL: https://github.com/yikangshen/Ordered-Neurons
+            Maintainer: None
+            Last updated: None
+    ...
 
-The input file should have each sentence on a new line, and each sentence should be **tokenized**.
+Tokenize some text according to a language model's standard:
 
-There are also some model-specific constraints, although I may try to streamline these later:
-* For every model except RNNG and Tiny LSTM, the sentence should end with an `<eos>` token.
-* The n-gram model is **uncased**, so you'll have to convert your input file to lowercase
-  to avoid getting `unk`s. I am working on adding a script to do this.
-* For RNNG and Tiny LSTM, the input must be `unk`ified. An `unk`ify function is provided in
-  `rnng-incremental/get_raw.py`, which can be used in the following way:
-```bash
-python2 get_raw.py train.02-21 \
-    RAW.txt > UNKIFIED.txt
-```
+    $ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
+    $ lm-zoo tokenize gpt2 metamorphosis.txt
+    Pulling latest Docker image for cpllab/language-models:gpt2.
+    One Ġmorning , Ġwhen ĠGreg or ĠSam sa Ġwoke Ġfrom Ġtroubled Ġdreams , Ġhe Ġfound Ġhimself Ġtransformed Ġin Ġhis Ġbed Ġinto Ġa Ġhorrible Ġver min .
+    He Ġlay Ġon Ġhis Ġarmour - like Ġback , Ġand Ġif Ġhe Ġlifted Ġhis Ġhead Ġa Ġlittle Ġhe Ġcould Ġsee Ġhis Ġbrown Ġbelly , Ġslightly Ġdom ed Ġand Ġdivided Ġby Ġar ches Ġinto Ġstiff Ġsections .
+    The Ġbed ding Ġwas Ġhardly Ġable Ġto Ġcover Ġit Ġand Ġseemed Ġready Ġto Ġslide Ġoff Ġany Ġmoment .
+    ...
 
-### Output file format
+Get token-level surprisals for text data:
 
-The output file will have the following format:
-```
-token1 0.0
-token2 ...
-.      ...
-<eos>  0.0
-```
-where the second column (separated by `\t`) gives the surprisal in bits of the token.
+    $ lm-zoo get-surprisals ngram metamorphosis.txt
+    sentence_id     token_id        token   surprisal
+    1       1       one     7.76847
+    1       2       morning 9.40638
+    1       3       ,       1.05009
+    1       4       when    7.08489
+    1       5       gregor  18.8963
+    1       6       <unk>   4.27466
+    1       7       woke    19.0607
+    1       8       from    10.3404
+    1       9       troubled        17.478
+    1       10      dreams  10.671
+    1       11      ,       3.39374
+    1       12      he      5.99193
+    1       13      found   8.07358
+    1       14      himself 2.92718
+    1       15      transformed     16.7328
+    1       16      in      5.32057
+    1       17      his     7.26454
+    1       18      bed     9.78166
+    1       19      into    8.90954
+    1       20      a       3.72355
+    1       21      horrible        14.2477
+    1       22      <unk>   3.56907
+    1       23      .       3.90242
+    1       24      </s>    22.8395
+    2       1       he      4.43708
+    2       2       lay     14.1721
+    ...
 
-When you run `eval_ngram.sh`, you will also get an extra `.raw` output file that has the raw SRILM output with
-details about word probabilities and backoff.
+For more information, see our [Quickstart tutorial][2].
 
-## Dependencies
+## Supported models
 
-### LSTMs and Transformers
-The GRNN, JRNN, Transformer-XL, and Tiny LSTM models require `pytorch` and other dependencies that can be found
-in their source folders. If you don't feel like creating your own environments, feel free to "steal" mine:
-`/om2/user/jennhu/conda/envs/neural-nlp` (credit to Martin Schrimpf) works for GRNN, JRNN, and Tiny LSTM, and
-`/om2/user/jennhu/conda/envs/transXL` was custom-built for Transformer-XL.
+Officially supported models are listed in our [documentation][3].
 
-### RNNG
-The dependencies for RNNG should already be set in the source code. If problems arise, I may make
-a Singularity image available with the relevant C++ libraries.
+### Contributing models
 
-### n-gram
-The dependencies for n-gram (SRILM) are also set in a Singularity image called in the script.
-However, by default, you will also need `numpy` to convert the raw SRILM output to the standard
-format. If you don't already have an active conda environment (which has `numpy`), simply use the command
-`module add openmind/anaconda` before running the n-gram script.
+TODO
 
-Note that I did not add this line to the top of the `eval_ngram.sh` file because users may want
-to run the n-gram model in their own preferred environments.
+[1]: https://docs.docker.com/get-docker/
+[2]: https://cpllab.github.io/lm-zoo/quickstart.html
+[3]: https://cpllab.github.io/lm-zoo/models.html
 
-## Other tips
 
-When submitting jobs to SLURM, keep in mind that different models have different memory/time
-requirements. The following settings have worked for me in the past:
-
-| Model | Suggested memory | Speed  | GPU |
-| :---: | :--------------: | :----: | :-: |
-| GRNN  | `5G`             | Medium | Yes |
-| JRNN  | `20G`            | Medium | No  |
-| RNNG  | `12G`            | Slow   | No  |
-| Tiny  | `5G`             | Fast   | No  |
-| Trans | `5G`             | Fast   | Yes |
-| ngram | `5G`             | Fast   | No  |
-
-The speed is relative to the other models; for reference, Tiny LSTM takes under 1 minute to calculate
-surprisal for 900 simple sentences (~7 words each), while RNNG takes several hours.
-
-If using GPU, remember to request the appropriate resources in your `sbatch` call.
-
-I may also add sample SLURM scripts if that would be helpful.
-
-## TODO
-
-### Adding models
-
-- [ ] BERT (currently have working pipeline, but pre-processing is a little more involved)
-- [ ] action LSTM / stack-only ablated RNNG ([Kuncoro et al. 2017](https://aclweb.org/anthology/E17-1117)) - see [Issue #17](https://github.com/clab/rnng/issues/17)
-- [ ] [Ordered-Neurons LSTM](https://arxiv.org/pdf/1810.09536.pdf)
-- [ ] MomLSTM
-- [ ] PCFG
-- [ ] add models trained on non-English data
-
-### Improving existing models
-
-- [ ] add GPU functionality
-
-### Ease of use
-
-- [ ] add README to each model folder with hyperparameters, etc.
-- [ ] add script for converting file to lowercase (for n-gram)
-- [ ] add script for tokenization
-- [ ] add SLURM script to submit all models as job array
-- [ ] add environments to shared folder
