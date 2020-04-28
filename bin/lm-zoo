@@ -6,6 +6,7 @@ import sys
 
 import click
 import crayons
+import dateutil.parser
 import docker
 import requests
 import tqdm
@@ -157,7 +158,6 @@ def list(short):
         ("name", "Full name"),
         ("ref_url", "Reference URL"),
         ("maintainer", "Maintainer"),
-        ("datetime", "Last updated"),
     ]
 
     for model in get_model_dict().values():
@@ -168,10 +168,21 @@ def list(short):
             click.echo("\t{0} {1}".format(
                 crayons.normal("Image URI: ", bold=True),
                 model.image_uri))
+
+            props = []
             for key, label in show_props:
                 if hasattr(model, key):
-                    click.echo("\t" + crayons.normal(label + ": ", bold=True)
-                                + getattr(model, key))
+                    props.append((label, getattr(model, key)))
+
+            dt = dateutil.parser.isoparse(model.image["datetime"])
+            props.append(("Last updated", dt.strftime("%Y-%m-%d")))
+            props.append(("Size", "%.02fGB" % (model.image["size"] / 1024 / 1024 / 1024)))
+
+            for label, value in props:
+                click.echo("\t" + crayons.normal(label + ": ", bold=True)
+                            + value)
+
+
 
 
 @lm_zoo.command()

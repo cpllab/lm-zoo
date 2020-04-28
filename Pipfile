@@ -4,6 +4,7 @@ crayons = "*"
 docker = "*"
 requests = "*"
 tqdm = "*"
+python-dateutil = "*"
 
 [dev-packages]
 nose = "*"
