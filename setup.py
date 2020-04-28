@@ -5,7 +5,7 @@ setup(
     install_requires=[
         "certifi==2020.4.5.1",
         "chardet==3.0.4",
-        "click==7.1.1",
+        "click==7.1.2",
         "colorama==0.4.3",
         "crayons==0.3.0",
         "docker==4.2.0",
@@ -15,11 +15,10 @@ setup(
         "urllib3==1.25.9",
         "websocket-client==0.57.0",
     ],
-
     name="lm-zoo",
     packages=[],
     scripts=["bin/lm-zoo"],
-    version="0.1rc1",
+    version="0.1rc2",
     license="MIT",
     description="Command-line interface with state-of-the-art neural network language models",
     author="Jon Gauthier",
