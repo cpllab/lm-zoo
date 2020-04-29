@@ -11,7 +11,7 @@ model_dir="models/$1"
 previous_sha="$2"
 current_sha="$3"
 
-echo "Checking for changes from $previous_sha...$current_sha in $model_dir"
+echo "Checking for changes from ${previous_sha}...${current_sha} in ${model_dir}"
 
 if [ -z "$(git --no-pager diff $previous_sha $current_sha $model_dir)" ]; then
     echo "No changes to model $1; aborting job."

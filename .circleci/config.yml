@@ -29,7 +29,7 @@ jobs:
                 name: Run tests
                 working_directory: models/ngram
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
-    grnn:
+    GRNN:
         machine:
             image: circleci/classic:latest
         steps:
@@ -49,7 +49,7 @@ jobs:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:grnn
 
-    jrnn:
+    JRNN:
         machine:
             image: circleci/classic:latest
         steps:
@@ -70,7 +70,7 @@ jobs:
                 working_directory: models/JRNN
                 command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
-    rnng:
+    RNNG:
         machine:
             image: circleci/classic:latest
         steps:
@@ -282,9 +282,9 @@ workflows:
     build_all:
         jobs:
             - ngram
-            - grnn
-            - jrnn
-            - rnng
+            - GRNN
+            - JRNN
+            - RNNG
             - action-lstm
             - ordered-neurons
             - ordered-neurons-cased-ptb

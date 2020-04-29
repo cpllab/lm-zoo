@@ -1,17 +1,6 @@
-FROM pytorch/pytorch:0.4.1-cuda9-cudnn7-runtime
+FROM alpine/git:latest as builder
 
-# Root of model directory relative to build context.
-ARG MODEL_ROOT=models/ordered-neurons
-
-# RUN conda install pytorch=0.4.1 -c pytorch
-RUN pip install -q nltk
-
-# Build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends git openssh-client
-
-# Add test dependencies.
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
+RUN mkdir -p /opt
 
 # Copy in source code.
 RUN git clone git://github.com/yikangshen/Ordered-Neurons /opt/Ordered-Neurons \
@@ -29,16 +18,28 @@ ARG CHECKPOINT_NAME=fredashi-20190919
 RUN scp -o "StrictHostKeyChecking=no" \
       cpl@45.79.223.150:/home/cpl/ordered-neurons/models/$CHECKPOINT_NAME/{model.pt,corpus.data} \
       /opt/Ordered-Neurons
+# Remove SSH information.
+RUN rm -rf /root/.ssh
+
+
+
+FROM pytorch/pytorch:0.4.1-cuda9-cudnn7-runtime
+
+# Root of model directory relative to build context.
+ARG MODEL_ROOT=models/ordered-neurons
+
+COPY --from=builder /opt/Ordered-Neurons /opt/Ordered-Neurons
+
+RUN pip install -q nltk
+
+# Add test dependencies.
+RUN pip install nose rednose jsonschema
+ENV NOSE_REDNOSE 1
 
 # Cache vocab list for easy access from `spec`, etc.
 RUN PYTHONPATH="/opt/Ordered-Neurons:$PYTHONPATH" python \
                 -c 'import torch; corpus = torch.load("/opt/Ordered-Neurons/corpus.data"); \
                     f = open("/opt/vocab", "w"); f.write("\n".join(corpus.dictionary.word2idx.keys()));'
-
-# Remove SSH information.
-RUN rm -rf /root/.ssh
-# Remove build dependencies.
-RUN apt-get remove -y git openssh-client && apt-get -y autoremove && rm -rf /var/lib/apt/lists/*
 
 # Copy in custom file for surprisal evaluation
 COPY ${MODEL_ROOT}/get_surprisals.py /opt/Ordered-Neurons/get_surprisals.py
