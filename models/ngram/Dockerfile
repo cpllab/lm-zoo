@@ -1,38 +1,45 @@
-FROM debian:latest
+FROM continuumio/miniconda3:4.8.2-alpine AS builder
+
+USER root
+RUN apk add git openssh-client build-base
+
+ARG CPL_SSH_PRV_KEY
+RUN mkdir ${HOME}/.ssh && echo "StrictHostKeyChecking no" >> ${HOME}/.ssh/config \
+      && echo "$CPL_SSH_PRV_KEY" > ${HOME}/.ssh/id_rsa \
+      && chmod 600 ${HOME}/.ssh/id_rsa
+RUN mkdir -p /opt/srilm \
+        && scp -To "StrictHostKeyChecking=no" \
+        cpl@syntaxgym.org:/home/cpl/srilm/{srilm-1.7.2.tar.gz,wiki_kn_5gram.lm} /opt/srilm
+RUN rm -rf ${HOME}/.ssh
+
+RUN cd /opt/srilm && tar -xvzf srilm-1.7.2.tar.gz && \
+        cp Makefile tmpf && \
+        cat tmpf | awk -v pwd=`pwd` '/SRILM =/{printf("SRILM = %s\n", pwd); next;} {print;}' > Makefile && \
+        make && make cleanest && \
+        rm srilm-1.7.2.tar.gz
+
+
+FROM continuumio/miniconda3:4.8.2-alpine
 
 ARG MODEL_ROOT=models/ngram
 
-RUN apt update && apt install -y --no-install-recommends \
-          build-essential openssh-client \
-          libgomp1 libgetopt-complete-perl gawk python3 python3-pip python3-setuptools
-RUN ln -s /usr/bin/python3 /usr/bin/python
+ENV PATH "/opt/conda/bin:$PATH"
+COPY --from=builder /opt/srilm /opt/srilm
 
-RUN mkdir -p /opt/srilm
+# Runtime dependencies
+USER root
+RUN apk add perl bash libstdc++ gawk libgomp
 
-# Build arguments provide SSH keys for accessing private CPL data.
-ARG CPL_SSH_PRV_KEY
-RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config \
-      && echo "$CPL_SSH_PRV_KEY" > /root/.ssh/id_rsa \
-      && chmod 600 /root/.ssh/id_rsa
-RUN scp -o "StrictHostKeyChecking=no" \
-      cpl@syntaxgym.org:/home/cpl/srilm/{srilm-1.7.2.tar.gz,wiki_kn_5gram.lm} /opt/srilm
-RUN rm -rf /root/.ssh
-
-WORKDIR /opt/srilm
-RUN tar -xvzf srilm-1.7.2.tar.gz && \
-        cp Makefile tmpf && \
-        cat tmpf | awk -v pwd=`pwd` '/SRILM =/{printf("SRILM = %s\n", pwd); next;} {print;}' > Makefile && \
-        make && \
-        rm srilm-1.7.2.tar.gz
+#RUN apt update && apt install -y --no-install-recommends \
+#          build-essential openssh-client \
+#          libgomp1 libgetopt-complete-perl gawk python3 python3-pip python3-setuptools
+#RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Copy in test dependencies.
-RUN pip3 install wheel
-RUN pip3 install nose rednose jsonschema
+RUN pip install wheel
+RUN pip install nose jsonschema
 ENV NOSE_REDNOSE 1
 COPY test.py /opt/test.py
-
-# Remove build dependencies.
-RUN apt purge --auto-remove -y openssh-client build-essential
 
 COPY ${MODEL_ROOT}/vocab.txt /opt/vocab.txt
 COPY ${MODEL_ROOT}/get_surprisals.awk /opt/get_surprisals.awk
