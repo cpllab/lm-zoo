@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Contributing to the LM Zoo</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Acknowledgments" href="thanks.html" />
+  <link rel="prev" title="Official models" href="models.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <img class="logo" src="_static/logo.png" alt="doit logo"/>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">Documentation</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 "><a href="quickstart.html" class="reference internal ">Quickstart</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model API</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="models.html" class="reference internal ">Official models</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Contributing to the LM Zoo</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#acquiring-open-source-code" class="reference internal">Acquiring open-source code</a></li>
+                
+                  <li class="toctree-l2"><a href="#preparing-a-docker-image" class="reference internal">Preparing a Docker image</a></li>
+                
+                  <li class="toctree-l2"><a href="#submitting-your-language-model" class="reference internal">Submitting your language model</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="thanks.html" class="reference internal ">Acknowledgments</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Contributing to the LM Zoo</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="models.html"
+       title="previous chapter">← Official models</a>
+  </li>
+  <li class="next">
+    <a href="thanks.html"
+       title="next chapter">Acknowledgments →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <div class="section" id="contributing-to-the-lm-zoo">
+<span id="contributing"></span><h1>Contributing to the LM Zoo<a class="headerlink" href="#contributing-to-the-lm-zoo" title="Permalink to this headline">¶</a></h1>
+<p>Anyone can contribute models to the LM Zoo. This page provides instructions on
+creating a LM Zoo-friendly Docker image, and on submitting your image for Zoo
+review.</p>
+<p>Language models in the LM Zoo are Docker images which expose a set of binary
+programs conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a>. At a high level, the steps you’ll need
+to take to prepare such an image are</p>
+<ol class="arabic simple">
+<li><p>Acquire open source code and model checkpoints for the language model you’d
+like to contribute.</p></li>
+<li><p>Prepare a Docker image containing the code and model checkpoint, and verify
+that you can successfully run the model from within the container.  Write
+binary scripts conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a> which invoke your model.</p></li>
+<li><p>Submit your language model as a pull request to the <code class="docutils literal notranslate"><span class="pre">cpllab/lm-zoo</span></code> Github
+repository.</p></li>
+</ol>
+<p>Each of these steps are described in further detail below.</p>
+<div class="section" id="acquiring-open-source-code">
+<h2>Acquiring open-source code<a class="headerlink" href="#acquiring-open-source-code" title="Permalink to this headline">¶</a></h2>
+<p>Because the LM Zoo system runs on Docker, you are welcome to contribute code
+which uses any programming language and framework you favor, so long as you can
+provide a supporting Docker image.</p>
+<p>You are also welcome to contribute language model images for models which are
+not your own, so long as this complies with the license of the model
+developers. When in doubt, ask the developers for permission first!</p>
+</div>
+<div class="section" id="preparing-a-docker-image">
+<h2>Preparing a Docker image<a class="headerlink" href="#preparing-a-docker-image" title="Permalink to this headline">¶</a></h2>
+<p>If you’re not familiar with building your own Docker images, we recommend that
+you first read <a class="reference external" href="https://docs.docker.com/get-started/part2/">the official Docker documentation</a>.</p>
+<ol class="arabic">
+<li><p><a class="reference external" href="https://github.com/cpllab/lm-zoo/fork">Create your own fork</a> of the
+<code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> repository.</p></li>
+<li><p>Create your own subdirectory in the <code class="docutils literal notranslate"><span class="pre">models</span></code> directory. We recommend
+copying from the <a class="reference external" href="https://github.com/cpllab/lm-zoo/tree/master/models/_template">template directory</a> for
+starters. Modify the <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> and add wrapper scripts as necessary
+until your model conforms to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a>.</p></li>
+<li><p>You can build and test your wrapper as necessary using the file
+<code class="docutils literal notranslate"><span class="pre">scripts/build_and_test.sh</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">build_and_test</span><span class="o">.</span><span class="n">sh</span> <span class="o">&lt;</span><span class="n">my_directory_name</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">docker_target</span><span class="o">&gt;</span>
+<span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">build_and_test</span><span class="o">.</span><span class="n">sh</span> <span class="n">_template</span> <span class="n">myname</span><span class="o">/</span><span class="n">mylm</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>A few tips on building an image:</p>
+<div class="section" id="docker-build-context">
+<h3>Docker build context<a class="headerlink" href="#docker-build-context" title="Permalink to this headline">¶</a></h3>
+<p>All LM Zoo Docker images are built with the root directory of the LM Zoo as
+build context. This allows each Docker build routine to copy in shared scripts,
+for example, from the <code class="docutils literal notranslate"><span class="pre">shared</span></code> directory. Structure your build files
+accordingly – see the template directory’s <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> and its use of a
+build argument <code class="docutils literal notranslate"><span class="pre">MODEL_ROOT</span></code> as an example.</p>
+</div>
+<div class="section" id="shared-scripts">
+<h3>Shared scripts<a class="headerlink" href="#shared-scripts" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">shared</span></code> directory provides several useful shared binary scripts (e.g.
+<code class="docutils literal notranslate"><span class="pre">unkify</span></code> and <code class="docutils literal notranslate"><span class="pre">spec</span></code>) which you may be able to reuse for your image. We
+offer these scripts to avoid forcing contributors to reinvent mundane code for
+every image they build.</p>
+</div>
+</div>
+<div class="section" id="submitting-your-language-model">
+<h2>Submitting your language model<a class="headerlink" href="#submitting-your-language-model" title="Permalink to this headline">¶</a></h2>
+<p>Once you’ve confirmed that all tests pass for your image, create a pull request
+at the <code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> Github repository. Your pull request should follow <a class="reference external" href="https://github.com/cpllab/lm-zoo/blob/master/docs/pull_request_template.md">this
+template</a>
+(this should be automatically inserted when you create a pull request).</p>
+<p>The LM Zoo maintainers will evaluate your submission and respond on the pull
+request thread. Thanks for contributing!</p>
+</div>
+</div>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="models.html"
+       title="previous chapter">← Official models</a>
+  </li>
+  <li class="next">
+    <a href="thanks.html"
+       title="next chapter">Acknowledgments →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>
