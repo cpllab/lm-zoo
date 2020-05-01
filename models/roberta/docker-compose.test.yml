@@ -1,3 +1,0 @@
-sut:
-    image: cpllab/language-models:roberta
-    command: python /opt/test.py

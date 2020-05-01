@@ -1,3 +1,0 @@
-sut:
-    image: cpllab/language-models:action-lstm
-    command: python /opt/test.py

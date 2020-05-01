@@ -1,5 +1,0 @@
-Bootstrap: docker
-From: cpllab/language-models:action-lstm
-
-%post
-    chmod -R 755 /opt
