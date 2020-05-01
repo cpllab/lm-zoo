@@ -16,7 +16,7 @@ LM Zoo is a collection of pre-trained language models wrapped as Docker
 containers. Each model conforms to the :ref:`api`, which enforces a
 standard for accessing and probing the models in psycholinguistic evaluations.
 
-LM Zoo is maintained by the 
+LM Zoo is maintained by the
 `MIT Computational Psycholinguistics Laboratory <http://cpl.mit.edu/>`_.
 
 
@@ -24,6 +24,7 @@ LM Zoo is maintained by the
    quickstart
    api
    models
+   contributing
    thanks
    :maxdepth: 2
    :caption: Documentation
