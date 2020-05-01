@@ -13,8 +13,7 @@ import numpy as np
 
 from transformers import AutoModelWithLMHead, AutoTokenizer
 
-
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 def readlines(inputf):
@@ -39,7 +38,7 @@ def eval_sentence(sentence, tokenizer, model, device):
     tokens_tensor = tokens_tensor.to(device)
 
     with torch.no_grad():
-        log_probs = model(tokens_tensor)[0].log_softmax(dim=1).numpy()
+        log_probs = model(tokens_tensor)[0].log_softmax(dim=2).numpy()
 
     # initial token gets surprisal 0
     surprisals = [0.0]
