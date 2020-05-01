@@ -1,13 +1,20 @@
-FROM cpllab/language-models:transformers-base
+FROM alpine AS builder
 
-ARG MODEL_ROOT=models/gpt2
-
-RUN mkdir -p /opt/transformers/models/gpt2
-RUN cd /opt/transformers/models/gpt2 && \
+# Fetch model checkpoints
+RUN apk add curl
+RUN mkdir -p /opt/transformers/models/gpt2 && \
+        cd /opt/transformers/models/gpt2 && \
         curl -so config.json https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-config.json && \
         curl -so pytorch_model.bin https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-pytorch_model.bin && \
         curl -so vocab.json https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-vocab.json && \
         curl -so merges.txt https://s3.amazonaws.com/models.huggingface.co/bert/gpt2-merges.txt
+
+
+FROM cpllab/language-models:transformers-base
+
+ARG MODEL_ROOT=models/gpt2
+
+COPY --from=builder /opt/transformers/models/gpt2 /opt/transformers/models/gpt2
 
 ENV TRANSFORMER_MODEL_TYPE gpt2
 ENV TRANSFORMER_MODEL_PATH /opt/transformers/models/gpt2
