@@ -98,4 +98,4 @@ Get token-level surprisals for text data:
 For more information, see our [Quickstart tutorial][2].
 
 [1]: https://docs.docker.com/get-docker/
-
+[2]: https://cpllab.github.io/lm-zoo/quickstart.html
