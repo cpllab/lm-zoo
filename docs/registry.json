@@ -1,4 +1,36 @@
 {
+  "ngram": {
+    "ref_url": "http://www.speech.sri.com/projects/srilm",
+    "image": {
+      "registry": "docker.io",
+      "name": "cpllab/language-models",
+      "tag": "ngram",
+      "size": 752645577,
+      "datetime": "2020-05-01T20:43:31.151707532Z"
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    },
+    "shortname": "ngram"
+  },
+  "gpt2": {
+    "ref_url": "https://openai.com/blog/better-language-models/",
+    "image": {
+      "registry": "docker.io",
+      "name": "cpllab/language-models",
+      "tag": "gpt2",
+      "size": 3793389284,
+      "datetime": "2020-05-01T20:41:57.608530999Z"
+    },
+    "tokenizer": {
+      "type": "subword",
+      "cased": true,
+      "sentinel_position": "initial",
+      "sentinel_pattern": "\u0120"
+    },
+    "shortname": "gpt2"
+  },
   "RNNG": {
     "ref_url": "TODO",
     "image": {
@@ -44,23 +76,6 @@
       "cased": true
     },
     "shortname": "GRNN"
-  },
-  "gpt2": {
-    "ref_url": "https://openai.com/blog/better-language-models/",
-    "image": {
-      "registry": "docker.io",
-      "name": "cpllab/language-models",
-      "tag": "gpt2",
-      "size": 4808648849,
-      "datetime": "2020-04-28T03:25:31.144373918Z"
-    },
-    "tokenizer": {
-      "type": "subword",
-      "cased": true,
-      "sentinel_position": "initial",
-      "sentinel_pattern": "\u0120"
-    },
-    "shortname": "gpt2"
   },
   "JRNN": {
     "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
