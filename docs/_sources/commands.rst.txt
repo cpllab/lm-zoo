@@ -1,0 +1,7 @@
+.. _commands:
+
+``lm-zoo`` commands
+===================
+
+.. click::herpderp
+   :prog: testing

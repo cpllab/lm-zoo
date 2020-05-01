@@ -16,7 +16,7 @@ setup(
         "websocket-client==0.57.0",
     ],
     name="lm-zoo",
-    packages=[],
+    packages=["lm_zoo"],
     scripts=["bin/lm-zoo"],
     version="0.1rc2",
     license="MIT",

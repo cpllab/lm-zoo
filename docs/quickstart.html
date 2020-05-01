@@ -24,7 +24,7 @@
       <link rel="shortcut icon" href="_static/favicon.ico"/>
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Language model API" href="api.html" />
+  <link rel="next" title="lm-zoo commands" href="commands.html" />
   <link rel="prev" title="Welcome to LM Zoo" href="index.html" /> 
   </head>
 
@@ -109,13 +109,25 @@
           </li>
 
         
-          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model API</a>
+          <li class="toctree-l1 "><a href="commands.html" class="reference internal ">lm-zoo commands</a>
 
             
           </li>
 
         
           <li class="toctree-l1 "><a href="models.html" class="reference internal ">Official models</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="contributing.html" class="reference internal ">Contributing to the LM Zoo</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model Docker API</a>
 
             
           </li>
@@ -149,8 +161,8 @@
        title="previous chapter">← Welcome to LM Zoo</a>
   </li>
   <li class="next">
-    <a href="api.html"
-       title="next chapter">Language model API →</a>
+    <a href="commands.html"
+       title="next chapter"><code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> commands →</a>
   </li>
 </ul>
   
@@ -162,15 +174,14 @@
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p><cite>lm-zoo</cite> is supported for Windows, OS X, and Linux systems. It requires <cite>Docker
-&lt;https://docs.docker.com/get-docker/&gt;</cite> to run language model images.</p>
+<p><cite>lm-zoo</cite> is supported for Windows, OS X, and Linux systems. It requires <a class="reference external" href="https://docs.docker.com/get-docker/">Docker</a> to run language model images.</p>
 <p>Language models can be large (4–8 GB in disk space per model) and require a
 substantial amount of RAM (2–8 GB). Some language models may require a
 reliable desktop machine or a computing cluster to run.</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>You can install LM Zoo using the Python package manager <code class="docutils literal notranslate"><span class="pre">pip</span></code>::</p>
+<p>You can install LM Zoo using the Python package manager <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">lm</span><span class="o">-</span><span class="n">zoo</span>
 </pre></div>
 </div>
@@ -181,11 +192,9 @@ reliable desktop machine or a computing cluster to run.</p>
 <p>Tokenize some data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
 $ head -n3 metamorphosis.txt
-Pulling latest Docker image for cpllab/language-models:rnng.
-One morning , when UNK-INITC UNK-INITC woke from troubled dreams , he found himself transformed in his bed into a horrible UNK-LC .
-He lay on his UNK-LC-DASH back , and if he lifted his head a little he could see his brown UNK-LC-ly , slightly UNK-LC-ed and divided by UNK-LC-s into stiff sections .
-The UNK-LC-ing was hardly able to cover it and seemed ready to slide off any moment .
-...
+One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.
+He lay on his armour-like back, and if he lifted his head a little he could see his brown belly, slightly domed and divided by arches into stiff sections.
+The bedding was hardly able to cover it and seemed ready to slide off any moment.
 
 $ lm-zoo tokenize ngram metamorphosis.txt
 Pulling latest Docker image for cpllab/language-models:ngram.
@@ -253,8 +262,8 @@ sentence_id     token_id        token   surprisal
        title="previous chapter">← Welcome to LM Zoo</a>
   </li>
   <li class="next">
-    <a href="api.html"
-       title="next chapter">Language model API →</a>
+    <a href="commands.html"
+       title="next chapter"><code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> commands →</a>
   </li>
 </ul><div class="footer" role="contentinfo">
       &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.

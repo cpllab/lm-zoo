@@ -98,7 +98,7 @@
           </li>
 
         
-          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model API</a>
+          <li class="toctree-l1 "><a href="commands.html" class="reference internal ">lm-zoo commands</a>
 
             
           </li>
@@ -111,6 +111,12 @@
 
         
           <li class="toctree-l1 "><a href="contributing.html" class="reference internal ">Contributing to the LM Zoo</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model Docker API</a>
 
             
           </li>
@@ -157,9 +163,40 @@
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>LM Zoo is a collection of pre-trained language models wrapped as Docker
-containers. Each model conforms to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a>, which enforces a
-standard for accessing and probing the models in psycholinguistic evaluations.</p>
+<p>The Language Model Zoo (LM Zoo) is an open-source repository of
+state-of-the-art language models, designed to support black-box access to model
+predictions and representations. It provides the command line tool <code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code>,
+a standard interface for interacting with language models.</p>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> to extract word-level surprisal data for natural
+language text:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
+$ head -n3 metamorphosis.txt
+One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.
+He lay on his armour-like back, and if he lifted his head a little he could see his brown belly, slightly domed and divided by arches into stiff sections.
+The bedding was hardly able to cover it and seemed ready to slide off any moment.
+
+$ lm-zoo get-surprisals ngram metamorphosis.txt
+sentence_id     token_id        token   surprisal
+1       1       one     7.76847
+1       2       morning 9.40638
+1       3       ,       1.05009
+1       4       when    7.08489
+1       5       gregor  18.8963
+1       6       &lt;unk&gt;   4.27466
+...
+
+$ lm-zoo get-surprisals GRNN metamorphosis.txt
+sentence_id     token_id        token   surprisal
+1       1       One     0.000000
+1       2       morning 11.585580
+1       3       ,       2.359496
+1       4       when    6.319129
+1       5       Gregor  18.608147
+1       6       &lt;unk&gt;   3.706054
+...
+</pre></div>
+</div>
+<p>For more features and installation instructions, see our ref:<cite>quickstart</cite> guide.</p>
 <p>LM Zoo is maintained by the
 <a class="reference external" href="http://cpl.mit.edu/">MIT Computational Psycholinguistics Laboratory</a>.</p>
 <div class="toctree-wrapper compound">
@@ -171,13 +208,7 @@ standard for accessing and probing the models in psycholinguistic evaluations.</
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-started">Getting started</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Language model API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#spec"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#get-surprisals"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#tokenize"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#unkify"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html"><code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Official models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="models.html#model-list">Model list</a></li>
 </ul>
@@ -186,6 +217,13 @@ standard for accessing and probing the models in psycholinguistic evaluations.</
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#acquiring-open-source-code">Acquiring open-source code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#preparing-a-docker-image">Preparing a Docker image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#submitting-your-language-model">Submitting your language model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Language model Docker API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#spec"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#get-surprisals"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#tokenize"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#unkify"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="thanks.html">Acknowledgments</a><ul>

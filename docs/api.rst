@@ -1,7 +1,7 @@
 .. _api:
 
-Language model API
-==================
+Language model Docker API
+=========================
 
 Each language model in the LM Zoo is a Docker container which provides various
 binaries for running and probing the internal model. This document specifies

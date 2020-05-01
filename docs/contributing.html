@@ -24,7 +24,7 @@
       <link rel="shortcut icon" href="_static/favicon.ico"/>
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Acknowledgments" href="thanks.html" />
+  <link rel="next" title="Language model Docker API" href="api.html" />
   <link rel="prev" title="Official models" href="models.html" /> 
   </head>
 
@@ -99,7 +99,7 @@
           </li>
 
         
-          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model API</a>
+          <li class="toctree-l1 "><a href="commands.html" class="reference internal ">lm-zoo commands</a>
 
             
           </li>
@@ -123,6 +123,12 @@
                   <li class="toctree-l2"><a href="#submitting-your-language-model" class="reference internal">Submitting your language model</a></li>
                 
               </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model Docker API</a>
+
             
           </li>
 
@@ -155,8 +161,8 @@
        title="previous chapter">← Official models</a>
   </li>
   <li class="next">
-    <a href="thanks.html"
-       title="next chapter">Acknowledgments →</a>
+    <a href="api.html"
+       title="next chapter">Language model Docker API →</a>
   </li>
 </ul>
   
@@ -170,14 +176,14 @@
 creating a LM Zoo-friendly Docker image, and on submitting your image for Zoo
 review.</p>
 <p>Language models in the LM Zoo are Docker images which expose a set of binary
-programs conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a>. At a high level, the steps you’ll need
+programs conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model Docker API</span></a>. At a high level, the steps you’ll need
 to take to prepare such an image are</p>
 <ol class="arabic simple">
 <li><p>Acquire open source code and model checkpoints for the language model you’d
 like to contribute.</p></li>
 <li><p>Prepare a Docker image containing the code and model checkpoint, and verify
 that you can successfully run the model from within the container.  Write
-binary scripts conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a> which invoke your model.</p></li>
+binary scripts conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model Docker API</span></a> which invoke your model.</p></li>
 <li><p>Submit your language model as a pull request to the <code class="docutils literal notranslate"><span class="pre">cpllab/lm-zoo</span></code> Github
 repository.</p></li>
 </ol>
@@ -201,7 +207,7 @@ you first read <a class="reference external" href="https://docs.docker.com/get-s
 <li><p>Create your own subdirectory in the <code class="docutils literal notranslate"><span class="pre">models</span></code> directory. We recommend
 copying from the <a class="reference external" href="https://github.com/cpllab/lm-zoo/tree/master/models/_template">template directory</a> for
 starters. Modify the <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> and add wrapper scripts as necessary
-until your model conforms to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model API</span></a>.</p></li>
+until your model conforms to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model Docker API</span></a>.</p></li>
 <li><p>You can build and test your wrapper as necessary using the file
 <code class="docutils literal notranslate"><span class="pre">scripts/build_and_test.sh</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">build_and_test</span><span class="o">.</span><span class="n">sh</span> <span class="o">&lt;</span><span class="n">my_directory_name</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">docker_target</span><span class="o">&gt;</span>
@@ -247,8 +253,8 @@ request thread. Thanks for contributing!</p>
        title="previous chapter">← Official models</a>
   </li>
   <li class="next">
-    <a href="thanks.html"
-       title="next chapter">Acknowledgments →</a>
+    <a href="api.html"
+       title="next chapter">Language model Docker API →</a>
   </li>
 </ul><div class="footer" role="contentinfo">
       &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.

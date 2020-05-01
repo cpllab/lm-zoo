@@ -1,3 +1,5 @@
+.. _quickstart:
+
 Quickstart
 ==================
 
@@ -28,11 +30,9 @@ Tokenize some data::
 
   $ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
   $ head -n3 metamorphosis.txt
-  Pulling latest Docker image for cpllab/language-models:rnng.
-  One morning , when UNK-INITC UNK-INITC woke from troubled dreams , he found himself transformed in his bed into a horrible UNK-LC .
-  He lay on his UNK-LC-DASH back , and if he lifted his head a little he could see his brown UNK-LC-ly , slightly UNK-LC-ed and divided by UNK-LC-s into stiff sections .
-  The UNK-LC-ing was hardly able to cover it and seemed ready to slide off any moment .
-  ...
+  One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.
+  He lay on his armour-like back, and if he lifted his head a little he could see his brown belly, slightly domed and divided by arches into stiff sections.
+  The bedding was hardly able to cover it and seemed ready to slide off any moment.
 
   $ lm-zoo tokenize ngram metamorphosis.txt
   Pulling latest Docker image for cpllab/language-models:ngram.

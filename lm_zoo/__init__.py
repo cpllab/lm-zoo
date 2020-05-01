@@ -140,7 +140,7 @@ def run_model_command(model, command_str, pull=True,
     stderr.buffer.write(container_stderr)
 
 
-@click.group()
+@click.group(help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
 def lm_zoo(): pass
 
 
@@ -183,26 +183,78 @@ def list(short):
 
 
 @lm_zoo.command()
-@click.argument("model")
-@click.argument("in_file", type=click.File("rb"))
+@click.argument("model", metavar="MODEL")
+@click.argument("in_file", type=click.File("rb"), metavar="FILE")
 def tokenize(model, in_file):
+    """
+    Tokenize natural-language text according to a model's preprocessing
+    standards.
+
+    FILE should be a raw natural language text file with one sentence per line.
+
+    This command returns a text file with one tokenized sentence per line, with
+    tokens separated by single spaces. For each sentence, there is a one-to-one
+    mapping between the tokens output by this command and the tokens used by
+    the ``get-surprisals`` command.
+    """
     run_model_command(model, "tokenize /dev/stdin",
                       stdin=in_file)
 
 
 @lm_zoo.command()
-@click.argument("model")
-@click.argument("in_file", type=click.File("rb"))
+@click.argument("model", metavar="MODEL")
+@click.argument("in_file", type=click.File("rb"), metavar="FILE")
 def get_surprisals(model, in_file):
-    # TODO document.
+    """
+    Get word-level surprisals from a language model for the given natural
+    language text. Tab-separated results will be sent to standard output,
+    following the format::
+
+      sentence_id	token_id	token	surprisal
+      1			1		This	0.000
+      1			2		is	1.000
+      1			3		a	1.000
+      1			4		<unk>	0.500
+      1			5		line	1.000
+      1			6		.	0.250
+      1			7		<eos>	0.100
+
+    The surprisal of a token :math:`w_i` is the negative logarithm of that
+    token's probability under a language model's predictive distribution:
+
+    .. math::
+        S(w_i) = -\log_2 p(w_i \mid w_1, w_2, \ldots, w_{i-1})
+
+    Note that surprisals are computed on the level of **tokens**, not words.
+    Models that insert extra tokens (e.g., an end-of-sentence token as above)
+    or which tokenize on the sub-word level (e.g. GPT2) will not have a
+    one-to-one mapping between rows of surprisal output from this command and
+    words.
+
+    There is guaranteed to be a one-to-one mapping, however, between the rows
+    of this file and the tokens produced by ``lm-zoo tokenize``.
+    """
     run_model_command(model, "get_surprisals /dev/stdin",
                       stdin=in_file)
 
 
 @lm_zoo.command()
-@click.argument("model")
-@click.argument("in_file", type=click.File("rb"))
+@click.argument("model", metavar="MODEL")
+@click.argument("in_file", type=click.File("rb"), metavar="FILE")
 def unkify(model, in_file):
+    """
+    Detect unknown words for a language model for the given natural language
+    text.
+
+    FILE should be a raw natural language text file with one sentence per line.
+
+    This command returns a text file with one sentence per line, where each
+    sentence is represented as a sequence of ``0`` and ``1`` values. These
+    values correspond one-to-one with the model's tokenization of the sentence
+    (as returned by ``lm-zoo tokenize``). The value ``0`` indicates that the
+    corresponding token is in the model's vocabulary; the value ``1`` indicates
+    that the corresponding token is an unknown word for the model.
+    """
     run_model_command(model, "unkify /dev/stdin",
                       stdin=in_file)
 
