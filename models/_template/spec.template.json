@@ -1,0 +1,27 @@
+{
+    "name": "My Language Model",
+    "ref_url": "https://me.com/my_lm",
+
+    "image": {
+        "maintainer": "me@me.com",
+        "version": "<image.sha1>",
+        "checksum": "<image.files_sha1>",
+        "datetime": "<image.datetime>",
+        "gpu": {
+            "required": false,
+            "supported": false
+        }
+    },
+
+    "vocabulary": {
+        "unk_types": ["<unk>"],
+        "prefix_types": [],
+        "suffix_types": ["<eos>"],
+        "special_types": []
+    },
+
+    "tokenizer": {
+        "type": "word",
+        "cased": true
+    }
+}

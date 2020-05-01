@@ -1,0 +1,10 @@
+#!/bin/sh
+
+LM_ROOT="/opt/mylm"
+INPUT_FILE="$1"
+
+# Our LM surprisal script expects pre-tokenized input
+/opt/bin/tokenize $1 > /tmp/input_tokenized
+
+# Compute surprisals.
+python ${LM_ROOT}/get_word_surprisals.py /tmp/input_tokenized

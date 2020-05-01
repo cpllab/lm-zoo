@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import sys
+
+LM_ROOT = "/opt/mylm"
+VOCAB_PATH = "/opt/vocab"
+UNK_TOKEN = "<unk>"
+
+with open(VOCAB_PATH, "r") as vocab_f:
+  vocab = set(line.strip() for line in vocab_f)
+
+
+with open(sys.argv[1], "r") as inf:
+  for line in inf:
+    tokens = line.strip().split(" ")
+    tokens_unked = [token if token in vocab else UNK_TOKEN for token in tokens]
+    print(" ".join(tokens_unked))
