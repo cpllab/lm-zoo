@@ -16,6 +16,12 @@ You can use `lm-zoo` to
 2. preprocess corpora according to a language model's particular tokenization
    standards.
 
+Quick links:
+
+- [Quickstart](https://cpllab.github.io/lm-zoo/quickstart.html)
+- [Supported models](https://cpllab.github.io/lm-zoo/models.html)
+- [Contributing models](https://cpllab.github.io/lm-zoo/contributing.html)
+
 ## Getting started
 
 Running language models from this repository requires [Docker][1].
@@ -91,16 +97,5 @@ Get token-level surprisals for text data:
 
 For more information, see our [Quickstart tutorial][2].
 
-## Supported models
-
-Officially supported models are listed in our [documentation][3].
-
-### Contributing models
-
-TODO
-
 [1]: https://docs.docker.com/get-docker/
-[2]: https://cpllab.github.io/lm-zoo/quickstart.html
-[3]: https://cpllab.github.io/lm-zoo/models.html
-
 
