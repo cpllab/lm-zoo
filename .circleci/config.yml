@@ -28,7 +28,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/ngram
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:ngram python /test.py
     GRNN:
         machine:
             image: circleci/classic:latest
@@ -44,7 +44,7 @@ jobs:
                 command: docker build -t cpllab/language-models:grnn -f models/GRNN/Dockerfile .
             - run:
                 name: Run tests
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas python /test.py
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:grnn python /test.py
             # - run:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:grnn
@@ -68,7 +68,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/JRNN
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:jrnn python /test.py
 
     RNNG:
         machine:
@@ -93,32 +93,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/RNNG
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
-
-    action-lstm:
-        machine:
-            image: circleci/classic:latest
-        steps:
-            - checkout
-            - run:
-                name: Check for relevant code updates
-                command: ./scripts/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
-
-            - run:
-                <<: *docker_login
-            - add_ssh_keys:
-                fingerprints:
-                    - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
-            - run:
-                name: Build
-                command: docker build -t cpllab/language-models:action-lstm -f models/Action-LSTM/Dockerfile --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
-            # - run:
-            #     name: Push to Docker Hub
-            #     command: docker push cpllab/language-models:action-lstm
-            - run:
-                name: Run tests
-                working_directory: models/Action-LSTM
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:rnng python /test.py
 
     ordered-neurons:
         machine:
@@ -143,46 +118,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/ordered-neurons
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
-
-    ordered-neurons-cased-ptb:
-        machine:
-            image: circleci/classic:latest
-        steps:
-            - checkout
-            - run:
-                name: Check for relevant code updates
-                command: ./scripts/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
-
-            - run:
-                <<: *docker_login
-            - add_ssh_keys:
-                fingerprints:
-                    - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
-            - run:
-                name: Build
-                command: docker build -t cpllab/language-models:ordered-neurons-cased-ptb -f models/ordered-neurons/Dockerfile --build-arg CHECKPOINT_NAME=jennhu-ptb-20191108 --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
-            # - run:
-            #     name: Push to Docker Hub
-            #     command: docker push cpllab/language-models:ordered-neurons-cased-ptb
-
-    pytorch-transformers:
-        machine:
-            image: circleci/classic:latest
-        steps:
-            - checkout
-            - run:
-                name: Check for relevant code updates
-                command: ./scripts/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
-
-            - run:
-                <<: *docker_login
-            - run:
-                name: Build
-                command: docker build -t cpllab/language-models:pytorch-transformers -f models/pytorch-transformers/Dockerfile .
-            # - run:
-            #     name: Push to Docker Hub
-            #     command: docker push cpllab/language-models:pytorch-transformers
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:ordered-neurons python /test.py
 
     gpt2:
         machine:
@@ -201,7 +137,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/gpt2
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:gpt2 python /test.py
             # - run:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:gpt2
@@ -223,57 +159,10 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/transformer-xl
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:transformer-xl python /test.py
             # - run:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:transformer-xl
-
-    roberta:
-        machine:
-            image: circleci/classic:latest
-        steps:
-            - checkout
-            - run:
-                name: Check for relevant code updates
-                command: ./scripts/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
-
-            - run:
-                <<: *docker_login
-            - run:
-                name: Build
-                command: docker build -t cpllab/language-models:roberta -f models/roberta/Dockerfile .
-            # - run:
-            #     name: Push to Docker Hub
-            #     command: docker push cpllab/language-models:roberta
-            - run:
-                name: Run tests
-                working_directory: models/roberta
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
-
-    tiny-lstm:
-        machine:
-            image: circleci/classic:latest
-        steps:
-            - checkout
-            - run:
-                name: Check for relevant code updates
-                command: ./scripts/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
-
-            - run:
-                <<: *docker_login
-            - add_ssh_keys:
-                fingerprints:
-                    - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
-            - run:
-                name: Build
-                command: docker build -t cpllab/language-models:tiny-lstm -f models/tiny-LSTM/Dockerfile --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
-            # - run:
-            #     name: Push to Docker Hub
-            #     command: docker push cpllab/language-models:tiny-lstm
-            - run:
-                name: Run tests
-                working_directory: models/tiny-LSTM
-                command: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 
 
@@ -285,11 +174,6 @@ workflows:
             - GRNN
             - JRNN
             - RNNG
-            - action-lstm
             - ordered-neurons
-            - ordered-neurons-cased-ptb
-            - pytorch-transformers
             - gpt2
             - transformer-xl
-            - roberta
-            - tiny-lstm
