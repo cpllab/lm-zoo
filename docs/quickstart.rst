@@ -5,7 +5,7 @@ Requirements
 ^^^^^^^^^^^^
 
 `lm-zoo` is supported for Windows, OS X, and Linux systems. It requires `Docker
-<https://docs.docker.com/get-docker/>` to run language model images.
+<https://docs.docker.com/get-docker/>`_ to run language model images.
 
 Language models can be large (4--8 GB in disk space per model) and require a
 substantial amount of RAM (2--8 GB). Some language models may require a
@@ -14,7 +14,7 @@ reliable desktop machine or a computing cluster to run.
 Installation
 ^^^^^^^^^^^^
 
-You can install LM Zoo using the Python package manager ``pip``:::
+You can install LM Zoo using the Python package manager ``pip``::
 
   pip install lm-zoo
 
