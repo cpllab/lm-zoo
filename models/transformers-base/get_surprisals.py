@@ -13,8 +13,7 @@ import numpy as np
 
 from transformers import AutoModelWithLMHead, AutoTokenizer
 
-
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 def readlines(inputf):
