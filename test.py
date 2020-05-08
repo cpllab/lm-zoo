@@ -169,16 +169,23 @@ class LMProcessingTest(unittest.TestCase):
         eq_(len(self.predictions_data["/sentence"]), len(self.tokenized_lines),
             "Number of lines in predictions output should match number of tokenized lines")
 
-        vocabulary = get_spec()["vocabulary"]["items"]
+        vocabulary = self.predictions_data["/vocabulary"]
+        vocabulary = np.char.decode(vocabulary, "utf-8")
         vocab_size = len(vocabulary)
+        word2idx = {word: idx for idx, word in enumerate(vocabulary)}
 
         for i, sentence in self.predictions_data["/sentence"].items():
             i = int(i)
             tokenized_sentence = self.tokenized_lines[i]
             tokens = tokenized_sentence.split(" ")
             eq_(len(sentence["predictions"]), len(tokens))
-            eq_(len(sentence["tokens"]), len(tokens))
             eq_(sentence["predictions"].shape[1], vocab_size)
+
+            reference_token_ids = [word2idx[token] for token in tokens]
+            token_ids = list(sentence["tokens"][()])
+            print(reference_token_ids, token_ids)
+            eq_(token_ids, reference_token_ids,
+                "Token IDs should match token IDs drawn from `tokenize` output")
 
 
     def test_predictions_quantatitive(self):
