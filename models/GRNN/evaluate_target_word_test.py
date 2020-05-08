@@ -9,6 +9,7 @@
 import argparse
 import sys
 
+import h5py
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -66,7 +67,10 @@ vocab_size = len(dictionary)
 prefix = dictionary_corpus.tokenize(dictionary, args.prefixfile)
 
 
-def get_surprisals(sentences, model, dictionary, seed, device="cpu"):
+def _get_predictions_inner(sentences, model, dictionary, seed, device="cpu"):
+    """
+    Returns torch tensors. See `get_predictions` for Numpy returns.
+    """
     ntokens = dictionary.__len__()
 
     with torch.no_grad():
@@ -76,22 +80,49 @@ def get_surprisals(sentences, model, dictionary, seed, device="cpu"):
             input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
 
             prev_word = None
-            sentence_surprisals = []
+            sentence_predictions = []
             for j, word in enumerate(sentence):
                 if j == 0:
                     word_surprisal = 0.
+                    sentence_predictions.append(None)
                 else:
                     input.fill_(prev_word.item())
                     output, hidden = model(input, hidden)
 
                     # Compute word-level surprisals
                     word_softmax = F.softmax(output, dim=2)
-                    word_surprisals = -torch.log2(word_softmax)
-                    word_surprisals = word_surprisals.squeeze().cpu()
-                    word_surprisal = word_surprisals[word].item()
+                    sentence_predictions.append(word_softmax)
 
-                sentence_surprisals.append((dictionary.idx2word[word.item()], word_surprisal))
                 prev_word = word
+
+            yield sentence_predictions
+
+
+def get_predictions(sentences, model, dictionary, seed, device="cpu"):
+    ret = _get_predictions_inner(sentences, model, dictionary, seed, device=device)
+    for sentence_preds in ret:
+        ret_i = np.array([preds.cpu() if preds is not None else preds
+                          for preds in sentence_preds])
+        yield ret_i
+
+
+def get_surprisals(sentences, model, dictionary, seed, device="cpu"):
+    ntokens = dictionary.__len__()
+
+    with torch.no_grad():
+        predictions = _get_predictions_inner(sentences, model, dictionary, seed, device=device)
+
+        for i, (sentence, sentence_preds) in enumerate(zip(sentences, predictions)):
+            sentence_surprisals = []
+            for j, (word_j, preds_j) in enumerate(zip(sentence, sentence_preds)):
+                word_id = word_j.item()
+
+                if preds_j is None:
+                    word_surprisal = 0.
+                else:
+                    word_surprisal = -torch.log2(preds_j).squeeze().cpu()[word_id]
+
+                sentence_surprisals.append((dictionary.idx2word[word_id], word_surprisal))
 
             yield sentence_surprisals
 
@@ -116,3 +147,25 @@ if __name__ == "__main__":
             for i, sentence_surps in enumerate(surprisals):
                 for j, (word, word_surp) in enumerate(sentence_surps):
                     outf.write("%i\t%i\t%s\t%f\n" % (i + 1, j + 1, word, word_surp))
+    elif args.mode == "predictions":
+        outf = h5py.File(args.outf.name, args.outf.mode)
+
+        predictions = get_predictions(sentences, model, dictionary, args.seed, device)
+        for i, (sentence, sentence_preds) in enumerate(zip(sentences, predictions)):
+            sentence = [token_id.item() for token_id in sentence]
+
+            # Skip the first word, which has null predictions
+            sentence_preds = [word_preds.squeeze().cpu() for word_preds in sentence_preds[1:]]
+            first_word_pred = np.ones_like(sentence_preds[0])
+            first_word_pred /= first_word_pred.sum()
+            sentence_preds = np.vstack([first_word_pred] + sentence_preds)
+
+            group = outf.create_group("/sentence/%i" % i)
+            group.create_dataset("predictions", data=sentence_preds)
+            group.create_dataset("tokens", data=sentence)
+
+        vocab_encoded = np.array(dictionary.idx2word)
+        vocab_encoded = np.char.encode(vocab_encoded, "utf-8")
+        outf.create_dataset("/vocabulary", data=vocab_encoded)
+
+        outf.close()

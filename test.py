@@ -2,12 +2,16 @@
 # coding=utf-8
 
 from collections import defaultdict
+from functools import lru_cache
 import json
 import re
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 import unittest
+
+import h5py
+import numpy as np
 
 import jsonschema
 from nose.tools import *
@@ -26,6 +30,7 @@ SURPRISAL_RE = re.compile(r"sentence_id\ttoken_id\ttoken\tsurprisal\n"
                           flags=re.MULTILINE)
 
 
+@lru_cache()
 def get_spec():
     return json.loads(subprocess.check_output(["spec"]).decode("utf-8"))
 
@@ -58,7 +63,9 @@ class LMProcessingTest(unittest.TestCase):
         else:
             text_f = NamedTemporaryFile("w", encoding="utf-8")
 
-        with text_f:
+        predictions_f = NamedTemporaryFile("wb")
+
+        with text_f, predictions_f:
             test_string = TEST_STRING
             if sys.version_info[0] == 2:
                 test_string = TEST_STRING.encode("utf-8")
@@ -78,6 +85,11 @@ class LMProcessingTest(unittest.TestCase):
             print("== get_surprisals %s" % text_f.name)
             cls.surprisals_output = subprocess.check_output(["get_surprisals", text_f.name]).decode("utf-8")
             print(cls.surprisals_output)
+
+            print("== get_predictions.hdf5 %s" % text_f.name)
+            cls.predictions_output = subprocess.check_output(["get_predictions.hdf5", text_f.name, predictions_f.name]).decode("utf-8")
+            print(cls.predictions_output)
+            cls.predictions_data = h5py.File(predictions_f.name, "r")
 
         cls.tokenized_lines = [line.strip() for line in cls.tokenized_output.strip().split("\n")]
         cls.unkified_lines = [line.strip() for line in cls.unkified_output.strip().split("\n")]
@@ -148,6 +160,53 @@ class LMProcessingTest(unittest.TestCase):
         """
         # TODO
         ...
+
+    def test_tokenization_match_predictions(self):
+        """
+        Tokenized sequence should exactly match size of predictions array
+        """
+        print(self.predictions_data)
+        eq_(len(self.predictions_data["/sentence"]), len(self.tokenized_lines),
+            "Number of lines in predictions output should match number of tokenized lines")
+
+        vocabulary = get_spec()["vocabulary"]["items"]
+        vocab_size = len(vocabulary)
+
+        for i, sentence in self.predictions_data["/sentence"].items():
+            i = int(i)
+            tokenized_sentence = self.tokenized_lines[i]
+            tokens = tokenized_sentence.split(" ")
+            eq_(len(sentence["predictions"]), len(tokens))
+            eq_(len(sentence["tokens"]), len(tokens))
+            eq_(sentence["predictions"].shape[1], vocab_size)
+
+
+    def test_predictions_quantatitive(self):
+        for i, sentence in self.predictions_data["/sentence"].items():
+            for word_preds in sentence["predictions"]:
+                # Predictions should be valid probability distribution
+                ok_(((word_preds >= 0) & (word_preds <= 1)).all(),
+                        "Prediction distributions must have entries in [0, 1]")
+                np.testing.assert_almost_equal(word_preds.sum(), 1, decimal=3)
+
+    def test_predictions_vocabulary(self):
+        """
+        Token IDs in prediction output should match the IDs we reconstruct from
+        the /vocabulary dataset.
+        """
+
+        vocabulary = self.predictions_data["/vocabulary"]
+        # Decode bytestring to UTF-8
+        vocabulary = np.char.decode(vocabulary, "utf-8")
+        vocab_size = len(vocabulary)
+
+        spec_vocab = get_spec()["vocabulary"]["items"]
+
+        ok_(vocab_size > 0)
+        eq_(vocab_size, len(spec_vocab),
+            "Prediction vocabulary should match size stated in model spec")
+        eq_(set(vocabulary), set(spec_vocab),
+            "Vocabulary items should match exactly (not necessarily in order)")
 
 
 if __name__ == "__main__":

@@ -13,9 +13,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         perl && \
         rm -rf /var/lib/apt/lists/*
 
+# Add runtime dependencies.
+RUN pip install h5py
+
 # Add test dependencies.
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
+RUN pip install nose jsonschema
 
 # Copy in tokenizer.
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
