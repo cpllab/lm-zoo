@@ -189,12 +189,15 @@ class LMProcessingTest(unittest.TestCase):
 
 
     def test_predictions_quantatitive(self):
+        """
+        Sentence-level prediction vectors should be valid log-probability
+        distributions
+        """
         for i, sentence in self.predictions_data["/sentence"].items():
             for word_preds in sentence["predictions"]:
-                # Predictions should be valid probability distribution
+                ok_(np.isfinite(word_preds).all(), "No NaN or inf values")
                 ok_(((word_preds >= 0) & (word_preds <= 1)).all(),
-                        "Prediction distributions must have entries in [0, 1]")
-                np.testing.assert_almost_equal(word_preds.sum(), 1, decimal=3)
+                        "Prediction distributions must have log-probs in [-inf, 0]")
 
     def test_predictions_vocabulary(self):
         """
@@ -214,6 +217,14 @@ class LMProcessingTest(unittest.TestCase):
             "Prediction vocabulary should match size stated in model spec")
         eq_(set(vocabulary), set(spec_vocab),
             "Vocabulary items should match exactly (not necessarily in order)")
+
+    def test_predictions_match_surprisals(self):
+        """
+        Model suprisals should match the relevant word probability in model
+        predictions
+        """
+        # TODO
+        ...
 
 
 if __name__ == "__main__":
