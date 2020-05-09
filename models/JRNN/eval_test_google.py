@@ -1,9 +1,19 @@
 import os
 import sys
 
+# Disable Tensorflow warning/info logs.
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+# Disable Tensorflow deprecation warnings
+try:
+  from tensorflow.python.util import module_wrapper as deprecation
+except ImportError:
+  from tensorflow.python.util import deprecation_wrapper as deprecation
+deprecation._PER_MODULE_WARNING_LIMIT = 0
+
 import numpy as np
 from six.moves import xrange
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 from google.protobuf import text_format
 import data_utils
@@ -20,6 +30,7 @@ tf.flags.DEFINE_string('output_file', '',
                        'File to dump results.')
 tf.flags.DEFINE_string('input_file', '',
                         'file of sentences to be evaluated')
+tf.flags.DEFINE_string("mode", '', "One 'of 'surprisal', 'predictions'")
 
 # For saving demo resources, use batch size 1 and step 1.
 BATCH_SIZE = 1
@@ -38,8 +49,7 @@ def _LoadModel(gd_file, ckpt_file):
     TensorFlow session and tensors dict.
   """
   with tf.Graph().as_default():
-    sys.stderr.write('Recovering graph.\n')
-    with tf.gfile.FastGFile(gd_file, 'r') as f:
+    with tf.gfile.GFile(gd_file, 'r') as f:
       s = f.read()
       gd = tf.GraphDef()
       text_format.Merge(s, gd)
@@ -66,7 +76,6 @@ def _LoadModel(gd_file, ckpt_file):
                                      'Reshape_3:0',
                                      'global_step:0'], name='')
 
-    sys.stderr.write('Recovering checkpoint %s\n' % ckpt_file)
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     sess.run('save/restore_all', {'save/Const:0': ckpt_file})
     sess.run(t['states_init'])
