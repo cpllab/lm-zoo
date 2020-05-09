@@ -1,0 +1,12 @@
+#!/bin/bash
+JRNN_ROOT="/opt/lm_1b"
+
+/opt/bin/tokenize $1 > /tmp/input_tokenized
+
+python ${JRNN_ROOT}/eval_test_google.py \
+    --pbtxt ${JRNN_ROOT}/graph-2016-09-10.pbtxt \
+    --ckpt '/opt/lm_1b/ckpt-*' \
+    --vocab_file ${JRNN_ROOT}/vocab-2016-09-10.txt \
+    --mode predictions \
+    --input_file /tmp/input_tokenized \
+    --output_file $2

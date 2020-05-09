@@ -10,6 +10,7 @@ except ImportError:
   from tensorflow.python.util import deprecation_wrapper as deprecation
 deprecation._PER_MODULE_WARNING_LIMIT = 0
 
+import h5py
 import numpy as np
 from six.moves import xrange
 import tensorflow as tf
@@ -120,8 +121,16 @@ def get_predictions(sentences, model, sess, vocab):
                            feed_dict={model["inputs_in"]: inputs,
                                       model["char_inputs_in"]: char_ids_inputs,
                                       model["targets_in"]: targets,
-                                      model["target_weights_in"]: target_weights})
-        sentence_predictions.append(softmax[0])
+                                      model["target_weights_in"]: target_weights})[0]
+
+        # TODO JRNN softmax distribution size is greater than the vocabulary.
+        # Why is that .. ?
+        # In any case, let's just truncate and renorm to the actual vocab
+        softmax = softmax[:vocab.size]
+        softmax /= softmax.sum()
+        softmax = np.log(softmax)
+
+        sentence_predictions.append(softmax)
 
       prev_word_id = word_id
       prev_word_char_ids = char_ids
@@ -137,7 +146,7 @@ def get_surprisals(sentences, model, sess, vocab):
       if preds_j is None:
         word_surprisal = 0.
       else:
-        word_surprisal = -np.log2(preds_j[vocab.word_to_id(word_j)])
+        word_surprisal = -(preds_j[vocab.word_to_id(word_j)] / np.log(2))
 
       sentence_surprisals.append((word_j, word_surprisal))
 
@@ -148,10 +157,10 @@ def main(unused_argv):
   vocab = data_utils.CharsVocabulary(FLAGS.vocab_file, MAX_WORD_LEN)
   sess, model = _LoadModel(FLAGS.pbtxt, FLAGS.ckpt)
 
-  if FLAGS.mode == "surprisal":
-    with open(FLAGS.input_file) as inf:
-      sentences = [line.strip().split(" ") for line in inf]
+  with open(FLAGS.input_file) as inf:
+    sentences = [line.strip().split(" ") for line in inf]
 
+  if FLAGS.mode == "surprisal":
     outf = sys.stdout if FLAGS.output_file == "-" else open(output_file, "w")
     # Print TSV header
     outf.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
@@ -163,7 +172,27 @@ def main(unused_argv):
 
     outf.close()
   elif FLAGS.mode == "predictions":
-    raise NotImplementedError()
+    outf = h5py.File(FLAGS.output_file, "w")
+
+    predictions = get_predictions(sentences, model, sess, vocab)
+    for i, (sentence, sentence_preds) in enumerate(zip(sentences, predictions)):
+        token_ids = [vocab.word_to_id(word) for word in sentence]
+
+        # Skip the first word, which has null predictions
+        sentence_preds = sentence_preds[1:]
+        first_word_pred = np.ones_like(sentence_preds[0])
+        first_word_pred /= first_word_pred.sum()
+        sentence_preds = np.vstack([first_word_pred] + sentence_preds)
+
+        group = outf.create_group("/sentence/%i" % i)
+        group.create_dataset("predictions", data=sentence_preds)
+        group.create_dataset("tokens", data=token_ids)
+
+    vocab_encoded = np.array(vocab._id_to_word)
+    vocab_encoded = np.char.encode(vocab_encoded, "utf-8")
+    outf.create_dataset("/vocabulary", data=vocab_encoded)
+
+    outf.close()
   else:
     raise ValueError("Unknown --mode %s" % FLAGS.mode)
 

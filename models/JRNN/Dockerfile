@@ -30,9 +30,11 @@ COPY ${MODEL_ROOT}/lm_1b_eval.py ${MODEL_ROOT}/data_utils.py ${MODEL_ROOT}/eval_
 # Copy tokenizer.
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 
+# Install runtime dependencies.
+RUN pip install h5py
+
 # Copy in test dependencies.
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
+RUN pip install nose jsonschema
 COPY test.py /opt/test.py
 
 # Copy external-facing scripts
