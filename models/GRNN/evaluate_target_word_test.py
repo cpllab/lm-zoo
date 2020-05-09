@@ -89,8 +89,8 @@ def _get_predictions_inner(sentences, model, dictionary, seed, device="cpu"):
                     input.fill_(prev_word.item())
                     output, hidden = model(input, hidden)
 
-                    # Compute word-level surprisals
-                    word_softmax = F.softmax(output, dim=2)
+                    # Compute word-level log-softmax
+                    word_softmax = F.log_softmax(output, dim=2)
                     sentence_predictions.append(word_softmax)
 
                 prev_word = word
@@ -120,7 +120,7 @@ def get_surprisals(sentences, model, dictionary, seed, device="cpu"):
                 if preds_j is None:
                     word_surprisal = 0.
                 else:
-                    word_surprisal = -torch.log2(preds_j).squeeze().cpu()[word_id]
+                    word_surprisal = -(preds_j / np.log(2)).squeeze().cpu()[word_id]
 
                 sentence_surprisals.append((dictionary.idx2word[word_id], word_surprisal))
 

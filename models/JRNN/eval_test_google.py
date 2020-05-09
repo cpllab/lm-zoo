@@ -83,70 +83,90 @@ def _LoadModel(gd_file, ckpt_file):
   return sess, t
 
 
-def _EvalTestSents(input_file, vocab, output_file):
-    targets = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
-    weights = np.ones([BATCH_SIZE, NUM_TIMESTEPS], np.float32)
+def get_predictions(sentences, model, sess, vocab):
+  """
+  Args:
+    sentences: List of pre-tokenized lists of tokens
+    model:
+    sess:
+    vocab: CharsVocabulary instance
 
-    # Load the model with the given pbtxt file and the checkpoint files
-    sess, t = _LoadModel(FLAGS.pbtxt, FLAGS.ckpt)
+  Yields lists of numpy arrays, one per sentence.
+  """
+  inputs = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
+  char_ids_inputs = np.zeros([BATCH_SIZE, NUM_TIMESTEPS, vocab.max_word_length], np.int32)
 
-    # Read intput file
-    with open(input_file) as f:
-        sents = f.readlines()
+  # Dummy inputs needed for the graph to compute
+  targets = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
+  target_weights = np.ones([BATCH_SIZE, NUM_TIMESTEPS], np.float32)
 
-    result = []
+  for i, sentence in enumerate(sentences):
+    sess.run(model["states_init"])
 
-    # print CSV header
-    f = sys.stdout if output_file == "-" else open(output_file, "w")
-    f.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+    # Compute token- and character-level vocabulary ID sequences
+    sentence_ids = [vocab.word_to_id(w) for w in sentence]
+    sentence_char_ids = [vocab.word_to_char_ids(w) for w in sentence]
 
-    for j in range(len(sents)):
+    prev_word_id, prev_word_char_ids = None, None
+    sentence_predictions = []
+    for j, (word, word_id, char_ids) in enumerate(zip(sentence, sentence_ids, sentence_char_ids)):
+      if j == 0:
+        sentence_predictions.append(None)
+      else:
+        inputs[0, 0] = prev_word_id
+        char_ids_inputs[0, 0, :] = prev_word_char_ids
 
-        # Just so we know where things stand
-        #if (j%10 == 0):
-          #print(j/len(sents))
+        softmax = sess.run(model["softmax_out"],
+                           feed_dict={model["inputs_in"]: inputs,
+                                      model["char_inputs_in"]: char_ids_inputs,
+                                      model["targets_in"]: targets,
+                                      model["target_weights_in"]: target_weights})
+        sentence_predictions.append(softmax[0])
 
-        inputs = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
-        char_ids_inputs = np.zeros( [BATCH_SIZE, NUM_TIMESTEPS, vocab.max_word_length], np.int32)
+      prev_word_id = word_id
+      prev_word_char_ids = char_ids
 
-        sent = [vocab.word_to_id(w) for w in sents[j].split()]
-        sent_char_ids = [vocab.word_to_char_ids(w) for w in sents[j].split()]
+    yield sentence_predictions
 
-        samples = sent[:]
-        char_ids_samples = sent_char_ids[:]
 
-        # Total sentence surprisal
-        total_surprisal = 0
+def get_surprisals(sentences, model, sess, vocab):
+  predictions = get_predictions(sentences, model, sess, vocab)
+  for i, (sentence, sentence_preds) in enumerate(zip(sentences, predictions)):
+    sentence_surprisals = []
+    for j, (word_j, preds_j) in enumerate(zip(sentence, sentence_preds)):
+      if preds_j is None:
+        word_surprisal = 0.
+      else:
+        word_surprisal = -np.log2(preds_j[vocab.word_to_id(word_j)])
 
-        # First word in the sentence has a dummy surprisal of 0
-        result.append("%i\t1\t%s\t0.00\n" % (j + 1, vocab.id_to_word(sent[0])))
-        sess.run(t['states_init'])
+      sentence_surprisals.append((word_j, word_surprisal))
 
-        for n in range(len(sents[j].split(" ")) - 1):
-            inputs[0, 0] = samples[0]
-            char_ids_inputs[0, 0, :] = char_ids_samples[0]
-            samples = samples[1:]
-            char_ids_samples = char_ids_samples[1:]
-            softmax = sess.run(t['softmax_out'],
-                                 feed_dict={t['char_inputs_in']: char_ids_inputs,
-                                            t['inputs_in']: inputs,
-                                            t['targets_in']: targets,
-                                            t['target_weights_in']: weights})
+    yield sentence_surprisals
 
-            surprisal = -1 * np.log2(softmax[0][sent[n+1]])
-            total_surprisal += surprisal
-
-            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 2, vocab.id_to_word(sent[n+1]), surprisal))
-
-    # Write result to output file
-    for line in result:
-      f.write(line)
-    if output_file != "-":
-      f.close()
 
 def main(unused_argv):
   vocab = data_utils.CharsVocabulary(FLAGS.vocab_file, MAX_WORD_LEN)
-  _EvalTestSents(FLAGS.input_file, vocab, FLAGS.output_file)
+  sess, model = _LoadModel(FLAGS.pbtxt, FLAGS.ckpt)
+
+  if FLAGS.mode == "surprisal":
+    with open(FLAGS.input_file) as inf:
+      sentences = [line.strip().split(" ") for line in inf]
+
+    outf = sys.stdout if FLAGS.output_file == "-" else open(output_file, "w")
+    # Print TSV header
+    outf.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+
+    surprisals = get_surprisals(sentences, model, sess, vocab)
+    for i, (sentence, sentence_surps) in enumerate(zip(sentences, surprisals)):
+      for j, (word, word_surp) in enumerate(sentence_surps):
+        outf.write("%i\t%i\t%s\t%f\n" % (i + 1, j + 1, word, word_surp))
+
+    outf.close()
+  elif FLAGS.mode == "predictions":
+    raise NotImplementedError()
+  else:
+    raise ValueError("Unknown --mode %s" % FLAGS.mode)
+
 
 if __name__ == '__main__':
   tf.app.run()
