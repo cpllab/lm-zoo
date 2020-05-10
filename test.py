@@ -216,6 +216,7 @@ class LMProcessingTest(unittest.TestCase):
         spec_vocab = get_spec()["vocabulary"]["items"]
 
         ok_(vocab_size > 0)
+        print(vocab_size, len(spec_vocab))
         eq_(vocab_size, len(spec_vocab),
             "Prediction vocabulary should match size stated in model spec")
         eq_(set(vocabulary), set(spec_vocab),
