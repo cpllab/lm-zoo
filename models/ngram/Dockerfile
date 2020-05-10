@@ -30,15 +30,9 @@ COPY --from=builder /opt/srilm /opt/srilm
 USER root
 RUN apk add perl bash libstdc++ gawk libgomp
 
-#RUN apt update && apt install -y --no-install-recommends \
-#          build-essential openssh-client \
-#          libgomp1 libgetopt-complete-perl gawk python3 python3-pip python3-setuptools
-#RUN ln -s /usr/bin/python3 /usr/bin/python
-
 # Copy in test dependencies.
-RUN pip install wheel
-RUN pip install nose jsonschema
-ENV NOSE_REDNOSE 1
+RUN conda install -qy --freeze-installed numpy nomkl \
+        && pip install nose jsonschema
 COPY test.py /opt/test.py
 
 COPY ${MODEL_ROOT}/vocab.txt /opt/vocab.txt

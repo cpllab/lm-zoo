@@ -10,10 +10,10 @@ import sys
 from tempfile import NamedTemporaryFile
 import unittest
 
-import h5py
 import numpy as np
 
 import jsonschema
+from nose.plugins.skip import SkipTest
 from nose.tools import *
 
 TEST_STRING = """This is a test sentence.
@@ -58,6 +58,8 @@ class LMProcessingTest(unittest.TestCase):
         # super(LMTest, cls).setUpClass()
         cls.spec = get_spec()
 
+        cls._predictions_supported = cls.spec["image"]["supported_features"]["get_predictions"]
+
         if sys.version_info[0] == 2:
             text_f = NamedTemporaryFile("w")
         else:
@@ -86,10 +88,13 @@ class LMProcessingTest(unittest.TestCase):
             cls.surprisals_output = subprocess.check_output(["get_surprisals", text_f.name]).decode("utf-8")
             print(cls.surprisals_output)
 
-            print("== get_predictions.hdf5 %s" % text_f.name)
-            cls.predictions_output = subprocess.check_output(["get_predictions.hdf5", text_f.name, predictions_f.name]).decode("utf-8")
-            print(cls.predictions_output)
-            cls.predictions_data = h5py.File(predictions_f.name, "r")
+            cls.predictions_output, cls.predictions_data = None, None
+            if cls._predictions_supported:
+                import h5py
+                print("== get_predictions.hdf5 %s" % text_f.name)
+                cls.predictions_output = subprocess.check_output(["get_predictions.hdf5", text_f.name, predictions_f.name]).decode("utf-8")
+                print(cls.predictions_output)
+                cls.predictions_data = h5py.File(predictions_f.name, "r")
 
         cls.tokenized_lines = [line.strip() for line in cls.tokenized_output.strip().split("\n")]
         cls.unkified_lines = [line.strip() for line in cls.unkified_output.strip().split("\n")]
@@ -165,6 +170,9 @@ class LMProcessingTest(unittest.TestCase):
         """
         Tokenized sequence should exactly match size of predictions array
         """
+        if not self._predictions_supported:
+            raise SkipTest("This image does not support predictions")
+
         print(self.predictions_data)
         eq_(len(self.predictions_data["/sentence"]), len(self.tokenized_lines),
             "Number of lines in predictions output should match number of tokenized lines")
@@ -193,6 +201,9 @@ class LMProcessingTest(unittest.TestCase):
         Sentence-level prediction vectors should be valid log-probability
         distributions
         """
+        if not self._predictions_supported:
+            raise SkipTest("This image does not support predictions")
+
         for i, sentence in self.predictions_data["/sentence"].items():
             for word_preds in sentence["predictions"]:
                 ok_(np.isfinite(word_preds).all(), "No NaN or inf values")
@@ -207,6 +218,8 @@ class LMProcessingTest(unittest.TestCase):
         Token IDs in prediction output should match the IDs we reconstruct from
         the /vocabulary dataset.
         """
+        if not self._predictions_supported:
+            raise SkipTest("This image does not support predictions")
 
         vocabulary = self.predictions_data["/vocabulary"]
         # Decode bytestring to UTF-8
@@ -227,6 +240,9 @@ class LMProcessingTest(unittest.TestCase):
         Model suprisals should match the relevant word probability in model
         predictions
         """
+        if not self._predictions_supported:
+            raise SkipTest("This image does not support predictions")
+
         # TODO
         ...
 
