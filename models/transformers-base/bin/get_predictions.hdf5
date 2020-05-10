@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+python /opt/transformers/get_surprisals.py --mode predictions \
+       "$1" --outputf "$2" \
+       --model_path "$TRANSFORMER_MODEL_PATH"
