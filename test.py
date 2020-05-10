@@ -196,8 +196,9 @@ class LMProcessingTest(unittest.TestCase):
         for i, sentence in self.predictions_data["/sentence"].items():
             for word_preds in sentence["predictions"]:
                 ok_(np.isfinite(word_preds).all(), "No NaN or inf values")
+                print(word_preds.min(), word_preds.max())
                 ok_((word_preds <= 0).all(),
-                        "Prediction distributions must have log-probs in [-inf, 0]")
+                        "Prediction distributions must have log-probs in (-inf, 0]")
 
                 np.testing.assert_almost_equal(np.exp(word_preds).sum(), 1, decimal=3)
 

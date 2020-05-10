@@ -158,6 +158,7 @@ if __name__ == "__main__":
             sentence_preds = [word_preds.squeeze().cpu() for word_preds in sentence_preds[1:]]
             first_word_pred = np.ones_like(sentence_preds[0])
             first_word_pred /= first_word_pred.sum()
+            first_word_pred = np.log(first_word_pred)
             sentence_preds = np.vstack([first_word_pred] + sentence_preds)
 
             group = outf.create_group("/sentence/%i" % i)
