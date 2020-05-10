@@ -28,7 +28,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/ngram
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:ngram python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:ngram python /test.py
     GRNN:
         machine:
             image: circleci/classic:latest
@@ -44,7 +44,7 @@ jobs:
                 command: docker build -t cpllab/language-models:grnn -f models/GRNN/Dockerfile .
             - run:
                 name: Run tests
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:grnn python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:grnn python /test.py
             # - run:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:grnn
@@ -68,7 +68,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/JRNN
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:jrnn python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:jrnn python /test.py
 
     RNNG:
         machine:
@@ -93,7 +93,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/RNNG
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:rnng python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:rnng python /test.py
 
     ordered-neurons:
         machine:
@@ -118,7 +118,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/ordered-neurons
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:ordered-neurons python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:ordered-neurons python /test.py
 
     gpt2:
         machine:
@@ -137,7 +137,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/gpt2
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:gpt2 python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:gpt2 python /test.py
             # - run:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:gpt2
@@ -159,7 +159,7 @@ jobs:
             - run:
                 name: Run tests
                 working_directory: models/transformer-xl
-                command: docker run --rm -v test.py:/test.py -v docs/schemas:/schemas cpllab/language-models:transformer-xl python /test.py
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:transformer-xl python /test.py
             # - run:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:transformer-xl
