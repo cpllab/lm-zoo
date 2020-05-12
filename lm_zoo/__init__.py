@@ -1,12 +1,16 @@
+from io import StringIO
+import json
+import logging
 import os
 import sys
 
-import click
-import crayons
 import dateutil.parser
 import docker
+import pandas as pd
 import requests
 import tqdm
+
+L = logging.getLogger("lm-zoo")
 
 
 REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
@@ -26,6 +30,88 @@ def get_model_dict():
 def get_docker_client():
     client = docker.APIClient()
     return client
+
+
+def spec(model):
+    """
+    Get a language model specification as a dict.
+    """
+    ret = run_model_command_get_stdout(model, "spec")
+    return json.loads(ret)
+
+
+def tokenize(model, sentences):
+    """
+    Tokenize natural-language text according to a model's preprocessing
+    standards.
+
+    `sentences` should be a list of natural-language sentences.
+
+    This command returns a list of tokenized sentences, with each sentence a
+    list of token strings.
+    For each sentence, there is a one-to-one
+    mapping between the tokens output by this command and the tokens used by
+    the ``get-surprisals`` command.
+    """
+    in_file = StringIO("\n".join(sentences))
+    ret = run_model_command_get_stdout(model, "tokenize /dev/stdin",
+                                       stdin=in_file)
+    sentences = ret.strip().split("\n")
+    sentences = [sentence.split(" ") for sentence in sentences]
+    return sentences
+
+
+def unkify(model, sentences):
+    """
+    Detect unknown words for a language model for the given natural language
+    text.
+
+    `sentences` should be a list of natural-language sentences.
+
+    Returns:
+        A list of sentence masks, each a list of ``0`` and ``1`` values.  These
+        values correspond one-to-one with the model's tokenization of the
+        sentence (as returned by ``lm-zoo.tokenize``). The value ``0``
+        indicates that the corresponding token is in the model's vocabulary;
+        the value ``1`` indicates that the corresponding token is an unknown
+        word for the model.
+    """
+    in_file = StringIO("\n".join(sentences))
+    ret = run_model_command_get_stdout(model, "unkify /dev/stdin",
+                                       stdin=in_file)
+    sentences = ret.strip().split("\n")
+    sentences = [list(map(int, sentence.split(" "))) for sentence in sentences]
+    return sentences
+
+
+def get_surprisals(model, sentences):
+    """
+    Compute word-level surprisals from a language model for the given natural
+    language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
+    token_id)`` (both one-indexed) and columns ``token`` and ``surprisal``.
+
+    The surprisal of a token :math:`w_i` is the negative logarithm of that
+    token's probability under a language model's predictive distribution:
+
+    .. math::
+        S(w_i) = -\log_2 p(w_i \mid w_1, w_2, \ldots, w_{i-1})
+
+    Note that surprisals are computed on the level of **tokens**, not words.
+    Models that insert extra tokens (e.g., an end-of-sentence token as above)
+    or which tokenize on the sub-word level (e.g. GPT2) will not have a
+    one-to-one mapping between rows of surprisal output from this command and
+    words.
+
+    There is guaranteed to be a one-to-one mapping, however, between the rows
+    of this file and the tokens produced by ``lm-zoo tokenize``.
+    """
+    in_file = StringIO("\n".join(sentences) + "\n")
+    out = StringIO()
+    ret = run_model_command(model, "get_surprisals /dev/stdin",
+                            stdin=in_file, stdout=out)
+    out = out.getvalue()
+    ret = pd.read_csv(StringIO(out), sep="\t").set_index(["sentence_id", "token_id"])
+    return ret
 
 
 class Model(object):
@@ -94,28 +180,37 @@ def run_model_command(model, command_str, pull=True,
     Run the given shell command inside a container instantiating the given
     model.
     """
+    client = get_docker_client()
     try:
         model = get_model_dict()[model]
     except KeyError:
-        raise click.UsageError(f"Model {model} not found.")
-
-    client = get_docker_client()
-
-    image, tag = model.image["name"], model.image["tag"]
-    if pull:
-        # First pull the image.
-        registry = model.image["registry"]
-        click.echo("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
+        # Could be a Docker image reference. Try to pull it
         try:
-            progress_bars = {}
-            for line in client.pull(f"{registry}/{image}", tag=tag, stream=True, decode=True):
-                if progress_stream is not None:
-                    # Write pull progress on the given stream.
-                    _update_progress(line, progress_bars)
-                else:
-                    pass
-        except docker.errors.NotFound:
-            raise RuntimeError("Image not found.")
+            client.inspect_image(model)
+        except docker.errors.ImageNotFound:
+            raise ValueError(f"Model {model} not found")
+        else:
+            ref_fields = model.rsplit(":", 1)
+            if len(ref_fields) == 2:
+                image, tag = ref_fields
+            else:
+                image, tag = ref_fields[0], "latest"
+    else:
+        image, tag = model.image["name"], model.image["tag"]
+        if pull:
+            # First pull the image.
+            registry = model.image["registry"]
+            L.info("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
+            try:
+                progress_bars = {}
+                for line in client.pull(f"{registry}/{image}", tag=tag, stream=True, decode=True):
+                    if progress_stream is not None:
+                        # Write pull progress on the given stream.
+                        _update_progress(line, progress_bars)
+                    else:
+                        pass
+            except docker.errors.NotFound:
+                raise RuntimeError("Image not found.")
 
     container = client.create_container(f"{image}:{tag}", stdin_open=True,
                                         command=command_str)
@@ -124,141 +219,27 @@ def run_model_command(model, command_str, pull=True,
     if stdin is not None:
         # Send file contents to stdin of container.
         in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
-        os.write(in_stream._sock.fileno(), stdin.read())
+        to_send = stdin.read()
+        if isinstance(to_send, str):
+            to_send = to_send.encode("utf-8")
+        os.write(in_stream._sock.fileno(), to_send)
         os.close(in_stream._sock.fileno())
 
     # Stop container and collect results.
     # TODO parameterize timeout
-    client.stop(container, timeout=60)
+    client.stop(container, timeout=999999999)
 
     # Collect output.
     container_stdout = client.logs(container, stdout=True, stderr=False)
     container_stderr = client.logs(container, stdout=False, stderr=True)
 
     client.remove_container(container)
-    stdout.buffer.write(container_stdout)
-    stderr.buffer.write(container_stderr)
+    stdout.write(container_stdout.decode("utf-8"))
+    stderr.write(container_stderr.decode("utf-8"))
 
 
-@click.group(help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
-def lm_zoo(): pass
-
-
-@lm_zoo.command()
-@click.option("--short", is_flag=True, default=False,
-              help="Output just a list of shortnames rather than a pretty list")
-def list(short):
-    """
-    List language models available in the central repository.
-    """
-    show_props = [
-        ("name", "Full name"),
-        ("ref_url", "Reference URL"),
-        ("maintainer", "Maintainer"),
-    ]
-
-    for model in get_model_dict().values():
-        if short:
-            click.echo(model.shortname)
-        else:
-            click.echo(crayons.normal(model.shortname, bold=True))
-            click.echo("\t{0} {1}".format(
-                crayons.normal("Image URI: ", bold=True),
-                model.image_uri))
-
-            props = []
-            for key, label in show_props:
-                if hasattr(model, key):
-                    props.append((label, getattr(model, key)))
-
-            dt = dateutil.parser.isoparse(model.image["datetime"])
-            props.append(("Last updated", dt.strftime("%Y-%m-%d")))
-            props.append(("Size", "%.02fGB" % (model.image["size"] / 1024 / 1024 / 1024)))
-
-            for label, value in props:
-                click.echo("\t" + crayons.normal(label + ": ", bold=True)
-                            + value)
-
-
-
-
-@lm_zoo.command()
-@click.argument("model", metavar="MODEL")
-@click.argument("in_file", type=click.File("rb"), metavar="FILE")
-def tokenize(model, in_file):
-    """
-    Tokenize natural-language text according to a model's preprocessing
-    standards.
-
-    FILE should be a raw natural language text file with one sentence per line.
-
-    This command returns a text file with one tokenized sentence per line, with
-    tokens separated by single spaces. For each sentence, there is a one-to-one
-    mapping between the tokens output by this command and the tokens used by
-    the ``get-surprisals`` command.
-    """
-    run_model_command(model, "tokenize /dev/stdin",
-                      stdin=in_file)
-
-
-@lm_zoo.command()
-@click.argument("model", metavar="MODEL")
-@click.argument("in_file", type=click.File("rb"), metavar="FILE")
-def get_surprisals(model, in_file):
-    """
-    Get word-level surprisals from a language model for the given natural
-    language text. Tab-separated results will be sent to standard output,
-    following the format::
-
-      sentence_id	token_id	token	surprisal
-      1			1		This	0.000
-      1			2		is	1.000
-      1			3		a	1.000
-      1			4		<unk>	0.500
-      1			5		line	1.000
-      1			6		.	0.250
-      1			7		<eos>	0.100
-
-    The surprisal of a token :math:`w_i` is the negative logarithm of that
-    token's probability under a language model's predictive distribution:
-
-    .. math::
-        S(w_i) = -\log_2 p(w_i \mid w_1, w_2, \ldots, w_{i-1})
-
-    Note that surprisals are computed on the level of **tokens**, not words.
-    Models that insert extra tokens (e.g., an end-of-sentence token as above)
-    or which tokenize on the sub-word level (e.g. GPT2) will not have a
-    one-to-one mapping between rows of surprisal output from this command and
-    words.
-
-    There is guaranteed to be a one-to-one mapping, however, between the rows
-    of this file and the tokens produced by ``lm-zoo tokenize``.
-    """
-    run_model_command(model, "get_surprisals /dev/stdin",
-                      stdin=in_file)
-
-
-@lm_zoo.command()
-@click.argument("model", metavar="MODEL")
-@click.argument("in_file", type=click.File("rb"), metavar="FILE")
-def unkify(model, in_file):
-    """
-    Detect unknown words for a language model for the given natural language
-    text.
-
-    FILE should be a raw natural language text file with one sentence per line.
-
-    This command returns a text file with one sentence per line, where each
-    sentence is represented as a sequence of ``0`` and ``1`` values. These
-    values correspond one-to-one with the model's tokenization of the sentence
-    (as returned by ``lm-zoo tokenize``). The value ``0`` indicates that the
-    corresponding token is in the model's vocabulary; the value ``1`` indicates
-    that the corresponding token is an unknown word for the model.
-    """
-    run_model_command(model, "unkify /dev/stdin",
-                      stdin=in_file)
-
-
-
-if __name__ == "__main__":
-    lm_zoo()
+def run_model_command_get_stdout(*args, **kwargs):
+    stdout = StringIO()
+    kwargs["stdout"] = stdout
+    run_model_command(*args, **kwargs)
+    return stdout.getvalue()
