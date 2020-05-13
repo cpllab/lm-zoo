@@ -27,7 +27,7 @@ def main(args):
     registry = {}
     client = docker.from_env(timeout=60)
 
-    for docker_image in tqdm(args.docker_images):
+    for docker_image in tqdm(sorted(args.docker_images)):
         try:
             # HACK: Remove vocabulary from spec on guest-side to avoid
             # streaming huge amounts of data for each model. We'd delete it
@@ -46,13 +46,13 @@ def main(args):
         del image_spec["name"]
 
         reference_match = DOCKER_REFERENCE_RE.match(docker_image)
-        image_spec["image"] = {
+        image_spec["image"].update({
             "registry": DOCKER_DEFAULT_REGISTRY,
             "name": reference_match.group(1),
             "tag": reference_match.group(2) or DOCKER_DEFAULT_TAG,
             "size": image_obj.attrs["VirtualSize"],
             "datetime": image_obj.attrs["Created"],
-        }
+        })
 
         registry[image_spec["shortname"]] = image_spec
 

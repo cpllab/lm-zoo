@@ -8,6 +8,16 @@
                     "type": "string",
                     "format": "datetime"
                 },
+                "supported_features": {
+                    "type": "object",
+                    "properties": {
+                        "tokenize": {"type": "boolean"},
+                        "unkify": {"type": "boolean"},
+                        "get_surprisals": {"type": "boolean"},
+                        "get_predictions": {"type": "boolean"}
+                    },
+                    "required": ["tokenize", "unkify", "get_surprisals", "get_predictions"]
+                },
                 "gpu": {
                     "type": "object",
                     "properties": {
@@ -42,7 +52,8 @@
             "required": [
                 "maintainer",
                 "version",
-                "datetime"
+                "datetime",
+                "supported_features"
             ]
         },
         "name": {

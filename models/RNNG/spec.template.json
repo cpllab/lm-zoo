@@ -6,6 +6,12 @@
         "maintainer": "jon@gauthiers.net",
         "version": "<image.sha1>",
         "datetime": "<image.datetime>",
+        "supported_features": {
+            "tokenize": true,
+            "unkify": true,
+            "get_surprisals": true,
+            "get_predictions": false
+        },
         "gpu": {
             "required": false,
             "supported": false

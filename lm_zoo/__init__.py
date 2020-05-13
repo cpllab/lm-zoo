@@ -2,10 +2,13 @@ from io import StringIO
 import json
 import logging
 import os
+from pathlib import Path
 import sys
+from tempfile import NamedTemporaryFile
 
 import dateutil.parser
 import docker
+import h5py
 import pandas as pd
 import requests
 import tqdm
@@ -114,6 +117,39 @@ def get_surprisals(model, sentences):
     return ret
 
 
+def get_predictions(model, sentences):
+    """
+    Compute token-level predictive distributions from a language model for the
+    given natural language sentences. Returns a h5py ``File`` object with the
+    following structure:
+
+        /sentence/<i>/predictions: N_tokens_i * N_vocabulary numpy ndarray of
+            log-probabilities (rows are log-probability distributions)
+        /sentence/<i>/tokens: sequence of integer token IDs corresponding to
+            indices in ``/vocabulary``
+        /vocabulary: byte-encoded ndarray of vocabulary items (decode with
+            ``numpy.char.decode(vocabulary, "utf-8")``)
+
+    Args:
+        model: lm-zoo model reference
+        sentences: list of natural language sentence strings (not pre
+            tokenized)
+    """
+    in_file = StringIO("\n".join(sentences) + "\n")
+    with NamedTemporaryFile("rb") as hdf5_out:
+        # Bind mount as hdf5 output
+        host_path = Path(hdf5_out.name).resolve()
+        guest_path = "/predictions_out"
+        mount = (host_path, guest_path, "rw")
+
+        result = run_model_command(model, f"get_predictions.hdf5 /dev/stdin {guest_path}",
+                                   mounts=[mount],
+                                   stdin=in_file)
+        ret = h5py.File(host_path, "r")
+
+    return ret
+
+
 class Model(object):
 
     def __init__(self, model_dict):
@@ -173,13 +209,20 @@ def _update_progress(line, progress_bars):
         pass
 
 
-def run_model_command(model, command_str, pull=True,
+def run_model_command(model, command_str, pull=True, mounts=None,
                       stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                       progress_stream=sys.stderr):
     """
     Run the given shell command inside a container instantiating the given
     model.
+
+    Args:
+        mounts: List of bind mounts described as tuples `(guest_path,
+            host_path, mode)`, where `mode` is one of ``ro``, ``rw``
     """
+    if mounts is None:
+        mounts = []
+
     client = get_docker_client()
     try:
         model = get_model_dict()[model]
@@ -212,8 +255,16 @@ def run_model_command(model, command_str, pull=True,
             except docker.errors.NotFound:
                 raise RuntimeError("Image not found.")
 
+    # Prepare mount config
+    volumes = [guest for _, guest, _ in mounts]
+    host_config = client.create_host_config(binds={
+        host: {"bind": guest, "mode": mode}
+        for host, guest, mode in mounts
+    })
+
     container = client.create_container(f"{image}:{tag}", stdin_open=True,
-                                        command=command_str)
+                                        command=command_str,
+                                        volumes=volumes, host_config=host_config)
     client.start(container)
 
     if stdin is not None:

@@ -1,9 +1,20 @@
 import os
 import sys
 
+# Disable Tensorflow warning/info logs.
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+# Disable Tensorflow deprecation warnings
+try:
+  from tensorflow.python.util import module_wrapper as deprecation
+except ImportError:
+  from tensorflow.python.util import deprecation_wrapper as deprecation
+deprecation._PER_MODULE_WARNING_LIMIT = 0
+
+import h5py
 import numpy as np
 from six.moves import xrange
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 from google.protobuf import text_format
 import data_utils
@@ -20,6 +31,7 @@ tf.flags.DEFINE_string('output_file', '',
                        'File to dump results.')
 tf.flags.DEFINE_string('input_file', '',
                         'file of sentences to be evaluated')
+tf.flags.DEFINE_string("mode", '', "One 'of 'surprisal', 'predictions'")
 
 # For saving demo resources, use batch size 1 and step 1.
 BATCH_SIZE = 1
@@ -38,8 +50,7 @@ def _LoadModel(gd_file, ckpt_file):
     TensorFlow session and tensors dict.
   """
   with tf.Graph().as_default():
-    sys.stderr.write('Recovering graph.\n')
-    with tf.gfile.FastGFile(gd_file, 'r') as f:
+    with tf.gfile.GFile(gd_file, 'r') as f:
       s = f.read()
       gd = tf.GraphDef()
       text_format.Merge(s, gd)
@@ -66,7 +77,6 @@ def _LoadModel(gd_file, ckpt_file):
                                      'Reshape_3:0',
                                      'global_step:0'], name='')
 
-    sys.stderr.write('Recovering checkpoint %s\n' % ckpt_file)
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     sess.run('save/restore_all', {'save/Const:0': ckpt_file})
     sess.run(t['states_init'])
@@ -74,70 +84,119 @@ def _LoadModel(gd_file, ckpt_file):
   return sess, t
 
 
-def _EvalTestSents(input_file, vocab, output_file):
-    targets = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
-    weights = np.ones([BATCH_SIZE, NUM_TIMESTEPS], np.float32)
+def get_predictions(sentences, model, sess, vocab):
+  """
+  Args:
+    sentences: List of pre-tokenized lists of tokens
+    model:
+    sess:
+    vocab: CharsVocabulary instance
 
-    # Load the model with the given pbtxt file and the checkpoint files
-    sess, t = _LoadModel(FLAGS.pbtxt, FLAGS.ckpt)
+  Yields lists of numpy arrays, one per sentence.
+  """
+  inputs = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
+  char_ids_inputs = np.zeros([BATCH_SIZE, NUM_TIMESTEPS, vocab.max_word_length], np.int32)
 
-    # Read intput file
-    with open(input_file) as f:
-        sents = f.readlines()
+  # Dummy inputs needed for the graph to compute
+  targets = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
+  target_weights = np.ones([BATCH_SIZE, NUM_TIMESTEPS], np.float32)
 
-    result = []
+  for i, sentence in enumerate(sentences):
+    sess.run(model["states_init"])
 
-    # print CSV header
-    f = sys.stdout if output_file == "-" else open(output_file, "w")
-    f.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+    # Compute token- and character-level vocabulary ID sequences
+    sentence_ids = [vocab.word_to_id(w) for w in sentence]
+    sentence_char_ids = [vocab.word_to_char_ids(w) for w in sentence]
 
-    for j in range(len(sents)):
+    prev_word_id, prev_word_char_ids = None, None
+    sentence_predictions = []
+    for j, (word, word_id, char_ids) in enumerate(zip(sentence, sentence_ids, sentence_char_ids)):
+      if j == 0:
+        sentence_predictions.append(None)
+      else:
+        inputs[0, 0] = prev_word_id
+        char_ids_inputs[0, 0, :] = prev_word_char_ids
 
-        # Just so we know where things stand
-        #if (j%10 == 0):
-          #print(j/len(sents))
+        softmax = sess.run(model["softmax_out"],
+                           feed_dict={model["inputs_in"]: inputs,
+                                      model["char_inputs_in"]: char_ids_inputs,
+                                      model["targets_in"]: targets,
+                                      model["target_weights_in"]: target_weights})[0]
 
-        inputs = np.zeros([BATCH_SIZE, NUM_TIMESTEPS], np.int32)
-        char_ids_inputs = np.zeros( [BATCH_SIZE, NUM_TIMESTEPS, vocab.max_word_length], np.int32)
+        # TODO JRNN softmax distribution size is greater than the vocabulary.
+        # Why is that .. ?
+        # In any case, let's just truncate and renorm to the actual vocab
+        softmax = softmax[:vocab.size]
+        softmax /= softmax.sum()
+        softmax = np.log(softmax)
 
-        sent = [vocab.word_to_id(w) for w in sents[j].split()]
-        sent_char_ids = [vocab.word_to_char_ids(w) for w in sents[j].split()]
+        sentence_predictions.append(softmax)
 
-        samples = sent[:]
-        char_ids_samples = sent_char_ids[:]
+      prev_word_id = word_id
+      prev_word_char_ids = char_ids
 
-        # Total sentence surprisal
-        total_surprisal = 0
+    yield sentence_predictions
 
-        # First word in the sentence has a dummy surprisal of 0
-        result.append("%i\t1\t%s\t0.00\n" % (j + 1, vocab.id_to_word(sent[0])))
-        sess.run(t['states_init'])
 
-        for n in range(len(sents[j].split(" ")) - 1):
-            inputs[0, 0] = samples[0]
-            char_ids_inputs[0, 0, :] = char_ids_samples[0]
-            samples = samples[1:]
-            char_ids_samples = char_ids_samples[1:]
-            softmax = sess.run(t['softmax_out'],
-                                 feed_dict={t['char_inputs_in']: char_ids_inputs,
-                                            t['inputs_in']: inputs,
-                                            t['targets_in']: targets,
-                                            t['target_weights_in']: weights})
+def get_surprisals(sentences, model, sess, vocab):
+  predictions = get_predictions(sentences, model, sess, vocab)
+  for i, (sentence, sentence_preds) in enumerate(zip(sentences, predictions)):
+    sentence_surprisals = []
+    for j, (word_j, preds_j) in enumerate(zip(sentence, sentence_preds)):
+      if preds_j is None:
+        word_surprisal = 0.
+      else:
+        word_surprisal = -(preds_j[vocab.word_to_id(word_j)] / np.log(2))
 
-            surprisal = -1 * np.log2(softmax[0][sent[n+1]])
-            total_surprisal += surprisal
+      sentence_surprisals.append((word_j, word_surprisal))
 
-            result.append("%i\t%i\t%s\t%f\n" % (j + 1, n + 2, vocab.id_to_word(sent[n+1]), surprisal))
+    yield sentence_surprisals
 
-    # Write result to output file
-    for line in result:
-      f.write(line)
-    if output_file != "-":
-      f.close()
 
 def main(unused_argv):
   vocab = data_utils.CharsVocabulary(FLAGS.vocab_file, MAX_WORD_LEN)
-  _EvalTestSents(FLAGS.input_file, vocab, FLAGS.output_file)
+  sess, model = _LoadModel(FLAGS.pbtxt, FLAGS.ckpt)
+
+  with open(FLAGS.input_file) as inf:
+    sentences = [line.strip().split(" ") for line in inf]
+
+  if FLAGS.mode == "surprisal":
+    outf = sys.stdout if FLAGS.output_file == "-" else open(output_file, "w")
+    # Print TSV header
+    outf.write("sentence_id\ttoken_id\ttoken\tsurprisal\n")
+
+    surprisals = get_surprisals(sentences, model, sess, vocab)
+    for i, (sentence, sentence_surps) in enumerate(zip(sentences, surprisals)):
+      for j, (word, word_surp) in enumerate(sentence_surps):
+        outf.write("%i\t%i\t%s\t%f\n" % (i + 1, j + 1, word, word_surp))
+
+    outf.close()
+  elif FLAGS.mode == "predictions":
+    outf = h5py.File(FLAGS.output_file, "w")
+
+    predictions = get_predictions(sentences, model, sess, vocab)
+    for i, (sentence, sentence_preds) in enumerate(zip(sentences, predictions)):
+        token_ids = [vocab.word_to_id(word) for word in sentence]
+
+        # Skip the first word, which has null predictions
+        sentence_preds = sentence_preds[1:]
+        first_word_pred = np.ones_like(sentence_preds[0])
+        first_word_pred /= first_word_pred.sum()
+        first_word_pred = np.log(first_word_pred)
+        sentence_preds = np.vstack([first_word_pred] + sentence_preds)
+
+        group = outf.create_group("/sentence/%i" % i)
+        group.create_dataset("predictions", data=sentence_preds)
+        group.create_dataset("tokens", data=token_ids)
+
+    vocab_encoded = np.array(vocab._id_to_word)
+    vocab_encoded = np.char.encode(vocab_encoded, "utf-8")
+    outf.create_dataset("/vocabulary", data=vocab_encoded)
+
+    outf.close()
+  else:
+    raise ValueError("Unknown --mode %s" % FLAGS.mode)
+
 
 if __name__ == '__main__':
   tf.app.run()

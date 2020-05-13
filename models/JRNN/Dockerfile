@@ -24,15 +24,18 @@ RUN cd /opt/lm_1b && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax7 && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/all_shards-2016-09-10/ckpt-softmax8 && \
         curl -sO http://download.tensorflow.org/models/LM_LSTM_CNN/vocab-2016-09-10.txt && \
+        sed -i '/^!!!MAXTERMID$/d' vocab-2016-09-10.txt && \
         apt-get remove -y curl && apt-get autoremove -y && cd -
 COPY ${MODEL_ROOT}/lm_1b_eval.py ${MODEL_ROOT}/data_utils.py ${MODEL_ROOT}/eval_test_google.py /opt/lm_1b/
 
 # Copy tokenizer.
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 
+# Install runtime dependencies.
+RUN pip install h5py
+
 # Copy in test dependencies.
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
+RUN pip install nose jsonschema
 COPY test.py /opt/test.py
 
 # Copy external-facing scripts

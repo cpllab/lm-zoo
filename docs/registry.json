@@ -1,27 +1,25 @@
 {
-  "ngram": {
-    "ref_url": "http://www.speech.sri.com/projects/srilm",
-    "image": {
-      "registry": "docker.io",
-      "name": "cpllab/language-models",
-      "tag": "ngram",
-      "size": 752645577,
-      "datetime": "2020-05-01T20:43:31.151707532Z"
-    },
-    "tokenizer": {
-      "type": "word",
-      "cased": true
-    },
-    "shortname": "ngram"
-  },
   "gpt2": {
     "ref_url": "https://openai.com/blog/better-language-models/",
     "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "6e0cef3b1952533f2d0cf82299eff52b9bb3fb46",
+      "checksum": "dfb164a3c850a161b3e3c86e0de2aeb0637cf4f7",
+      "datetime": "2020-05-13T18:00:29.005594527Z",
+      "supported_features": {
+        "tokenize": true,
+        "unkify": true,
+        "get_surprisals": true,
+        "get_predictions": true
+      },
+      "gpu": {
+        "required": false,
+        "supported": false
+      },
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "gpt2",
-      "size": 3793389284,
-      "datetime": "2020-05-01T20:41:57.608530999Z"
+      "size": 3747338783
     },
     "tokenizer": {
       "type": "subword",
@@ -31,45 +29,27 @@
     },
     "shortname": "gpt2"
   },
-  "RNNG": {
-    "ref_url": "TODO",
-    "image": {
-      "registry": "docker.io",
-      "name": "cpllab/language-models",
-      "tag": "rnng",
-      "size": 1560365196,
-      "datetime": "2020-04-29T15:43:05.17648728Z"
-    },
-    "tokenizer": {
-      "type": "word",
-      "cased": true
-    },
-    "shortname": "RNNG"
-  },
-  "ordered-neurons": {
-    "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
-    "image": {
-      "registry": "docker.io",
-      "name": "cpllab/language-models",
-      "tag": "ordered-neurons",
-      "size": 3218881586,
-      "datetime": "2020-04-28T21:13:24.370466715Z"
-    },
-    "tokenizer": {
-      "type": "word",
-      "cased": false,
-      "drop_token_pattern": "^[-.?!,]+$"
-    },
-    "shortname": "ordered-neurons"
-  },
   "GRNN": {
     "ref_url": "https://github.com/facebookresearch/colorlessgreenRNNs",
     "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "6e0cef3b1952533f2d0cf82299eff52b9bb3fb46",
+      "checksum": "a814310d3dab8eab60d0bcbd4b392ec0e50dc1fa",
+      "datetime": "2020-05-13T18:05:56.294871991Z",
+      "supported_features": {
+        "tokenize": true,
+        "unkify": true,
+        "get_surprisals": true,
+        "get_predictions": true
+      },
+      "gpu": {
+        "required": false,
+        "supported": false
+      },
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "grnn",
-      "size": 4755765452,
-      "datetime": "2020-04-28T21:05:02.012640275Z"
+      "size": 4767176760
     },
     "tokenizer": {
       "type": "word",
@@ -80,16 +60,113 @@
   "JRNN": {
     "ref_url": "https://github.com/tensorflow/models/tree/master/research/lm_1b",
     "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
+      "checksum": "5753103f6f76f0454d8006862442feb56d16edd0",
+      "datetime": "2020-05-13T18:11:07.240701898Z",
+      "supported_features": {
+        "tokenize": true,
+        "unkify": true,
+        "get_surprisals": true,
+        "get_predictions": true
+      },
+      "gpu": {
+        "required": false,
+        "supported": false
+      },
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "jrnn",
-      "size": 5371431181,
-      "datetime": "2020-04-27T22:17:55.281781327Z"
+      "size": 5371223959
     },
     "tokenizer": {
       "type": "word",
       "cased": true
     },
     "shortname": "JRNN"
+  },
+  "ngram": {
+    "ref_url": "http://www.speech.sri.com/projects/srilm",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
+      "checksum": "76d7111ad3b3d54374bf9d97d9a4ee952b60c943",
+      "datetime": "2020-05-13T18:26:50.327667692Z",
+      "supported_features": {
+        "tokenize": true,
+        "unkify": true,
+        "get_surprisals": true,
+        "get_predictions": false
+      },
+      "gpu": {
+        "required": false,
+        "supported": false
+      },
+      "registry": "docker.io",
+      "name": "cpllab/language-models",
+      "tag": "ngram",
+      "size": 880207166
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    },
+    "shortname": "ngram"
+  },
+  "ordered-neurons": {
+    "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
+      "checksum": "209e5f9556a240a81579f43ba68d41c12911fad1",
+      "datetime": "2020-05-13T18:30:57.78690053Z",
+      "supported_features": {
+        "tokenize": true,
+        "unkify": true,
+        "get_surprisals": true,
+        "get_predictions": false
+      },
+      "gpu": {
+        "required": false,
+        "supported": false
+      },
+      "registry": "docker.io",
+      "name": "cpllab/language-models",
+      "tag": "ordered-neurons",
+      "size": 3218893924
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": false,
+      "drop_token_pattern": "^[-.?!,]+$"
+    },
+    "shortname": "ordered-neurons"
+  },
+  "RNNG": {
+    "ref_url": "TODO",
+    "image": {
+      "maintainer": "jon@gauthiers.net",
+      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
+      "datetime": "2020-05-13T18:45:28.412297806Z",
+      "supported_features": {
+        "tokenize": true,
+        "unkify": true,
+        "get_surprisals": true,
+        "get_predictions": false
+      },
+      "gpu": {
+        "required": false,
+        "supported": false
+      },
+      "registry": "docker.io",
+      "name": "cpllab/language-models",
+      "tag": "rnng",
+      "size": 1560369410
+    },
+    "tokenizer": {
+      "type": "word",
+      "cased": true
+    },
+    "shortname": "RNNG"
   }
 }
