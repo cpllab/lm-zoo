@@ -3,6 +3,7 @@ import sys
 import click
 import crayons
 import dateutil
+import h5py
 
 import lm_zoo as Z
 
@@ -128,3 +129,16 @@ def unkify(model, in_file):
     sentences = read_lines(in_file)
     masks = Z.unkify(model, sentences)
     print("\n".join(map(str, masks_i) for masks_i in masks))
+
+
+@lm_zoo.command()
+@click.argument("model", metavar="MODEL")
+@click.argument("in_file", type=click.File("r"), metavar="FILE")
+@click.argument("out_file", type=click.File("wb"), metavar="FILE")
+def get_predictions(model, in_file, out_file):
+    sentences = read_lines(in_file)
+    result = Z.get_predictions(model, sentences)
+
+    with h5py.File(out_file.name, "w") as out:
+        result.copy("sentence", out)
+        result.copy("vocabulary", out)

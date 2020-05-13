@@ -6,6 +6,7 @@ requests = "*"
 tqdm = "*"
 python-dateutil = "*"
 pandas = ">=1.0.0"
+h5py = "*"
 
 [dev-packages]
 nose = "*"
@@ -15,3 +16,4 @@ sphinx = "*"
 sphinx-jsonschema = "*"
 sphinx-press-theme = "*"
 sphinx-click = "*"
+pytest = "*"
