@@ -11,7 +11,7 @@
             "tokenize": true,
             "unkify": true,
             "get_surprisals": true,
-            "get_predictions": false
+            "get_predictions": true
         },
         "gpu": {
             "required": false,
