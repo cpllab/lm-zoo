@@ -5,6 +5,7 @@ docker = "*"
 requests = "*"
 tqdm = "*"
 python-dateutil = "*"
+pandas = ">=1.0.0"
 
 [dev-packages]
 nose = "*"
