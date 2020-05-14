@@ -15,6 +15,7 @@ import requests
 import tqdm
 
 from lm_zoo import errors
+__version__ = "1.1b0"
 
 L = logging.getLogger("lm-zoo")
 
