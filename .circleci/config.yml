@@ -27,8 +27,8 @@ jobs:
             #     command: docker push cpllab/language-models:ngram
             - run:
                 name: Run tests
-                working_directory: models/ngram
                 command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:ngram python /test.py
+
     GRNN:
         machine:
             image: circleci/classic:latest
@@ -67,7 +67,6 @@ jobs:
             #     command: docker push cpllab/language-models:jrnn
             - run:
                 name: Run tests
-                working_directory: models/JRNN
                 command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:jrnn python /test.py
 
     RNNG:
@@ -92,7 +91,6 @@ jobs:
             #     command: docker push cpllab/language-models:rnng
             - run:
                 name: Run tests
-                working_directory: models/RNNG
                 command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:rnng python /test.py
 
     ordered-neurons:
@@ -117,7 +115,6 @@ jobs:
             #     command: docker push cpllab/language-models:ordered-neurons
             - run:
                 name: Run tests
-                working_directory: models/ordered-neurons
                 command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:ordered-neurons python /test.py
 
     gpt2:
@@ -136,7 +133,6 @@ jobs:
                 command: docker build -t cpllab/language-models:gpt2 -f models/gpt2/Dockerfile .
             - run:
                 name: Run tests
-                working_directory: models/gpt2
                 command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:gpt2 python /test.py
             # - run:
             #     name: Push to Docker Hub
@@ -158,7 +154,6 @@ jobs:
                 command: docker build -t cpllab/language-models:transformer-xl -f models/transformer-xl/Dockerfile .
             - run:
                 name: Run tests
-                working_directory: models/transformer-xl
                 command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:transformer-xl python /test.py
             # - run:
             #     name: Push to Docker Hub
