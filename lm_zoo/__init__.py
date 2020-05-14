@@ -1,3 +1,4 @@
+from functools import lru_cache
 from io import StringIO
 import json
 import logging
@@ -21,6 +22,7 @@ REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
 DOCKER_REGISTRY = "docker.io"
 
 
+@lru_cache()
 def get_registry():
     return requests.get(REGISTRY_URI).json()
 
@@ -30,6 +32,7 @@ def get_model_dict():
     return {key: Model(m) for key, m in registry.items()}
 
 
+@lru_cache()
 def get_docker_client():
     client = docker.APIClient()
     return client
