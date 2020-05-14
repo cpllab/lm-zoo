@@ -14,12 +14,20 @@ import pandas as pd
 import requests
 import tqdm
 
+from lm_zoo import errors
+
 L = logging.getLogger("lm-zoo")
 
 
 REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
 
 DOCKER_REGISTRY = "docker.io"
+
+
+# Special status codes issued by LM Zoo container commands
+STATUS_CODES = {
+    "unsupported_feature": 99,
+}
 
 
 @lru_cache()
@@ -214,7 +222,8 @@ def _update_progress(line, progress_bars):
 
 def run_model_command(model, command_str, pull=True, mounts=None,
                       stdin=None, stdout=sys.stdout, stderr=sys.stderr,
-                      progress_stream=sys.stderr):
+                      progress_stream=sys.stderr,
+                      raise_errors=True):
     """
     Run the given shell command inside a container instantiating the given
     model.
@@ -222,6 +231,12 @@ def run_model_command(model, command_str, pull=True, mounts=None,
     Args:
         mounts: List of bind mounts described as tuples `(guest_path,
             host_path, mode)`, where `mode` is one of ``ro``, ``rw``
+        raise_errors: If ``True``, monitor command status/output and raise
+            errors when necessary.
+
+    Returns:
+        Docker API response as a Python dictionary. The key ``StatusCode`` may
+        be of interest.
     """
     if mounts is None:
         mounts = []
@@ -280,8 +295,13 @@ def run_model_command(model, command_str, pull=True, mounts=None,
         os.close(in_stream._sock.fileno())
 
     # Stop container and collect results.
-    # TODO parameterize timeout
-    client.stop(container, timeout=999999999)
+    result = client.wait(container, timeout=999999999)
+
+    if raise_errors:
+        if result["StatusCode"] == STATUS_CODES["unsupported_feature"]:
+            feature = command_str.split(" ")[0]
+            raise errors.UnsupportedFeatureError(feature=feature,
+                                                 model=":".join((image, tag)))
 
     # Collect output.
     container_stdout = client.logs(container, stdout=True, stderr=False)
@@ -290,6 +310,8 @@ def run_model_command(model, command_str, pull=True, mounts=None,
     client.remove_container(container)
     stdout.write(container_stdout.decode("utf-8"))
     stderr.write(container_stderr.decode("utf-8"))
+
+    return result
 
 
 def run_model_command_get_stdout(*args, **kwargs):

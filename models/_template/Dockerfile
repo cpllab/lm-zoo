@@ -60,6 +60,10 @@ COPY shared/unkify /opt/bin/unkify
 ## The LM Zoo shared spec script will automatically insert the language model's
 ## vocabulary into a template spec. Handy!
 COPY shared/spec /opt/bin/spec
+## If your image doesn't support certain features, copy in the shared script
+## ``unsupported`` for each of these features. This makes things easily
+## detectable from the LM Zoo API.
+COPY shared/unsupported /opt/bin/get_predictions.hdf5
 
 ENV PATH "/opt/bin:${PATH}"
 ## Fix I/O encoding.
