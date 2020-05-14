@@ -46,6 +46,17 @@ def get_docker_client():
     return client
 
 
+def _make_in_stream(sentences):
+    """
+    Convert a sentence list to a dummy UTF8 stream to pipe to containers.
+    """
+    # Sentences should not have final newlines
+    sentences = [sentence.strip("\r\n") for sentence in sentences]
+
+    stream_str = "\n".join(sentences + [""])
+    return StringIO(stream_str)
+
+
 def spec(model):
     """
     Get a language model specification as a dict.
@@ -67,7 +78,7 @@ def tokenize(model, sentences):
     mapping between the tokens output by this command and the tokens used by
     the ``get-surprisals`` command.
     """
-    in_file = StringIO("\n".join(sentences))
+    in_file = _make_in_stream(sentences)
     ret = run_model_command_get_stdout(model, "tokenize /dev/stdin",
                                        stdin=in_file)
     sentences = ret.strip().split("\n")
@@ -90,7 +101,7 @@ def unkify(model, sentences):
         the value ``1`` indicates that the corresponding token is an unknown
         word for the model.
     """
-    in_file = StringIO("\n".join(sentences))
+    in_file = _make_in_stream(sentences)
     ret = run_model_command_get_stdout(model, "unkify /dev/stdin",
                                        stdin=in_file)
     sentences = ret.strip().split("\n")
@@ -119,7 +130,7 @@ def get_surprisals(model, sentences):
     There is guaranteed to be a one-to-one mapping, however, between the rows
     of this file and the tokens produced by ``lm-zoo tokenize``.
     """
-    in_file = StringIO("\n".join(sentences) + "\n")
+    in_file = _make_in_stream(sentences)
     out = StringIO()
     ret = run_model_command(model, "get_surprisals /dev/stdin",
                             stdin=in_file, stdout=out)
@@ -146,7 +157,7 @@ def get_predictions(model, sentences):
         sentences: list of natural language sentence strings (not pre
             tokenized)
     """
-    in_file = StringIO("\n".join(sentences) + "\n")
+    in_file = _make_in_stream(sentences)
     with NamedTemporaryFile("rb") as hdf5_out:
         # Bind mount as hdf5 output
         host_path = Path(hdf5_out.name).resolve()
