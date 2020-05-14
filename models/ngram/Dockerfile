@@ -40,6 +40,7 @@ COPY ${MODEL_ROOT}/get_surprisals.awk /opt/get_surprisals.awk
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 COPY ${MODEL_ROOT}/bin /opt/bin
 COPY shared/unkify /opt/bin/unkify
+COPY shared/unsupported /opt/bin/get_predictions.hdf5
 
 ENV PATH "/opt/bin:${PATH}"
 ENV PYTHONIOENCODING utf-8
