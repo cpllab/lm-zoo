@@ -89,9 +89,9 @@
     "ref_url": "http://www.speech.sri.com/projects/srilm",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
-      "checksum": "76d7111ad3b3d54374bf9d97d9a4ee952b60c943",
-      "datetime": "2020-05-13T18:26:50.327667692Z",
+      "version": "5c72f5aa6a9b5e67f990d363c9ea4fc35c37679e",
+      "checksum": "1b39b07c7bc1088eb1219dae5d4d71e2487f384c",
+      "datetime": "2020-05-14T15:13:51.292744484Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -105,7 +105,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "ngram",
-      "size": 880207166
+      "size": 880207248
     },
     "tokenizer": {
       "type": "word",
@@ -117,9 +117,9 @@
     "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
-      "checksum": "209e5f9556a240a81579f43ba68d41c12911fad1",
-      "datetime": "2020-05-13T18:30:57.78690053Z",
+      "version": "5c72f5aa6a9b5e67f990d363c9ea4fc35c37679e",
+      "checksum": "bddf5c327f5030a13bea894c2f8a00f18e0c6175",
+      "datetime": "2020-05-14T15:37:40.582798717Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -133,7 +133,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "ordered-neurons",
-      "size": 3218893924
+      "size": 3218894006
     },
     "tokenizer": {
       "type": "word",
@@ -146,8 +146,8 @@
     "ref_url": "TODO",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "2cfa4ca74298718d78e6d8eab89e90b3699e4d4d",
-      "datetime": "2020-05-13T18:45:28.412297806Z",
+      "version": "5c72f5aa6a9b5e67f990d363c9ea4fc35c37679e",
+      "datetime": "2020-05-14T15:14:28.41126284Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -161,7 +161,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "rnng",
-      "size": 1560369410
+      "size": 1560369492
     },
     "tokenizer": {
       "type": "word",
