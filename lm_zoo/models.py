@@ -32,7 +32,7 @@ class Registry(object):
             platform, remote_ref = remote_model_match.groups()
             if platform == "docker":
                 return DockerModel(remote_ref)
-            elif platform in ["shub", "library"]:
+            elif platform in ["singularity", "shub", "library"]:
                 return SingularityModel(platform, remote_ref)
             else:
                 raise ValueError("Unknown platform URI %s://" % (platform,))
@@ -63,8 +63,6 @@ class OfficialModel(Model):
     def __init__(self, model_dict):
         self._image_info = model_dict["image"]
         self.name = model_dict["shortname"]
-        from pprint import pprint
-        pprint(model_dict)
 
     @classmethod
     def from_dict(cls, model_dict):

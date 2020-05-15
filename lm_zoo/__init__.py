@@ -17,32 +17,16 @@ import requests
 import tqdm
 
 from lm_zoo import errors
+from lm_zoo.backends import get_backend
 from lm_zoo.models import Registry, Model
 __version__ = "1.1b0"
 
 L = logging.getLogger("lm-zoo")
 
 
-# Special status codes issued by LM Zoo container commands
-STATUS_CODES = {
-    "unsupported_feature": 99,
-}
-
-
 @lru_cache()
 def get_registry():
     return Registry()
-
-
-def get_model_dict():
-    registry = get_registry()
-    return {key: Model(m) for key, m in registry.items()}
-
-
-@lru_cache()
-def get_docker_client():
-    client = docker.APIClient()
-    return client
 
 
 def _make_in_stream(sentences):
@@ -54,8 +38,6 @@ def _make_in_stream(sentences):
 
     stream_str = "\n".join(sentences + [""])
     return StringIO(stream_str)
-
-
 
 
 def spec(model: Model):
@@ -244,74 +226,14 @@ def run_model_command(model: Model, command_str, pull=False, mounts=None,
     if mounts is None:
         mounts = []
 
-    client = get_docker_client()
-    if "docker" in model.platforms:
-        # TODO allow client to select backend. For now we'll preferentially
-        # select Docker
+    backend = get_backend(model)
+    image_available = backend.image_exists(model)
+    if pull or not image_available:
+        backend.pull_image(model, progress_stream=progress_stream)
 
-        # Is the image already available?
-        image_available = True
-        try:
-            client.inspect_image(model.reference)
-        except docker.errors.ImageNotFound:
-            image_available = False
-
-        if pull or not image_available:
-            # First pull the image.
-            L.info("Pulling latest Docker image for %s." % (model), err=True)
-            try:
-                progress_bars = {}
-                for line in client.pull(f"{model.registry}/{model.image}", tag=model.tag,
-                                        stream=True, decode=True):
-                    if progress_stream is not None:
-                        # Write pull progress on the given stream.
-                        _update_progress(line, progress_bars)
-                    else:
-                        pass
-            except docker.errors.NotFound:
-                raise RuntimeError("Image not found.")
-
-        # Prepare mount config
-        volumes = [guest for _, guest, _ in mounts]
-        host_config = client.create_host_config(binds={
-            host: {"bind": guest, "mode": mode}
-            for host, guest, mode in mounts
-        })
-
-        container = client.create_container(model.reference, stdin_open=True,
-                                            command=command_str,
-                                            volumes=volumes, host_config=host_config)
-        client.start(container)
-
-        if stdin is not None:
-            # Send file contents to stdin of container.
-            in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
-            to_send = stdin.read()
-            if isinstance(to_send, str):
-                to_send = to_send.encode("utf-8")
-            os.write(in_stream._sock.fileno(), to_send)
-            os.close(in_stream._sock.fileno())
-
-        # Stop container and collect results.
-        result = client.wait(container, timeout=999999999)
-
-        if raise_errors:
-            if result["StatusCode"] == STATUS_CODES["unsupported_feature"]:
-                feature = command_str.split(" ")[0]
-                raise errors.UnsupportedFeatureError(feature=feature,
-                                                    model=str(model))
-
-        # Collect output.
-        container_stdout = client.logs(container, stdout=True, stderr=False)
-        container_stderr = client.logs(container, stdout=False, stderr=True)
-
-        client.remove_container(container)
-        stdout.write(container_stdout.decode("utf-8"))
-        stderr.write(container_stderr.decode("utf-8"))
-
-        return result
-    else:
-        raise ValueError("No support for model with platforms %s" % (", ".join(model.platforms,)))
+    return backend.run_command(model, command_str, mounts=mounts,
+                               stdin=stdin, stdout=stdout, stderr=stderr,
+                               raise_errors=raise_errors)
 
 
 def run_model_command_get_stdout(*args, **kwargs):
