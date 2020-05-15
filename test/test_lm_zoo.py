@@ -36,3 +36,7 @@ def test_get_predictions(lmzoo_model):
 def test_unsupported_feature(template_model):
     with pytest.raises(Z.errors.UnsupportedFeatureError):
         Z.get_predictions(template_model, ["This is a test sentence"])
+
+
+def test_singularity(registry):
+    assert Z.tokenize(registry["singularity://lmzoo-template.sif"], ["This is a test sentence"]) == ["This is a test sentence".split()]

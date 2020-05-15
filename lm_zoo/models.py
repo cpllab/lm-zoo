@@ -132,7 +132,7 @@ class SingularityModel(Model):
     platforms = ("singularity",)
 
     def __init__(self, repository, reference):
-        if repository not in ["shub", "library"]:
+        if repository not in ["singularity", "shub", "library"]:
             raise ValueError("unknown Singularity repository %s" % (repository,))
         self.repository = repository
         self.reference = reference
