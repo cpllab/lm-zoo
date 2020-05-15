@@ -4,8 +4,10 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
 import sys
 from tempfile import NamedTemporaryFile
+from typing import List, Dict
 
 import dateutil.parser
 import docker
@@ -15,14 +17,10 @@ import requests
 import tqdm
 
 from lm_zoo import errors
+from lm_zoo.models import Registry, Model
 __version__ = "1.1b0"
 
 L = logging.getLogger("lm-zoo")
-
-
-REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
-
-DOCKER_REGISTRY = "docker.io"
 
 
 # Special status codes issued by LM Zoo container commands
@@ -33,7 +31,7 @@ STATUS_CODES = {
 
 @lru_cache()
 def get_registry():
-    return requests.get(REGISTRY_URI).json()
+    return Registry()
 
 
 def get_model_dict():
@@ -58,7 +56,9 @@ def _make_in_stream(sentences):
     return StringIO(stream_str)
 
 
-def spec(model):
+
+
+def spec(model: Model):
     """
     Get a language model specification as a dict.
     """
@@ -66,7 +66,7 @@ def spec(model):
     return json.loads(ret)
 
 
-def tokenize(model, sentences):
+def tokenize(model: Model, sentences):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -87,7 +87,7 @@ def tokenize(model, sentences):
     return sentences
 
 
-def unkify(model, sentences):
+def unkify(model: Model, sentences):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -110,7 +110,7 @@ def unkify(model, sentences):
     return sentences
 
 
-def get_surprisals(model, sentences):
+def get_surprisals(model: Model, sentences):
     """
     Compute word-level surprisals from a language model for the given natural
     language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
@@ -140,7 +140,7 @@ def get_surprisals(model, sentences):
     return ret
 
 
-def get_predictions(model, sentences):
+def get_predictions(model: Model, sentences):
     """
     Compute token-level predictive distributions from a language model for the
     given natural language sentences. Returns a h5py ``File`` object with the
@@ -173,15 +173,6 @@ def get_predictions(model, sentences):
     return ret
 
 
-class Model(object):
-
-    def __init__(self, model_dict):
-        self.__dict__ = model_dict
-
-    @property
-    def image_uri(self):
-        return "%s/%s:%s" % (self.image.get("registry", DOCKER_REGISTRY),
-                             self.image["name"], self.image["tag"])
 
 
 def _update_progress(line, progress_bars):
@@ -232,7 +223,7 @@ def _update_progress(line, progress_bars):
         pass
 
 
-def run_model_command(model, command_str, pull=True, mounts=None,
+def run_model_command(model: Model, command_str, pull=False, mounts=None,
                       stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                       progress_stream=sys.stderr,
                       raise_errors=True):
@@ -254,29 +245,24 @@ def run_model_command(model, command_str, pull=True, mounts=None,
         mounts = []
 
     client = get_docker_client()
-    try:
-        model = get_model_dict()[model]
-    except KeyError:
-        # Could be a Docker image reference. Try to pull it
+    if "docker" in model.platforms:
+        # TODO allow client to select backend. For now we'll preferentially
+        # select Docker
+
+        # Is the image already available?
+        image_available = True
         try:
-            client.inspect_image(model)
+            client.inspect_image(model.reference)
         except docker.errors.ImageNotFound:
-            raise ValueError(f"Model {model} not found")
-        else:
-            ref_fields = model.rsplit(":", 1)
-            if len(ref_fields) == 2:
-                image, tag = ref_fields
-            else:
-                image, tag = ref_fields[0], "latest"
-    else:
-        image, tag = model.image["name"], model.image["tag"]
-        if pull:
+            image_available = False
+
+        if pull or not image_available:
             # First pull the image.
-            registry = model.image["registry"]
-            L.info("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
+            L.info("Pulling latest Docker image for %s." % (model), err=True)
             try:
                 progress_bars = {}
-                for line in client.pull(f"{registry}/{image}", tag=tag, stream=True, decode=True):
+                for line in client.pull(f"{model.registry}/{model.image}", tag=model.tag,
+                                        stream=True, decode=True):
                     if progress_stream is not None:
                         # Write pull progress on the given stream.
                         _update_progress(line, progress_bars)
@@ -285,45 +271,47 @@ def run_model_command(model, command_str, pull=True, mounts=None,
             except docker.errors.NotFound:
                 raise RuntimeError("Image not found.")
 
-    # Prepare mount config
-    volumes = [guest for _, guest, _ in mounts]
-    host_config = client.create_host_config(binds={
-        host: {"bind": guest, "mode": mode}
-        for host, guest, mode in mounts
-    })
+        # Prepare mount config
+        volumes = [guest for _, guest, _ in mounts]
+        host_config = client.create_host_config(binds={
+            host: {"bind": guest, "mode": mode}
+            for host, guest, mode in mounts
+        })
 
-    container = client.create_container(f"{image}:{tag}", stdin_open=True,
-                                        command=command_str,
-                                        volumes=volumes, host_config=host_config)
-    client.start(container)
+        container = client.create_container(model.reference, stdin_open=True,
+                                            command=command_str,
+                                            volumes=volumes, host_config=host_config)
+        client.start(container)
 
-    if stdin is not None:
-        # Send file contents to stdin of container.
-        in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
-        to_send = stdin.read()
-        if isinstance(to_send, str):
-            to_send = to_send.encode("utf-8")
-        os.write(in_stream._sock.fileno(), to_send)
-        os.close(in_stream._sock.fileno())
+        if stdin is not None:
+            # Send file contents to stdin of container.
+            in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
+            to_send = stdin.read()
+            if isinstance(to_send, str):
+                to_send = to_send.encode("utf-8")
+            os.write(in_stream._sock.fileno(), to_send)
+            os.close(in_stream._sock.fileno())
 
-    # Stop container and collect results.
-    result = client.wait(container, timeout=999999999)
+        # Stop container and collect results.
+        result = client.wait(container, timeout=999999999)
 
-    if raise_errors:
-        if result["StatusCode"] == STATUS_CODES["unsupported_feature"]:
-            feature = command_str.split(" ")[0]
-            raise errors.UnsupportedFeatureError(feature=feature,
-                                                 model=":".join((image, tag)))
+        if raise_errors:
+            if result["StatusCode"] == STATUS_CODES["unsupported_feature"]:
+                feature = command_str.split(" ")[0]
+                raise errors.UnsupportedFeatureError(feature=feature,
+                                                    model=str(model))
 
-    # Collect output.
-    container_stdout = client.logs(container, stdout=True, stderr=False)
-    container_stderr = client.logs(container, stdout=False, stderr=True)
+        # Collect output.
+        container_stdout = client.logs(container, stdout=True, stderr=False)
+        container_stderr = client.logs(container, stdout=False, stderr=True)
 
-    client.remove_container(container)
-    stdout.write(container_stdout.decode("utf-8"))
-    stderr.write(container_stderr.decode("utf-8"))
+        client.remove_container(container)
+        stdout.write(container_stdout.decode("utf-8"))
+        stderr.write(container_stderr.decode("utf-8"))
 
-    return result
+        return result
+    else:
+        raise ValueError("No support for model with platforms %s" % (", ".join(model.platforms,)))
 
 
 def run_model_command_get_stdout(*args, **kwargs):
