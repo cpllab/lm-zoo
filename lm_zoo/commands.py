@@ -8,6 +8,9 @@ import h5py
 import lm_zoo as Z
 
 
+zoo = Z.get_registry()
+
+
 @click.group(help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
 def lm_zoo(): pass
 
@@ -66,6 +69,7 @@ def tokenize(model, in_file):
     mapping between the tokens output by this command and the tokens used by
     the ``get-surprisals`` command.
     """
+    model = zoo[model]
     sentences = read_lines(in_file)
     sentences = Z.tokenize(model, sentences)
     print("\n".join(" ".join(sentence) for sentence in sentences))
@@ -104,6 +108,7 @@ def get_surprisals(model, in_file):
     There is guaranteed to be a one-to-one mapping, however, between the rows
     of this file and the tokens produced by ``lm-zoo tokenize``.
     """
+    model = zoo[model]
     sentences = read_lines(in_file)
     ret = Z.get_surprisals(model, sentences)
     ret.to_csv(sys.stdout, sep="\t")
@@ -126,9 +131,10 @@ def unkify(model, in_file):
     corresponding token is in the model's vocabulary; the value ``1`` indicates
     that the corresponding token is an unknown word for the model.
     """
+    model = zoo[model]
     sentences = read_lines(in_file)
     masks = Z.unkify(model, sentences)
-    print("\n".join(map(str, masks_i) for masks_i in masks))
+    print("\n".join(list(map(str, masks_i)) for masks_i in masks))
 
 
 @lm_zoo.command()
@@ -136,6 +142,7 @@ def unkify(model, in_file):
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
 @click.argument("out_file", type=click.File("wb"), metavar="FILE")
 def get_predictions(model, in_file, out_file):
+    model = zoo[model]
     sentences = read_lines(in_file)
     result = Z.get_predictions(model, sentences)
 
