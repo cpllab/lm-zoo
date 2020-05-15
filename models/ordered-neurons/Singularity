@@ -1,5 +1,2 @@
 Bootstrap: docker
-From: cpllab/language-models:grnn
-
-%post
-    chmod -R 755 /opt
+From: cpllab/language-models:ordered-neurons
