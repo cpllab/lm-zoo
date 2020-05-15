@@ -48,7 +48,7 @@ COPY ${MODEL_ROOT}/get_word_surprisals.py /opt/mylm/get_word_surprisals.py
 ## It isn't necessary to create this file, but in doing so we can use the
 ## shared LM Zoo `spec` binary to auto-generate a spec output containing our
 ## vocabulary.
-RUN echo "my\nvocabulary" > /opt/vocab
+COPY ${MODEL_ROOT}/vocab.txt /opt/vocab
 
 ## Copy external-facing scripts.
 COPY ${MODEL_ROOT}/bin /opt/bin

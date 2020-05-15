@@ -128,7 +128,7 @@ def unkify(model, in_file):
     """
     sentences = read_lines(in_file)
     masks = Z.unkify(model, sentences)
-    print("\n".join(map(str, masks_i) for masks_i in masks))
+    print("\n".join(" ".join(map(str, masks_i)) for masks_i in masks))
 
 
 @lm_zoo.command()
