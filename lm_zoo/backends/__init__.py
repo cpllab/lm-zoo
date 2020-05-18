@@ -30,7 +30,8 @@ class Backend(object):
 from lm_zoo.backends.docker import DockerBackend
 from lm_zoo.backends.singularity import SingularityBackend
 
-BACKENDS = [DockerBackend, SingularityBackend]
+BACKEND_DICT = {"docker": DockerBackend, "singularity": SingularityBackend}
+BACKENDS = list(BACKEND_DICT.values())
 
 # TODO document
 PROTOCOL_TO_BACKEND = {
@@ -40,7 +41,19 @@ PROTOCOL_TO_BACKEND = {
 }
 
 
-def get_backend(model, preferred_backends=None):
+def get_backend(backend_ref):
+    """
+    Load a `Backend` instance for the given reference (string or class).
+    """
+    if isinstance(backend_ref, str):
+        return BACKEND_DICT[backend_ref]
+    elif issubclass(backend_ref, Backend):
+        return backend_ref
+    else:
+        raise ValueError("invalid backend reference %s" % (backend_ref,))
+
+
+def get_compatible_backend(model, preferred_backends=None):
     """
     Get a compatible backend for the given model.
     """

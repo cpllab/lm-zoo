@@ -17,7 +17,7 @@ import requests
 import tqdm
 
 from lm_zoo import errors
-from lm_zoo.backends import get_backend
+from lm_zoo.backends import get_backend, get_compatible_backend
 from lm_zoo.models import Registry, Model
 __version__ = "1.1b0"
 
@@ -40,15 +40,15 @@ def _make_in_stream(sentences):
     return StringIO(stream_str)
 
 
-def spec(model: Model):
+def spec(model: Model, backend=None):
     """
     Get a language model specification as a dict.
     """
-    ret = run_model_command_get_stdout(model, "spec")
+    ret = run_model_command_get_stdout(model, "spec", backend=backend)
     return json.loads(ret)
 
 
-def tokenize(model: Model, sentences):
+def tokenize(model: Model, sentences, backend=None):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -63,13 +63,13 @@ def tokenize(model: Model, sentences):
     """
     in_file = _make_in_stream(sentences)
     ret = run_model_command_get_stdout(model, "tokenize /dev/stdin",
-                                       stdin=in_file)
+                                       stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
     sentences = [sentence.split(" ") for sentence in sentences]
     return sentences
 
 
-def unkify(model: Model, sentences):
+def unkify(model: Model, sentences, backend=None):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -86,13 +86,13 @@ def unkify(model: Model, sentences):
     """
     in_file = _make_in_stream(sentences)
     ret = run_model_command_get_stdout(model, "unkify /dev/stdin",
-                                       stdin=in_file)
+                                       stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
     sentences = [list(map(int, sentence.split(" "))) for sentence in sentences]
     return sentences
 
 
-def get_surprisals(model: Model, sentences):
+def get_surprisals(model: Model, sentences, backend=None):
     """
     Compute word-level surprisals from a language model for the given natural
     language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
@@ -116,13 +116,13 @@ def get_surprisals(model: Model, sentences):
     in_file = _make_in_stream(sentences)
     out = StringIO()
     ret = run_model_command(model, "get_surprisals /dev/stdin",
-                            stdin=in_file, stdout=out)
+                            stdin=in_file, stdout=out, backend=backend)
     out = out.getvalue()
     ret = pd.read_csv(StringIO(out), sep="\t").set_index(["sentence_id", "token_id"])
     return ret
 
 
-def get_predictions(model: Model, sentences):
+def get_predictions(model: Model, sentences, backend=None):
     """
     Compute token-level predictive distributions from a language model for the
     given natural language sentences. Returns a h5py ``File`` object with the
@@ -149,7 +149,8 @@ def get_predictions(model: Model, sentences):
 
         result = run_model_command(model, f"get_predictions.hdf5 /dev/stdin {guest_path}",
                                    mounts=[mount],
-                                   stdin=in_file)
+                                   stdin=in_file,
+                                   backend=backend)
         ret = h5py.File(host_path, "r")
 
     return ret
@@ -205,7 +206,8 @@ def _update_progress(line, progress_bars):
         pass
 
 
-def run_model_command(model: Model, command_str, pull=False, mounts=None,
+def run_model_command(model: Model, command_str,
+                      backend=None, pull=False, mounts=None,
                       stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                       progress_stream=sys.stderr,
                       raise_errors=True):
@@ -214,6 +216,9 @@ def run_model_command(model: Model, command_str, pull=False, mounts=None,
     model.
 
     Args:
+        backend: Backend platform on which to execute the model. May be any of
+            the string keys of `lm_zoo.backends.BACKEND_DICT`, or a `Backend`
+            class.
         mounts: List of bind mounts described as tuples `(guest_path,
             host_path, mode)`, where `mode` is one of ``ro``, ``rw``
         raise_errors: If ``True``, monitor command status/output and raise
@@ -226,7 +231,12 @@ def run_model_command(model: Model, command_str, pull=False, mounts=None,
     if mounts is None:
         mounts = []
 
-    backend = get_backend(model)
+    preferred_backends = [] if backend is None else [get_backend(backend)]
+    backend = get_compatible_backend(model, preferred_backends=preferred_backends)
+    if preferred_backends and backend.__class__ != preferred_backends[0]:
+        L.warn("Requested backend %s is not compatible with model %s; using %s instead",
+               preferred_backends[0], model, backend.__class__)
+
     image_available = backend.image_exists(model)
     if pull or not image_available:
         backend.pull_image(model, progress_stream=progress_stream)
