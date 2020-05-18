@@ -1,10 +1,13 @@
 import logging
+from subprocess import CalledProcessError
 import sys
 from tempfile import NamedTemporaryFile
 
 from spython.main import Client
 
+from lm_zoo import errors
 from lm_zoo.backends import Backend
+from lm_zoo.constants import STATUS_CODES
 from lm_zoo.models import Model
 
 
@@ -53,10 +56,20 @@ class SingularityBackend(Backend):
         # TODO no separate stderr support :( manually reroute stderr for now
         command.append("2>/dev/null")
 
-        result = Client.execute(image=model.reference, command=command,
-                                bind=binds, stream=True)
-        for line in result:
-            stdout.write(line)
+        try:
+            result = Client.execute(image=model.reference, command=command,
+                                    bind=binds, stream=True)
+
+            for line in result:
+                stdout.write(line)
+        except CalledProcessError as e:
+            if raise_errors:
+                if e.returncode == STATUS_CODES["unsupported_feature"]:
+                    feature = command_str.split(" ")[0]
+                    raise errors.UnsupportedFeatureError(feature=feature,
+                                                         model=str(model))
+                else:
+                    raise
 
         if stdin is not None:
             stdin_f.close()
