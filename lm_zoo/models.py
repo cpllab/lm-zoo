@@ -39,6 +39,12 @@ class Registry(object):
 
         return self._registry[model_ref]
 
+    def __iter__(self):
+        return iter(self._registry)
+
+    def items(self):
+        return self._registry.items()
+
 
 class Model(object):
 
@@ -62,6 +68,8 @@ class OfficialModel(Model):
 
     def __init__(self, model_dict):
         self._image_info = model_dict["image"]
+        self.ref_url = model_dict["ref_url"]
+        self.maintainer = model_dict.get("maintainer", "Unknown")
         self.name = model_dict["shortname"]
 
     @classmethod
@@ -70,6 +78,9 @@ class OfficialModel(Model):
         Initialize a Model instance from a registry dict entry.
         """
         return cls(model_dict)
+
+    def __getattr__(self, attr):
+        return self._image_info[attr]
 
     @property
     def registry(self):

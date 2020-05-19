@@ -38,11 +38,11 @@ def list(short):
         ("maintainer", "Maintainer"),
     ]
 
-    for model in Z.get_model_dict().values():
+    for _, model in Z.get_registry().items():
         if short:
-            click.echo(model.shortname)
+            click.echo(model.name)
         else:
-            click.echo(crayons.normal(model.shortname, bold=True))
+            click.echo(crayons.normal(model.name, bold=True))
             click.echo("\t{0} {1}".format(
                 crayons.normal("Image URI: ", bold=True),
                 model.image_uri))
@@ -52,9 +52,9 @@ def list(short):
                 if hasattr(model, key):
                     props.append((label, getattr(model, key)))
 
-            dt = dateutil.parser.isoparse(model.image["datetime"])
+            dt = dateutil.parser.isoparse(model.datetime)
             props.append(("Last updated", dt.strftime("%Y-%m-%d")))
-            props.append(("Size", "%.02fGB" % (model.image["size"] / 1024 / 1024 / 1024)))
+            props.append(("Size", "%.02fGB" % (model.size / 1024 / 1024 / 1024)))
 
             for label, value in props:
                 click.echo("\t" + crayons.normal(label + ": ", bold=True)
