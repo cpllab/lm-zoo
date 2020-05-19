@@ -4,8 +4,10 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
 import sys
 from tempfile import NamedTemporaryFile
+from typing import List, Dict
 
 import dateutil.parser
 import docker
@@ -15,36 +17,16 @@ import requests
 import tqdm
 
 from lm_zoo import errors
+from lm_zoo.backends import get_backend, get_compatible_backend
+from lm_zoo.models import Registry, Model
 __version__ = "1.1b0"
 
 L = logging.getLogger("lm-zoo")
 
 
-REGISTRY_URI = "http://cpllab.github.io/lm-zoo/registry.json"
-
-DOCKER_REGISTRY = "docker.io"
-
-
-# Special status codes issued by LM Zoo container commands
-STATUS_CODES = {
-    "unsupported_feature": 99,
-}
-
-
 @lru_cache()
 def get_registry():
-    return requests.get(REGISTRY_URI).json()
-
-
-def get_model_dict():
-    registry = get_registry()
-    return {key: Model(m) for key, m in registry.items()}
-
-
-@lru_cache()
-def get_docker_client():
-    client = docker.APIClient()
-    return client
+    return Registry()
 
 
 def _make_in_stream(sentences):
@@ -58,15 +40,15 @@ def _make_in_stream(sentences):
     return StringIO(stream_str)
 
 
-def spec(model):
+def spec(model: Model, backend=None):
     """
     Get a language model specification as a dict.
     """
-    ret = run_model_command_get_stdout(model, "spec")
+    ret = run_model_command_get_stdout(model, "spec", backend=backend)
     return json.loads(ret)
 
 
-def tokenize(model, sentences):
+def tokenize(model: Model, sentences, backend=None):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -81,13 +63,13 @@ def tokenize(model, sentences):
     """
     in_file = _make_in_stream(sentences)
     ret = run_model_command_get_stdout(model, "tokenize /dev/stdin",
-                                       stdin=in_file)
+                                       stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
     sentences = [sentence.split(" ") for sentence in sentences]
     return sentences
 
 
-def unkify(model, sentences):
+def unkify(model: Model, sentences, backend=None):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -104,13 +86,13 @@ def unkify(model, sentences):
     """
     in_file = _make_in_stream(sentences)
     ret = run_model_command_get_stdout(model, "unkify /dev/stdin",
-                                       stdin=in_file)
+                                       stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
     sentences = [list(map(int, sentence.split(" "))) for sentence in sentences]
     return sentences
 
 
-def get_surprisals(model, sentences):
+def get_surprisals(model: Model, sentences, backend=None):
     """
     Compute word-level surprisals from a language model for the given natural
     language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
@@ -134,13 +116,13 @@ def get_surprisals(model, sentences):
     in_file = _make_in_stream(sentences)
     out = StringIO()
     ret = run_model_command(model, "get_surprisals /dev/stdin",
-                            stdin=in_file, stdout=out)
+                            stdin=in_file, stdout=out, backend=backend)
     out = out.getvalue()
     ret = pd.read_csv(StringIO(out), sep="\t").set_index(["sentence_id", "token_id"])
     return ret
 
 
-def get_predictions(model, sentences):
+def get_predictions(model: Model, sentences, backend=None):
     """
     Compute token-level predictive distributions from a language model for the
     given natural language sentences. Returns a h5py ``File`` object with the
@@ -167,21 +149,13 @@ def get_predictions(model, sentences):
 
         result = run_model_command(model, f"get_predictions.hdf5 /dev/stdin {guest_path}",
                                    mounts=[mount],
-                                   stdin=in_file)
+                                   stdin=in_file,
+                                   backend=backend)
         ret = h5py.File(host_path, "r")
 
     return ret
 
 
-class Model(object):
-
-    def __init__(self, model_dict):
-        self.__dict__ = model_dict
-
-    @property
-    def image_uri(self):
-        return "%s/%s:%s" % (self.image.get("registry", DOCKER_REGISTRY),
-                             self.image["name"], self.image["tag"])
 
 
 def _update_progress(line, progress_bars):
@@ -232,7 +206,8 @@ def _update_progress(line, progress_bars):
         pass
 
 
-def run_model_command(model, command_str, pull=True, mounts=None,
+def run_model_command(model: Model, command_str,
+                      backend=None, pull=False, mounts=None,
                       stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                       progress_stream=sys.stderr,
                       raise_errors=True):
@@ -241,6 +216,9 @@ def run_model_command(model, command_str, pull=True, mounts=None,
     model.
 
     Args:
+        backend: Backend platform on which to execute the model. May be any of
+            the string keys of `lm_zoo.backends.BACKEND_DICT`, or a `Backend`
+            class.
         mounts: List of bind mounts described as tuples `(guest_path,
             host_path, mode)`, where `mode` is one of ``ro``, ``rw``
         raise_errors: If ``True``, monitor command status/output and raise
@@ -253,77 +231,19 @@ def run_model_command(model, command_str, pull=True, mounts=None,
     if mounts is None:
         mounts = []
 
-    client = get_docker_client()
-    try:
-        model = get_model_dict()[model]
-    except KeyError:
-        # Could be a Docker image reference. Try to pull it
-        try:
-            client.inspect_image(model)
-        except docker.errors.ImageNotFound:
-            raise ValueError(f"Model {model} not found")
-        else:
-            ref_fields = model.rsplit(":", 1)
-            if len(ref_fields) == 2:
-                image, tag = ref_fields
-            else:
-                image, tag = ref_fields[0], "latest"
-    else:
-        image, tag = model.image["name"], model.image["tag"]
-        if pull:
-            # First pull the image.
-            registry = model.image["registry"]
-            L.info("Pulling latest Docker image for %s:%s." % (image, tag), err=True)
-            try:
-                progress_bars = {}
-                for line in client.pull(f"{registry}/{image}", tag=tag, stream=True, decode=True):
-                    if progress_stream is not None:
-                        # Write pull progress on the given stream.
-                        _update_progress(line, progress_bars)
-                    else:
-                        pass
-            except docker.errors.NotFound:
-                raise RuntimeError("Image not found.")
+    preferred_backends = [] if backend is None else [get_backend(backend)]
+    backend = get_compatible_backend(model, preferred_backends=preferred_backends)
+    if preferred_backends and backend.__class__ != preferred_backends[0]:
+        L.warn("Requested backend %s is not compatible with model %s; using %s instead",
+               preferred_backends[0].__name__, model, backend.__class__.__name__)
 
-    # Prepare mount config
-    volumes = [guest for _, guest, _ in mounts]
-    host_config = client.create_host_config(binds={
-        host: {"bind": guest, "mode": mode}
-        for host, guest, mode in mounts
-    })
+    image_available = backend.image_exists(model)
+    if pull or not image_available:
+        backend.pull_image(model, progress_stream=progress_stream)
 
-    container = client.create_container(f"{image}:{tag}", stdin_open=True,
-                                        command=command_str,
-                                        volumes=volumes, host_config=host_config)
-    client.start(container)
-
-    if stdin is not None:
-        # Send file contents to stdin of container.
-        in_stream = client.attach_socket(container, params={"stdin": 1, "stream": 1})
-        to_send = stdin.read()
-        if isinstance(to_send, str):
-            to_send = to_send.encode("utf-8")
-        os.write(in_stream._sock.fileno(), to_send)
-        os.close(in_stream._sock.fileno())
-
-    # Stop container and collect results.
-    result = client.wait(container, timeout=999999999)
-
-    if raise_errors:
-        if result["StatusCode"] == STATUS_CODES["unsupported_feature"]:
-            feature = command_str.split(" ")[0]
-            raise errors.UnsupportedFeatureError(feature=feature,
-                                                 model=":".join((image, tag)))
-
-    # Collect output.
-    container_stdout = client.logs(container, stdout=True, stderr=False)
-    container_stderr = client.logs(container, stdout=False, stderr=True)
-
-    client.remove_container(container)
-    stdout.write(container_stdout.decode("utf-8"))
-    stderr.write(container_stderr.decode("utf-8"))
-
-    return result
+    return backend.run_command(model, command_str, mounts=mounts,
+                               stdin=stdin, stdout=stdout, stderr=stderr,
+                               raise_errors=raise_errors)
 
 
 def run_model_command_get_stdout(*args, **kwargs):
