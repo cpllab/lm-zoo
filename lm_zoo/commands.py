@@ -6,13 +6,23 @@ import dateutil
 import h5py
 
 import lm_zoo as Z
+from lm_zoo.backends import BACKEND_DICT
 
 
 zoo = Z.get_registry()
 
 
+class ZooInstance(object):
+    def __init__(self, requested_backend):
+        self.requested_backend = requested_backend
+
+
 @click.group(help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
-def lm_zoo(): pass
+@click.option("--backend", type=click.Choice(list(BACKEND_DICT.keys()), case_sensitive=False),
+              help="Specify a backend (containerization platform) to run the specified model.")
+@click.pass_context
+def lm_zoo(ctx, backend):
+    ctx.obj = ZooInstance(requested_backend=backend)
 
 
 @lm_zoo.command()
@@ -57,7 +67,8 @@ def read_lines(fstream):
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
-def tokenize(model, in_file):
+@click.pass_obj
+def tokenize(obj, model, in_file):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -71,14 +82,16 @@ def tokenize(model, in_file):
     """
     model = zoo[model]
     sentences = read_lines(in_file)
-    sentences = Z.tokenize(model, sentences)
+    sentences = Z.tokenize(model, sentences,
+                           backend=obj.requested_backend)
     print("\n".join(" ".join(sentence) for sentence in sentences))
 
 
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
-def get_surprisals(model, in_file):
+@click.pass_obj
+def get_surprisals(obj, model, in_file):
     """
     Get word-level surprisals from a language model for the given natural
     language text. Tab-separated results will be sent to standard output,
@@ -110,14 +123,15 @@ def get_surprisals(model, in_file):
     """
     model = zoo[model]
     sentences = read_lines(in_file)
-    ret = Z.get_surprisals(model, sentences)
+    ret = Z.get_surprisals(model, sentences, backend=obj.requested_backend)
     ret.to_csv(sys.stdout, sep="\t")
 
 
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
-def unkify(model, in_file):
+@click.pass_obj
+def unkify(obj, model, in_file):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -133,7 +147,7 @@ def unkify(model, in_file):
     """
     model = zoo[model]
     sentences = read_lines(in_file)
-    masks = Z.unkify(model, sentences)
+    masks = Z.unkify(model, sentences, backend=obj.requested_backend)
     print("\n".join(list(map(str, masks_i)) for masks_i in masks))
 
 
@@ -141,10 +155,11 @@ def unkify(model, in_file):
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
 @click.argument("out_file", type=click.File("wb"), metavar="FILE")
-def get_predictions(model, in_file, out_file):
+@click.pass_obj
+def get_predictions(obj, model, in_file, out_file):
     model = zoo[model]
     sentences = read_lines(in_file)
-    result = Z.get_predictions(model, sentences)
+    result = Z.get_predictions(model, sentences, backend=obj.requested_backend)
 
     with h5py.File(out_file.name, "w") as out:
         result.copy("sentence", out)

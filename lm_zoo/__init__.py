@@ -235,7 +235,7 @@ def run_model_command(model: Model, command_str,
     backend = get_compatible_backend(model, preferred_backends=preferred_backends)
     if preferred_backends and backend.__class__ != preferred_backends[0]:
         L.warn("Requested backend %s is not compatible with model %s; using %s instead",
-               preferred_backends[0], model, backend.__class__)
+               preferred_backends[0].__name__, model, backend.__class__.__name__)
 
     image_available = backend.image_exists(model)
     if pull or not image_available:

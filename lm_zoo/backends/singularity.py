@@ -29,9 +29,15 @@ class SingularityBackend(Backend):
 
     def pull_image(self, model, progress_stream=sys.stderr):
         if len(set(model.platforms) & {"shub", "library"}) == 0:
-            raise ValueError("Only know how to pull from shub:// and library://"
-                             " . This Singularity model does not come from "
-                             "either repository.")
+            if "singularity" in model.platforms:
+                # It's a local image. Just check that it exists, and raise if
+                # not.
+                if not self.image_exists(model):
+                    raise ValueError("Could not find local Singularity image at %s" % (model.reference,))
+            else:
+                raise ValueError("Only know how to pull from shub:// and library://"
+                                " . This Singularity model does not come from "
+                                "either repository.")
 
         return Client.pull(image="%s://%s" % (model.repository, model.reference))
 
