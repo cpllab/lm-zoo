@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 import click
 import crayons
@@ -6,6 +7,7 @@ import dateutil
 import h5py
 
 import lm_zoo as Z
+from lm_zoo import errors
 from lm_zoo.backends import BACKEND_DICT
 
 
@@ -17,11 +19,35 @@ class ZooInstance(object):
         self.requested_backend = requested_backend
 
 
-@click.group(help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
+class CLIRunner(click.Group):
+
+    ERROR_STRINGS = {
+        errors.BackendConnectionError: \
+                ("Failed to connect to containerization backend "
+                 "{e.backend.name}. Please verify that any daemons (e.g. the "
+                 "Docker service) are running, and that you are connected to "
+                 "the internet."),
+    }
+
+    def __call__(self, *args, **kwargs):
+        try:
+            return self.main(*args, **kwargs)
+        except Exception as e:
+            if e.__class__ in self.ERROR_STRINGS:
+                traceback.print_exc()
+                error_str = self.ERROR_STRINGS[e.__class__].format(e=e)
+                click.echo(crayons.red("Error: ", bold=True) + error_str)
+            else:
+                raise e
+
+
+@click.group(cls=CLIRunner,
+             help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
 @click.option("--backend", type=click.Choice(list(BACKEND_DICT.keys()), case_sensitive=False),
               help="Specify a backend (containerization platform) to run the specified model.")
+@click.option("--verbose", "-v", is_flag=True)
 @click.pass_context
-def lm_zoo(ctx, backend):
+def lm_zoo(ctx, verbose, backend):
     ctx.obj = ZooInstance(requested_backend=backend)
 
 
