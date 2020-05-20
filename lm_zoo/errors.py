@@ -18,6 +18,23 @@ class UnsupportedFeatureError(NotImplementedError):
                    "\n%s" % self.message if self.message is not None else ""))
 
 
+class BackendConnectionError(RuntimeError):
+    """
+    This error is raised when a backend fails to connect to some remote
+    repository or daemon. It carries the underlying exception as an attribute
+    ``exception``. Optionally carries an associated ``model`` which triggered
+    the error.
+    """
+    def __init__(self, backend, exception, model=None):
+        self.backend = backend
+        self.exception = exception
+        self.model = model
+
+    def __str__(self):
+        return ("Backend %s encountered error: %s"
+                % (self.backend.__class__.__name__, self.exception))
+
+
 class IncompatibleBackendError(RuntimeError):
     """
     This error is raised when a model is requested for use with an incompatible

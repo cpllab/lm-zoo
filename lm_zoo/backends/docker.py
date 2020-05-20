@@ -7,6 +7,7 @@ import os
 import sys
 
 import docker
+import requests
 
 from lm_zoo import errors
 from lm_zoo.backends import Backend
@@ -24,6 +25,8 @@ class DockerBackend(Backend):
     def image_exists(self, model):
         try:
             self._client.inspect_image(model.reference)
+        except requests.exceptions.ConnectionError as exc:
+            raise errors.BackendConnectionError(self, exception=exc, model=model)
         except docker.errors.ImageNotFound:
             return False
         else:
@@ -37,6 +40,8 @@ class DockerBackend(Backend):
                 if progress_stream is not None:
                     # Write pull progress on the given stream.
                     _update_progress(line, progress_bars)
+        except requests.exceptions.ConnectionError as exc:
+            raise errors.BackendConnectionError(self, exception=exc, model=model)
         except docker.errors.NotFound:
             raise ValueError("Image %s was not found" % (model.image_uri,))
 
@@ -46,15 +51,23 @@ class DockerBackend(Backend):
         client = self._client
 
         # Prepare mount config
+        if mounts is None:
+            mounts = []
         volumes = [guest for _, guest, _ in mounts]
         host_config = client.create_host_config(binds={
             host: {"bind": guest, "mode": mode}
             for host, guest, mode in mounts
         })
 
-        container = client.create_container(model.reference, stdin_open=True,
-                                            command=command_str,
-                                            volumes=volumes, host_config=host_config)
+        # NB first API call -- wrap this in a try-catch and raise connection
+        # errors if necessary
+        try:
+            container = client.create_container(model.reference, stdin_open=True,
+                                                command=command_str,
+                                                volumes=volumes, host_config=host_config)
+        except requests.exceptions.ConnectionError as exc:
+            raise errors.BackendConnectionError(self, exception=exc, model=model)
+
         client.start(container)
 
         if stdin is not None:
