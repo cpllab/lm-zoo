@@ -123,15 +123,9 @@
             
               <ul>
                 
-                  <li class="toctree-l2"><a href="#spec" class="reference internal">spec</a></li>
+                  <li class="toctree-l2"><a href="#language-model-binaries" class="reference internal">Language model binaries</a></li>
                 
-                  <li class="toctree-l2"><a href="#get-predictions" class="reference internal">get_predictions</a></li>
-                
-                  <li class="toctree-l2"><a href="#get-surprisals" class="reference internal">get_surprisals</a></li>
-                
-                  <li class="toctree-l2"><a href="#tokenize" class="reference internal">tokenize</a></li>
-                
-                  <li class="toctree-l2"><a href="#unkify" class="reference internal">unkify</a></li>
+                  <li class="toctree-l2"><a href="#building-models-with-partial-feature-support" class="reference internal">Building models with partial feature support</a></li>
                 
               </ul>
             
@@ -180,27 +174,34 @@
 <p>Each language model in the LM Zoo is a Docker container which provides various
 binaries for running and probing the internal model. This document specifies
 the exact API for accessing and using these language models.</p>
-<p>Each container makes available the following binaries, which communicate via
-<cite>stdout</cite> and <cite>stderr</cite> with the host:</p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#spec" id="id1"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a></p>
+<li><p><a class="reference internal" href="#language-model-binaries" id="id1">Language model binaries</a></p>
 <ul>
-<li><p><a class="reference internal" href="#schema" id="id2">schema</a></p></li>
+<li><p><a class="reference internal" href="#spec" id="id2"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a></p>
+<ul>
+<li><p><a class="reference internal" href="#schema" id="id3">schema</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#get-predictions" id="id3"><code class="docutils literal notranslate"><span class="pre">get_predictions</span></code></a></p></li>
-<li><p><a class="reference internal" href="#get-surprisals" id="id4"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></p>
+<li><p><a class="reference internal" href="#get-predictions-hdf5" id="id4"><code class="docutils literal notranslate"><span class="pre">get_predictions.hdf5</span></code></a></p></li>
+<li><p><a class="reference internal" href="#get-surprisals" id="id5"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></p>
 <ul>
-<li><p><a class="reference internal" href="#get-surprisals-output-format" id="id5">get_surprisals output format</a></p></li>
+<li><p><a class="reference internal" href="#get-surprisals-output-format" id="id6">get_surprisals output format</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#tokenize" id="id6"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></p></li>
-<li><p><a class="reference internal" href="#unkify" id="id7"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></p></li>
+<li><p><a class="reference internal" href="#tokenize" id="id7"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></p></li>
+<li><p><a class="reference internal" href="#unkify" id="id8"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#building-models-with-partial-feature-support" id="id9">Building models with partial feature support</a></p></li>
 </ul>
 </div>
+<div class="section" id="language-model-binaries">
+<h2><a class="toc-backref" href="#id1">Language model binaries</a><a class="headerlink" href="#language-model-binaries" title="Permalink to this headline">¶</a></h2>
+<p>Each container makes available the following binaries, which communicate via
+<cite>stdout</cite> and <cite>stderr</cite> with the host:</p>
 <div class="section" id="spec">
-<h2><a class="toc-backref" href="#id1"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a><a class="headerlink" href="#spec" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id2"><code class="docutils literal notranslate"><span class="pre">spec</span></code></a><a class="headerlink" href="#spec" title="Permalink to this headline">¶</a></h3>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><p>None</p>
@@ -217,7 +218,7 @@ the exact API for accessing and using these language models.</p>
 </dl>
 <p>The <code class="docutils literal notranslate"><span class="pre">spec</span></code> binary outputs relevant metadata describing the language model image:</p>
 <div class="section" id="schema">
-<h3><a class="toc-backref" href="#id2">schema</a><a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<h4><a class="toc-backref" href="#id3">schema</a><a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h4>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20%" />
@@ -510,8 +511,8 @@ the exact API for accessing and using these language models.</p>
 </table>
 </div>
 </div>
-<div class="section" id="get-predictions">
-<h2><a class="toc-backref" href="#id3"><code class="docutils literal notranslate"><span class="pre">get_predictions</span></code></a><a class="headerlink" href="#get-predictions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="get-predictions-hdf5">
+<h3><a class="toc-backref" href="#id4"><code class="docutils literal notranslate"><span class="pre">get_predictions.hdf5</span></code></a><a class="headerlink" href="#get-predictions-hdf5" title="Permalink to this headline">¶</a></h3>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">
@@ -541,7 +542,7 @@ file should have the following groups:</p>
 <p>where <code class="docutils literal notranslate"><span class="pre">i</span></code> is zero-indexed.</p>
 </div>
 <div class="section" id="get-surprisals">
-<h2><a class="toc-backref" href="#id4"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a><a class="headerlink" href="#get-surprisals" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id5"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a><a class="headerlink" href="#get-surprisals" title="Permalink to this headline">¶</a></h3>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">
@@ -561,7 +562,7 @@ file should have the following groups:</p>
 <p>The output of <code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code> is a tab-separated file with the following
 columns (including headings on the first line):</p>
 <div class="section" id="get-surprisals-output-format">
-<h3><a class="toc-backref" href="#id5">get_surprisals output format</a><a class="headerlink" href="#get-surprisals-output-format" title="Permalink to this headline">¶</a></h3>
+<h4><a class="toc-backref" href="#id6">get_surprisals output format</a><a class="headerlink" href="#get-surprisals-output-format" title="Permalink to this headline">¶</a></h4>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 33%" />
@@ -615,7 +616,7 @@ columns (including headings on the first line):</p>
 </div>
 </div>
 <div class="section" id="tokenize">
-<h2><a class="toc-backref" href="#id6"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a><a class="headerlink" href="#tokenize" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id7"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a><a class="headerlink" href="#tokenize" title="Permalink to this headline">¶</a></h3>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">
@@ -648,7 +649,7 @@ lists declared in the language model specification (see
 </ol>
 </div>
 <div class="section" id="unkify">
-<h2><a class="toc-backref" href="#id7"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a><a class="headerlink" href="#unkify" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id8"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a><a class="headerlink" href="#unkify" title="Permalink to this headline">¶</a></h3>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">
@@ -671,6 +672,26 @@ corresponding token is known by the model, and <code class="docutils literal not
 <li><p>Each line is composed only of <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> values separated by spaces.</p></li>
 <li><p>Each line corresponds to a sentence line as output by <a class="reference internal" href="#tokenize">tokenize</a>, with
 exactly the same number of tokens (when splitting on whitespace).</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="building-models-with-partial-feature-support">
+<h2><a class="toc-backref" href="#id9">Building models with partial feature support</a><a class="headerlink" href="#building-models-with-partial-feature-support" title="Permalink to this headline">¶</a></h2>
+<p>Not all models in the LM Zoo need support all of the above interfaces. For
+example, some models do not support the <code class="docutils literal notranslate"><span class="pre">get_predictions.hdf5</span></code> command at the
+moment. Models explicitly mark which features they do and do not support. To do
+this in your own model, do the following:</p>
+<ol class="arabic">
+<li><p>Set a <code class="docutils literal notranslate"><span class="pre">false</span></code> value for the relevant feature under the
+<code class="docutils literal notranslate"><span class="pre">supported_features</span></code> key of your model’s spec (see <a class="reference internal" href="#spec">spec</a>).</p></li>
+<li><p>Define a dummy binary with the relevant feature’s name which simply exits
+with a status code <code class="docutils literal notranslate"><span class="pre">99</span></code>. This status code will be interpreted by the LM
+Zoo wrapper API and CLI tools to indicate that the requested feature is not
+supported.</p>
+<p>You can pull in the shared script <code class="docutils literal notranslate"><span class="pre">shared/unsupported</span></code> to do this for you.
+See an example in <a class="reference external" href="https://github.com/cpllab/lm-zoo/blob/5c72f5aa6a9b5e67f990d363c9ea4fc35c37679e/models/RNNG/Dockerfile#L58">the Dockerfile for the RNNG model</a>,
+which does not support <code class="docutils literal notranslate"><span class="pre">get_predictions.hdf5</span></code>.</p>
+</li>
 </ol>
 </div>
 </div>
