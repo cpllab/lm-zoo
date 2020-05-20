@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
       
       <script src="_static/theme-vendors.js"></script>
@@ -89,7 +90,7 @@
   
     <div class="sidebar-group">
       <p class="caption">
-        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">Documentation</a></span>
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">welcome to lm zoo</a></span>
       </p>
       <ul class="current">
         
@@ -123,6 +124,8 @@
               <ul>
                 
                   <li class="toctree-l2"><a href="#spec" class="reference internal">spec</a></li>
+                
+                  <li class="toctree-l2"><a href="#get-predictions" class="reference internal">get_predictions</a></li>
                 
                   <li class="toctree-l2"><a href="#get-surprisals" class="reference internal">get_surprisals</a></li>
                 
@@ -186,13 +189,14 @@ the exact API for accessing and using these language models.</p>
 <li><p><a class="reference internal" href="#schema" id="id2">schema</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#get-surprisals" id="id3"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></p>
+<li><p><a class="reference internal" href="#get-predictions" id="id3"><code class="docutils literal notranslate"><span class="pre">get_predictions</span></code></a></p></li>
+<li><p><a class="reference internal" href="#get-surprisals" id="id4"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a></p>
 <ul>
-<li><p><a class="reference internal" href="#get-surprisals-output-format" id="id4">get_surprisals output format</a></p></li>
+<li><p><a class="reference internal" href="#get-surprisals-output-format" id="id5">get_surprisals output format</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#tokenize" id="id5"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></p></li>
-<li><p><a class="reference internal" href="#unkify" id="id6"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></p></li>
+<li><p><a class="reference internal" href="#tokenize" id="id6"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a></p></li>
+<li><p><a class="reference internal" href="#unkify" id="id7"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a></p></li>
 </ul>
 </div>
 <div class="section" id="spec">
@@ -228,7 +232,7 @@ the exact API for accessing and using these language models.</p>
 </tr>
 <tr class="row-even"><td colspan="5"><p>properties</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="15"><ul class="simple">
+<tr class="row-odd"><td rowspan="21"><ul class="simple">
 <li><p><strong>image</strong></p></li>
 </ul>
 </td>
@@ -246,6 +250,43 @@ the exact API for accessing and using these language models.</p>
 </tr>
 <tr class="row-even"><td><p>format</p></td>
 <td colspan="2"><p>datetime</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p><strong>supported_features</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><strong>tokenize</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p><strong>unkify</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p><strong>get_surprisals</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p><strong>get_predictions</strong></p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
 </tr>
 <tr class="row-odd"><td rowspan="4"><ul class="simple">
 <li><p>gpu</p></li>
@@ -469,8 +510,38 @@ the exact API for accessing and using these language models.</p>
 </table>
 </div>
 </div>
+<div class="section" id="get-predictions">
+<h2><a class="toc-backref" href="#id3"><code class="docutils literal notranslate"><span class="pre">get_predictions</span></code></a><a class="headerlink" href="#get-predictions" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ol class="arabic simple">
+<li><p>Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line</p></li>
+<li><p>Path to which HDF5 prediction data should be written</p></li>
+</ol>
+</dd>
+<dt class="field-even">stdout</dt>
+<dd class="field-even"><p>Not specified</p>
+</dd>
+<dt class="field-odd">stderr</dt>
+<dd class="field-odd"><p>Not specified</p>
+</dd>
+</dl>
+<p>Extract word-level predictive distributions <span class="math notranslate nohighlight">\(\log p(w_i \mid w_1, \dots,
+w_{i-1})\)</span> for each word of each sentence. Writes results in HDF5 format as a
+collection of matrices, along with prediction vocabulary metadata. The HDF5
+file should have the following groups:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sentence/&lt;i&gt;/predictions: N_tokens_i * N_vocabulary array of
+   log-probabilities (rows are log-probability distributions)
+/sentence/&lt;i&gt;/tokens: sequence of integer token IDs corresponding to
+   indices in ``/vocabulary``
+/vocabulary: byte-encoded string array of vocabulary items (decode with
+   ``numpy.char.decode(vocabulary, &quot;utf-8&quot;)``)
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">i</span></code> is zero-indexed.</p>
+</div>
 <div class="section" id="get-surprisals">
-<h2><a class="toc-backref" href="#id3"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a><a class="headerlink" href="#get-surprisals" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4"><code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code></a><a class="headerlink" href="#get-surprisals" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">
@@ -490,7 +561,7 @@ the exact API for accessing and using these language models.</p>
 <p>The output of <code class="docutils literal notranslate"><span class="pre">get_surprisals</span></code> is a tab-separated file with the following
 columns (including headings on the first line):</p>
 <div class="section" id="get-surprisals-output-format">
-<h3><a class="toc-backref" href="#id4">get_surprisals output format</a><a class="headerlink" href="#get-surprisals-output-format" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id5">get_surprisals output format</a><a class="headerlink" href="#get-surprisals-output-format" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 33%" />
@@ -544,7 +615,7 @@ columns (including headings on the first line):</p>
 </div>
 </div>
 <div class="section" id="tokenize">
-<h2><a class="toc-backref" href="#id5"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a><a class="headerlink" href="#tokenize" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6"><code class="docutils literal notranslate"><span class="pre">tokenize</span></code></a><a class="headerlink" href="#tokenize" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">
@@ -577,7 +648,7 @@ lists declared in the language model specification (see
 </ol>
 </div>
 <div class="section" id="unkify">
-<h2><a class="toc-backref" href="#id6"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a><a class="headerlink" href="#unkify" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7"><code class="docutils literal notranslate"><span class="pre">unkify</span></code></a><a class="headerlink" href="#unkify" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ol class="arabic simple">

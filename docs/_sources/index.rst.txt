@@ -10,6 +10,15 @@ Welcome to LM Zoo
    :width: 80%
    :align: center
 
+.. toctree::
+   quickstart
+   commands
+   models
+   contributing
+   api
+   thanks
+   :hidden:
+
 |
 
 The Language Model Zoo (LM Zoo) is an open-source repository of
@@ -46,21 +55,12 @@ language text::
   1       6       <unk>   3.706054
   ...
 
-For more features and installation instructions, see our ref:`quickstart` guide.
+For more features and installation instructions, see our :ref:`quickstart` guide.
 
 LM Zoo is maintained by the
 `MIT Computational Psycholinguistics Laboratory <http://cpl.mit.edu/>`_.
 
 
-.. toctree::
-   quickstart
-   commands
-   models
-   contributing
-   api
-   thanks
-   :maxdepth: 2
-   :caption: Documentation
 
 
 

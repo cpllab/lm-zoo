@@ -26,6 +26,31 @@ The ``spec`` binary outputs relevant metadata describing the language model imag
 .. jsonschema:: schemas/language_model_spec.json
 
 
+``get_predictions``
+^^^^^^^^^^^^^^^^^^^
+
+:Arguments:
+  1. Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line
+  2. Path to which HDF5 prediction data should be written
+:stdout: Not specified
+:stderr: Not specified
+
+Extract word-level predictive distributions :math:`\log p(w_i \mid w_1, \dots,
+w_{i-1})` for each word of each sentence. Writes results in HDF5 format as a
+collection of matrices, along with prediction vocabulary metadata. The HDF5
+file should have the following groups::
+
+   /sentence/<i>/predictions: N_tokens_i * N_vocabulary array of
+      log-probabilities (rows are log-probability distributions)
+   /sentence/<i>/tokens: sequence of integer token IDs corresponding to
+      indices in ``/vocabulary``
+   /vocabulary: byte-encoded string array of vocabulary items (decode with
+      ``numpy.char.decode(vocabulary, "utf-8")``)
+
+where ``i`` is zero-indexed.
+
+
+
 ``get_surprisals``
 ^^^^^^^^^^^^^^^^^^
 

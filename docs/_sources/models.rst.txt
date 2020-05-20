@@ -2,7 +2,9 @@ Official models
 ==================
 
 LM Zoo ships with a set of official models that can be queried via the
-command-line tool (coming soon!).
+command-line tool.
+
+Do you develop language models? please see our instructions on :ref:`contributing`.
 
 Model list
 ^^^^^^^^^^^

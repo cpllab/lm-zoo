@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
       
       <script src="_static/theme-vendors.js"></script>
@@ -89,7 +90,7 @@
   
     <div class="sidebar-group">
       <p class="caption">
-        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">Documentation</a></span>
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">welcome to lm zoo</a></span>
       </p>
       <ul class="current">
         
@@ -104,7 +105,7 @@
             
               <ul>
                 
-                  <li class="toctree-l2"><a href="#lm-zoo-commands" class="reference internal">lm-zoo commands</a></li>
+                  <li class="toctree-l2"><a href="#lm-zoo" class="reference internal">lm-zoo</a></li>
                 
               </ul>
             
@@ -168,6 +169,174 @@
             
   <div class="section" id="lm-zoo-commands">
 <span id="commands"></span><h1><code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> commands<a class="headerlink" href="#lm-zoo-commands" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="lm-zoo">
+<h2>lm-zoo<a class="headerlink" href="#lm-zoo" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> provides black-box access to computing with state-of-the-art language models.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>lm-zoo <span class="o">[</span>OPTIONS<span class="o">]</span> COMMAND <span class="o">[</span>ARGS<span class="o">]</span>...
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-backend">
+<code class="sig-name descname">--backend</code><code class="sig-prename descclassname"> &lt;backend&gt;</code><a class="headerlink" href="#cmdoption-lm-zoo-backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a backend (containerization platform) to run the specified model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Options</dt>
+<dd class="field-odd"><p>docker|singularity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="lm-zoo-get-predictions">
+<h3>get-predictions<a class="headerlink" href="#lm-zoo-get-predictions" title="Permalink to this headline">¶</a></h3>
+<p>Compute token-level predictive distributions from a language model for the
+given natural language sentences.</p>
+<p>INFILE should be a raw natural language text file with one sentence per line.</p>
+<p>This command writes a HDF5 file to the given OUTFILE, with the following
+structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/sentence/&lt;i&gt;/predictions: N_tokens_i * N_vocabulary array of
+    log-probabilities (rows are log-probability distributions)
+/sentence/&lt;i&gt;/tokens: sequence of integer token IDs corresponding to
+    indices in ``/vocabulary``
+/vocabulary: byte-encoded string array of vocabulary items (decode with
+    ``numpy.char.decode(vocabulary, &quot;utf-8&quot;)``)
+</pre></div>
+</div>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>lm-zoo get-predictions <span class="o">[</span>OPTIONS<span class="o">]</span> MODEL INFILE OUTFILE
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-get-predictions-arg-MODEL">
+<code class="sig-name descname">MODEL</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-get-predictions-arg-MODEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-get-predictions-arg-INFILE">
+<code class="sig-name descname">INFILE</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-get-predictions-arg-INFILE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-get-predictions-arg-OUTFILE">
+<code class="sig-name descname">OUTFILE</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-get-predictions-arg-OUTFILE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</div>
+<div class="section" id="lm-zoo-get-surprisals">
+<h3>get-surprisals<a class="headerlink" href="#lm-zoo-get-surprisals" title="Permalink to this headline">¶</a></h3>
+<p>Get word-level surprisals from a language model for the given natural
+language text. Tab-separated results will be sent to standard output,
+following the format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sentence_id</span>       <span class="n">token_id</span>        <span class="n">token</span>   <span class="n">surprisal</span>
+<span class="mi">1</span>                 <span class="mi">1</span>               <span class="n">This</span>    <span class="mf">0.000</span>
+<span class="mi">1</span>                 <span class="mi">2</span>               <span class="ow">is</span>      <span class="mf">1.000</span>
+<span class="mi">1</span>                 <span class="mi">3</span>               <span class="n">a</span>       <span class="mf">1.000</span>
+<span class="mi">1</span>                 <span class="mi">4</span>               <span class="o">&lt;</span><span class="n">unk</span><span class="o">&gt;</span>   <span class="mf">0.500</span>
+<span class="mi">1</span>                 <span class="mi">5</span>               <span class="n">line</span>    <span class="mf">1.000</span>
+<span class="mi">1</span>                 <span class="mi">6</span>               <span class="o">.</span>       <span class="mf">0.250</span>
+<span class="mi">1</span>                 <span class="mi">7</span>               <span class="o">&lt;</span><span class="n">eos</span><span class="o">&gt;</span>   <span class="mf">0.100</span>
+</pre></div>
+</div>
+<p>The surprisal of a token <span class="math notranslate nohighlight">\(w_i\)</span> is the negative logarithm of that
+token’s probability under a language model’s predictive distribution:</p>
+<div class="math notranslate nohighlight">
+\[S(w_i) = -\log_2 p(w_i \mid w_1, w_2, \ldots, w_{i-1})\]</div>
+<p>Note that surprisals are computed on the level of <strong>tokens</strong>, not words.
+Models that insert extra tokens (e.g., an end-of-sentence token as above)
+or which tokenize on the sub-word level (e.g. GPT2) will not have a
+one-to-one mapping between rows of surprisal output from this command and
+words.</p>
+<p>There is guaranteed to be a one-to-one mapping, however, between the rows
+of this file and the tokens produced by <code class="docutils literal notranslate"><span class="pre">lm-zoo</span> <span class="pre">tokenize</span></code>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>lm-zoo get-surprisals <span class="o">[</span>OPTIONS<span class="o">]</span> MODEL FILE
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-get-surprisals-arg-MODEL">
+<code class="sig-name descname">MODEL</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-get-surprisals-arg-MODEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-get-surprisals-arg-FILE">
+<code class="sig-name descname">FILE</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-get-surprisals-arg-FILE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</div>
+<div class="section" id="lm-zoo-list">
+<h3>list<a class="headerlink" href="#lm-zoo-list" title="Permalink to this headline">¶</a></h3>
+<p>List language models available in the central repository.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>lm-zoo list <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-list-short">
+<code class="sig-name descname">--short</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-list-short" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output just a list of shortnames rather than a pretty list</p>
+</dd></dl>
+
+</div>
+<div class="section" id="lm-zoo-tokenize">
+<h3>tokenize<a class="headerlink" href="#lm-zoo-tokenize" title="Permalink to this headline">¶</a></h3>
+<p>Tokenize natural-language text according to a model’s preprocessing
+standards.</p>
+<p>FILE should be a raw natural language text file with one sentence per line.</p>
+<p>This command returns a text file with one tokenized sentence per line, with
+tokens separated by single spaces. For each sentence, there is a one-to-one
+mapping between the tokens output by this command and the tokens used by
+the <code class="docutils literal notranslate"><span class="pre">get-surprisals</span></code> command.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>lm-zoo tokenize <span class="o">[</span>OPTIONS<span class="o">]</span> MODEL FILE
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-tokenize-arg-MODEL">
+<code class="sig-name descname">MODEL</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-tokenize-arg-MODEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-tokenize-arg-FILE">
+<code class="sig-name descname">FILE</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-tokenize-arg-FILE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</div>
+<div class="section" id="lm-zoo-unkify">
+<h3>unkify<a class="headerlink" href="#lm-zoo-unkify" title="Permalink to this headline">¶</a></h3>
+<p>Detect unknown words for a language model for the given natural language
+text.</p>
+<p>FILE should be a raw natural language text file with one sentence per line.</p>
+<p>This command returns a text file with one sentence per line, where each
+sentence is represented as a sequence of <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> values. These
+values correspond one-to-one with the model’s tokenization of the sentence
+(as returned by <code class="docutils literal notranslate"><span class="pre">lm-zoo</span> <span class="pre">tokenize</span></code>). The value <code class="docutils literal notranslate"><span class="pre">0</span></code> indicates that the
+corresponding token is in the model’s vocabulary; the value <code class="docutils literal notranslate"><span class="pre">1</span></code> indicates
+that the corresponding token is an unknown word for the model.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>lm-zoo unkify <span class="o">[</span>OPTIONS<span class="o">]</span> MODEL FILE
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-unkify-arg-MODEL">
+<code class="sig-name descname">MODEL</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-unkify-arg-MODEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-lm-zoo-unkify-arg-FILE">
+<code class="sig-name descname">FILE</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-lm-zoo-unkify-arg-FILE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 

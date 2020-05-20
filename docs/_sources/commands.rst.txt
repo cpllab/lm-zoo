@@ -3,5 +3,6 @@
 ``lm-zoo`` commands
 ===================
 
-.. click::herpderp
-   :prog: testing
+.. click:: lm_zoo.commands:lm_zoo
+   :prog: lm-zoo
+   :show-nested:

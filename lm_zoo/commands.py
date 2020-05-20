@@ -153,10 +153,26 @@ def unkify(obj, model, in_file):
 
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
-@click.argument("in_file", type=click.File("r"), metavar="FILE")
-@click.argument("out_file", type=click.File("wb"), metavar="FILE")
+@click.argument("in_file", type=click.File("r"), metavar="INFILE")
+@click.argument("out_file", type=click.File("wb"), metavar="OUTFILE")
 @click.pass_obj
 def get_predictions(obj, model, in_file, out_file):
+    """
+    Compute token-level predictive distributions from a language model for the
+    given natural language sentences.
+
+    INFILE should be a raw natural language text file with one sentence per line.
+
+    This command writes a HDF5 file to the given OUTFILE, with the following
+    structure::
+
+        /sentence/<i>/predictions: N_tokens_i * N_vocabulary array of
+            log-probabilities (rows are log-probability distributions)
+        /sentence/<i>/tokens: sequence of integer token IDs corresponding to
+            indices in ``/vocabulary``
+        /vocabulary: byte-encoded string array of vocabulary items (decode with
+            ``numpy.char.decode(vocabulary, "utf-8")``)
+    """
     model = zoo[model]
     sentences = read_lines(in_file)
     result = Z.get_predictions(model, sentences, backend=obj.requested_backend)
