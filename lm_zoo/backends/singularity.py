@@ -1,4 +1,6 @@
+import contextlib
 import logging
+import os
 from subprocess import CalledProcessError
 import sys
 from tempfile import NamedTemporaryFile
@@ -12,6 +14,37 @@ from lm_zoo.models import Model
 
 
 L = logging.getLogger(__name__)
+
+@contextlib.contextmanager
+def modified_environ(*remove, **update):
+    """
+    Temporarily updates the ``os.environ`` dictionary in-place.
+
+    The ``os.environ`` dictionary is updated in-place so that the modification
+    is sure to work in all situations.
+
+    :param remove: Environment variables to remove.
+    :param update: Dictionary of environment variables and values to add/update.
+    """
+    # https://stackoverflow.com/a/34333710/176075
+    env = os.environ
+    update = update or {}
+    remove = remove or []
+
+    # List of environment variables being updated or removed.
+    stomped = (set(update.keys()) | set(remove)) & set(env.keys())
+    # Environment variables and values to restore on exit.
+    update_after = {k: env[k] for k in stomped}
+    # Environment variables and values to remove on exit.
+    remove_after = frozenset(k for k in update if k not in env)
+
+    try:
+        env.update(update)
+        [env.pop(k, None) for k in remove]
+        yield
+    finally:
+        env.update(update_after)
+        [env.pop(k) for k in remove_after]
 
 
 class SingularityBackend(Backend):
@@ -41,11 +74,26 @@ class SingularityBackend(Backend):
 
         return Client.pull(image="%s://%s" % (model.repository, model.reference))
 
-    def run_command(self, model: Model, command_str, mounts=None,
+    def run_command(self, model: Model, command_str,
+                    mounts=None, environment=None,
                     stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                     raise_errors=True):
+        if mounts is None:
+            mounts = []
+        if environment is None:
+            environment = {}
+
+        # Support custom checkpoint loading
+        if model.checkpoint is not None:
+            # Mount given checkpoint read-only within the guest
+            guest_checkpoint_path = "/opt/lmzoo_checkpoint"
+            mounts.append((model.checkpoint, guest_checkpoint_path, "ro"))
+
+            # Update relevant environment variable
+            environment["LMZOO_CHECKPOINT_PATH"] = guest_checkpoint_path
+
         binds = ["%s:%s:%s" % (host, guest, mode)
-                for host, guest, mode in (mounts or [])]
+                for host, guest, mode in mounts]
 
         nv = False # TODO
 
@@ -62,12 +110,17 @@ class SingularityBackend(Backend):
         # TODO no separate stderr support :( manually reroute stderr for now
         command.append("2>/dev/null")
 
-        try:
-            result = Client.execute(image=model.reference, command=command,
-                                    bind=binds, stream=True)
+        # Prepare environment variables for export
+        environment = {"SINGULARITYENV_%s" % key: value
+                       for key, value in environment.items()}
 
-            for line in result:
-                stdout.write(line)
+        try:
+            with modified_environ(**environment):
+                result = Client.execute(image=model.reference, command=command,
+                                        bind=binds, stream=True)
+
+                for line in result:
+                    stdout.write(line)
         except CalledProcessError as e:
             if raise_errors:
                 if e.returncode == STATUS_CODES["unsupported_feature"]:

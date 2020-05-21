@@ -87,6 +87,23 @@ def test_checkpoint_mounting(template_model):
         assert len(tokenized) == 1
         assert tokenized[0] == "This is <unk> test <unk>".split()
 
+def test_checkpoint_mounting_singularity(registry, singularity_local_model):
+    """
+    We should be able to mount a "checkpoint" with a custom vocabulary in the
+    LM Zoo template image, and see tokenization output vary accordingly.
+    """
+
+    model = registry["singularity://%s" % singularity_local_model]
+    dummy_vocab = "This is test".split()
+    with TemporaryDirectory() as checkpoint_dir:
+        with (Path(checkpoint_dir) / "vocab.txt").open("w") as vocab_f:
+            vocab_f.write("\n".join(dummy_vocab))
+
+        custom_model = model.with_checkpoint(checkpoint_dir)
+        tokenized = Z.tokenize(custom_model, ["This is a test sentence"])
+        assert len(tokenized) == 1
+        assert tokenized[0] == "This is <unk> test <unk>".split()
+
 
 def test_singularity(registry, singularity_local_model):
     assert Z.tokenize(registry["singularity://%s" % singularity_local_model],
