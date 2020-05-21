@@ -49,7 +49,8 @@ class DockerBackend(Backend):
         except docker.errors.NotFound:
             raise ValueError("Image %s was not found" % (model.image_uri,))
 
-    def run_command(self, model: Model, command_str, mounts=None,
+    def run_command(self, model: Model, command_str,
+                    mounts=None, environment=None,
                     stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                     raise_errors=True):
         client = self._client
@@ -58,6 +59,19 @@ class DockerBackend(Backend):
         # Prepare mount config
         if mounts is None:
             mounts = []
+        if environment is None:
+            environment = {}
+
+        # Support custom checkpoint loading
+        if model.checkpoint is not None:
+            # Mount given checkpoint read-only within the guest
+            guest_checkpoint_path = "/opt/lmzoo_checkpoint"
+            mounts.append((model.checkpoint, guest_checkpoint_path, "ro"))
+
+            # Update relevant environment variable
+            environment["LMZOO_CHECKPOINT_PATH"] = guest_checkpoint_path
+
+        # Prepare mount config for Docker API
         volumes = [guest for _, guest, _ in mounts]
         host_config = client.create_host_config(binds={
             host: {"bind": guest, "mode": mode}
@@ -69,6 +83,7 @@ class DockerBackend(Backend):
         try:
             container = client.create_container(model.reference, stdin_open=True,
                                                 command=command_str,
+                                                environment=environment,
                                                 volumes=volumes, host_config=host_config)
         except requests.exceptions.ConnectionError as exc:
             raise errors.BackendConnectionError(self, exception=exc, model=model)

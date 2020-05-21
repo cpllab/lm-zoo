@@ -1,5 +1,10 @@
+"""
+Integration tests for the lm zoo API.
+"""
+
 import functools
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -57,16 +62,30 @@ def test_unkify(registry):
     assert len(result) == 1
     assert result[0] == [0] * len("This is a test sentence <eos>".split())
 
-
 @may_raise(Z.errors.UnsupportedFeatureError)
 def test_get_predictions(registry, any_model):
     result = Z.get_predictions(registry[any_model], ["This is a test sentence"])
     assert result["/sentence/0/predictions"].shape[0] == len("This is a test sentence <eos>".split(" "))
 
-
 def test_unsupported_feature(template_model):
     with pytest.raises(Z.errors.UnsupportedFeatureError):
         Z.get_predictions(template_model, ["This is a test sentence"])
+
+def test_checkpoint_mounting(template_model):
+    """
+    We should be able to mount a "checkpoint" with a custom vocabulary in the
+    LM Zoo template image, and see tokenization output vary accordingly.
+    """
+
+    dummy_vocab = "This is test".split()
+    with TemporaryDirectory() as checkpoint_dir:
+        with (Path(checkpoint_dir) / "vocab.txt").open("w") as vocab_f:
+            vocab_f.write("\n".join(dummy_vocab))
+
+        custom_model = template_model.with_checkpoint(checkpoint_dir)
+        tokenized = Z.tokenize(custom_model, ["This is a test sentence"])
+        assert len(tokenized) == 1
+        assert tokenized[0] == "This is <unk> test <unk>".split()
 
 
 def test_singularity(registry, singularity_local_model):
