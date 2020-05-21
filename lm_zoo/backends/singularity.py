@@ -2,13 +2,14 @@ import logging
 from subprocess import CalledProcessError
 import sys
 from tempfile import NamedTemporaryFile
+from typing import cast
 
 from spython.main import Client
 
 from lm_zoo import errors
 from lm_zoo.backends import Backend
 from lm_zoo.constants import STATUS_CODES
-from lm_zoo.models import Model
+from lm_zoo.models import Model, SingularityModel
 
 
 L = logging.getLogger(__name__)
@@ -44,6 +45,8 @@ class SingularityBackend(Backend):
     def run_command(self, model: Model, command_str, mounts=None,
                     stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                     raise_errors=True):
+        model = cast(SingularityModel, model)
+
         binds = ["%s:%s:%s" % (host, guest, mode)
                 for host, guest, mode in (mounts or [])]
 

@@ -48,7 +48,7 @@ def spec(model: Model, backend=None):
     return json.loads(ret)
 
 
-def tokenize(model: Model, sentences, backend=None):
+def tokenize(model: Model, sentences: List[str], backend=None):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -65,11 +65,11 @@ def tokenize(model: Model, sentences, backend=None):
     ret = run_model_command_get_stdout(model, "tokenize /dev/stdin",
                                        stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
-    sentences = [sentence.split(" ") for sentence in sentences]
-    return sentences
+    sentences_tokenized = [sentence.split(" ") for sentence in sentences]
+    return sentences_tokenized
 
 
-def unkify(model: Model, sentences, backend=None):
+def unkify(model: Model, sentences: List[str], backend=None):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -88,11 +88,12 @@ def unkify(model: Model, sentences, backend=None):
     ret = run_model_command_get_stdout(model, "unkify /dev/stdin",
                                        stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
-    sentences = [list(map(int, sentence.split(" "))) for sentence in sentences]
-    return sentences
+    sentences_tokenized = [list(map(int, sentence.split(" ")))
+                           for sentence in sentences]
+    return sentences_tokenized
 
 
-def get_surprisals(model: Model, sentences, backend=None):
+def get_surprisals(model: Model, sentences: List[str], backend=None):
     """
     Compute word-level surprisals from a language model for the given natural
     language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
@@ -117,12 +118,12 @@ def get_surprisals(model: Model, sentences, backend=None):
     out = StringIO()
     ret = run_model_command(model, "get_surprisals /dev/stdin",
                             stdin=in_file, stdout=out, backend=backend)
-    out = out.getvalue()
-    ret = pd.read_csv(StringIO(out), sep="\t").set_index(["sentence_id", "token_id"])
+    out_value = out.getvalue()
+    ret = pd.read_csv(StringIO(out_value), sep="\t").set_index(["sentence_id", "token_id"])
     return ret
 
 
-def get_predictions(model: Model, sentences, backend=None):
+def get_predictions(model: Model, sentences: List[str], backend=None):
     """
     Compute token-level predictive distributions from a language model for the
     given natural language sentences. Returns a h5py ``File`` object with the

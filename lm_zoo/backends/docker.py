@@ -5,6 +5,7 @@ platform.
 
 import os
 import sys
+from typing import cast
 
 import docker
 import requests
@@ -12,7 +13,7 @@ import requests
 from lm_zoo import errors
 from lm_zoo.backends import Backend
 from lm_zoo.constants import STATUS_CODES
-from lm_zoo.models import Model
+from lm_zoo.models import Model, DockerModel
 
 
 class DockerBackend(Backend):
@@ -33,6 +34,8 @@ class DockerBackend(Backend):
             return True
 
     def pull_image(self, model: Model, progress_stream=sys.stderr):
+        model = cast(DockerModel, model)
+
         try:
             progress_bars = {}
             for line in self._client.pull(f"{model.registry}/{model.image}", tag=model.tag,
@@ -49,6 +52,7 @@ class DockerBackend(Backend):
                     stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                     raise_errors=True):
         client = self._client
+        model = cast(DockerModel, model)
 
         # Prepare mount config
         if mounts is None:

@@ -1,4 +1,4 @@
-.. _api:
+.. _model_api:
 
 Language model Docker API
 =========================
