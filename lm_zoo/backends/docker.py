@@ -5,9 +5,11 @@ platform.
 
 import os
 import sys
+from typing import *
 
 import docker
 import requests
+import tqdm
 
 from lm_zoo import errors
 from lm_zoo.backends import Backend
@@ -34,7 +36,7 @@ class DockerBackend(Backend):
 
     def pull_image(self, model: Model, progress_stream=sys.stderr):
         try:
-            progress_bars = {}
+            progress_bars: Dict[str, Dict[str, Any]] = {}
             for line in self._client.pull(f"{model.registry}/{model.image}", tag=model.tag,
                                         stream=True, decode=True):
                 if progress_stream is not None:
@@ -97,3 +99,51 @@ class DockerBackend(Backend):
         stderr.write(container_stderr.decode("utf-8"))
 
         return result
+
+
+def _update_progress(line, progress_bars):
+    """
+    Process a progress update line from the Docker API for push/pull
+    operations, writing to `progress_bars`.
+    """
+    # From https://github.com/neuromation/platform-client-python/pull/201/files#diff-2d85e2a65d4d047287bea6267bd3826dR771
+    try:
+        if "id" in line:
+            status = line["status"]
+            if status == "Pushed" or status == "Download complete":
+                if line["id"] in progress_bars:
+                    progress = progress_bars[line["id"]]
+                    delta = progress["total"] - progress["current"]
+                    if delta < 0:
+                        delta = 0
+                    progress["progress"].update(delta)
+                    progress["progress"].close()
+            elif status == "Pushing" or status == "Downloading":
+                if line["id"] not in progress_bars:
+                    if "progressDetail" in line:
+                        progress_details = line["progressDetail"]
+                        total_progress = progress_details.get(
+                            "total", progress_details.get("current", 1)
+                        )
+                        if total_progress > 0:
+                            progress_bars[line["id"]] = {
+                                "progress": tqdm.tqdm(
+                                    total=total_progress,
+                                    leave=False,
+                                    unit="B",
+                                    unit_scale=True,
+                                ),
+                                "current": 0,
+                                "total": total_progress,
+                            }
+                if "progressDetail" in line and "current" in line["progressDetail"]:
+                    delta = (
+                        line["progressDetail"]["current"]
+                        - progress_bars[line["id"]]["current"]
+                    )
+                    if delta < 0:
+                        delta = 0
+                    progress_bars[line["id"]]["current"] = line["progressDetail"]["current"]
+                    progress_bars[line["id"]]["progress"].update(delta)
+    except BaseException:
+        pass
