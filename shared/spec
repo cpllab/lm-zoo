@@ -6,15 +6,48 @@ vocabulary.
 """
 
 import json
+import os
+from pathlib import Path
 import sys
 
-VOCAB_PATH = "/opt/vocab"
 SPEC_TEMPLATE_PATH = "/opt/spec.template.json"
 
 with open(SPEC_TEMPLATE_PATH, "r", encoding="utf-8") as spec_f:
     spec = json.load(spec_f)
 
-with open(VOCAB_PATH, "r", encoding="utf-8") as vocab_f:
+
+def attempt_load_vocabulary():
+    # Attempt to load the model vocabulary
+    if "LMZOO_VOCABULARY_PATH" in os.environ:
+        vocab_path = Path(os.environ["LMZOO_VOCABULARY_PATH"])
+        if not vocab_path.is_absolute():
+            if "LMZOO_CHECKPOINT_PATH" in os.environ:
+                vocab_path = Path(os.environ["LMZOO_CHECKPOINT_PATH"]) / vocab_path
+            else:
+                raise ValueError("Environment variable LMZOO_VOCABULARY_PATH is a "
+                                "relative path, but LMZOO_CHECKPOINT_PATH is not "
+                                "set. Stop.")
+
+        return vocab_path
+
+    # Try legacy filename within checkpoint
+    if "LMZOO_CHECKPOINT_PATH" in os.environ:
+        vocab_path = Path(os.environ["LMZOO_CHECKPOINT_PATH"]) / "vocab"
+        if vocab_path.exists():
+            return vocab_path
+
+    # Try legacy path
+    vocab_path = Path("/opt/vocab")
+    if vocab_path.exists():
+        return vocab_path
+
+    raise ValueError("Unable to locate model vocabulary. Please set "
+                     "LMZOO_VOCABULARY_PATH to a path relative to "
+                     "LMZOO_CHECKPOINT_PATH, or an absolute path.")
+
+
+vocab_path = attempt_load_vocabulary()
+with vocab_path.open("r", encoding="utf-8") as vocab_f:
     vocab = [line.strip() for line in vocab_f]
 
 # Prepare vocabulary information.

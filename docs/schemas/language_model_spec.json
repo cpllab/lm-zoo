@@ -14,9 +14,10 @@
                         "tokenize": {"type": "boolean"},
                         "unkify": {"type": "boolean"},
                         "get_surprisals": {"type": "boolean"},
-                        "get_predictions": {"type": "boolean"}
+                        "get_predictions": {"type": "boolean"},
+                        "mount_checkpoint": {"type": "boolean"}
                     },
-                    "required": ["tokenize", "unkify", "get_surprisals", "get_predictions"]
+                    "required": ["tokenize", "unkify", "get_surprisals", "get_predictions", "mount_checkpoint"]
                 },
                 "gpu": {
                     "type": "object",
