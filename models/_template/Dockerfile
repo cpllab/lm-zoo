@@ -9,7 +9,8 @@ FROM alpine AS builder
 #
 # RUN apk add curl
 RUN mkdir -p /opt/mylm
-# RUN cd /opt/mylm && \
+RUN mkdir -p /opt/mylm/checkpoint
+# RUN cd /opt/mylm/checkpoint && \
 #           curl -so model.ckpt https://me.com/mylm/model.ckpt &&
 #           curl -so vocab.txt https://me.com/mylm/vocab.txt
 
@@ -36,19 +37,15 @@ ARG MODEL_ROOT=models/_template
 
 ## Add test dependencies. These are required for all images -- otherwise tests
 ## will fail.
+RUN conda install -y numpy nomkl && conda clean -tipsy
 RUN pip install nose jsonschema
 
 ## TODO: Fetch/copy model dependencies.
 COPY --from=builder /opt/mylm /opt/mylm
+COPY ${MODEL_ROOT}/vocab.txt /opt/mylm/checkpoint/vocab.txt
 
 ## TODO: Copy in custom code wrapping the language model
 COPY ${MODEL_ROOT}/get_word_surprisals.py /opt/mylm/get_word_surprisals.py
-
-## Declare model vocabulary.
-## It isn't necessary to create this file, but in doing so we can use the
-## shared LM Zoo `spec` binary to auto-generate a spec output containing our
-## vocabulary.
-COPY ${MODEL_ROOT}/vocab.txt /opt/vocab
 
 ## Copy external-facing scripts.
 COPY ${MODEL_ROOT}/bin /opt/bin
@@ -66,6 +63,18 @@ COPY shared/spec /opt/bin/spec
 COPY shared/unsupported /opt/bin/get_predictions.hdf5
 
 ENV PATH "/opt/bin:${PATH}"
+
+## Set the path to the language model's checkpoint data. The image user can
+## override this environment variable, in which case the corresponding new
+## checkpoint should be loaded. (This is a requirement of models which support
+## the `mount_checkpoint` feature.)
+ENV LMZOO_CHECKPOINT_PATH /opt/mylm/checkpoint
+
+## State the path (relative to the checkpoint path) of the model's vocabulary.
+## It isn't necessary to do this, but in doing so we can use the shared LM Zoo
+## `spec` binary to auto-generate a spec output containing our vocabulary.
+ENV LMZOO_VOCABULARY_PATH vocab.txt
+
 ## Fix I/O encoding.
 ENV PYTHONIOENCODING utf-8
 
