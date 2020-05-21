@@ -9,7 +9,7 @@
 # where <model_name> corresponds to a directory in the `models` directory of this project.
 model_dir="models/$1"
 previous_sha="$2"
-current_sha="$3"
+current_sha="HEAD"
 
 echo "Checking for changes from ${previous_sha}...${current_sha} in ${model_dir}"
 

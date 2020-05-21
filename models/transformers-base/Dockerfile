@@ -4,17 +4,11 @@ FROM pytorch/pytorch:latest
 ARG MODEL_ROOT=models/transformers-base
 ARG COMMIT
 
-# Set up output volume.
-VOLUME /out
-
-#RUN git clone https://github.com/NVIDIA/apex.git && cd apex && python setup.py install --cuda_ext --cpp_ext
-
 # Test dependencies
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
+RUN pip install nose jsonschema
 
-# Download source code and pretrained model.
-RUN pip install transformers
+# Runtime dependencies
+RUN pip install transformers h5py
 
 # Copy in custom file for surprisal evaluation
 RUN mkdir /opt/transformers
@@ -22,6 +16,8 @@ COPY ${MODEL_ROOT}/get_surprisals.py /opt/transformers/get_surprisals.py
 COPY ${MODEL_ROOT}/tokenizer.py /opt/transformers/tokenizer.py
 
 ENV PYTHONIOENCODING utf-8:surrogateescape
+# open issue with pytorch https://github.com/pytorch/pytorch/issues/37377
+ENV MKL_SERVICE_FORCE_INTEL=1
 
 # Copy external-facing scripts
 COPY ${MODEL_ROOT}/bin /opt/bin

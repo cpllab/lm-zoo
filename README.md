@@ -12,7 +12,9 @@ interface for interacting with language models.
 
 You can use `lm-zoo` to
 
-1. extract token-level surprisal data, and
+1. compute language model predictions at the word level,
+1. extract token-level surprisal data (popularly used in psycholinguistic
+   experiments), and
 2. preprocess corpora according to a language model's particular tokenization
    standards.
 

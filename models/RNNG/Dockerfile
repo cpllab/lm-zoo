@@ -55,6 +55,7 @@ COPY ${MODEL_ROOT}/bin /opt/bin
 COPY ${MODEL_ROOT}/vocab.pkl /opt/rnng-incremental/
 COPY shared/spec /opt/bin/spec
 COPY shared/unkify /opt/bin/unkify
+COPY shared/unsupported /opt/bin/get_predictions.hdf5
 ENV PATH "/opt/bin:${PATH}"
 
 # Get model vocab from clusters file.

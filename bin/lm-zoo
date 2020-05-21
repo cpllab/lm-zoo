@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from lm_zoo import lm_zoo
+from lm_zoo.commands import lm_zoo
 
 lm_zoo()

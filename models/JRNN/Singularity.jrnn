@@ -1,5 +1,2 @@
 Bootstrap: docker
 From: cpllab/language-models:jrnn
-
-%post
-    chmod -R 755 /opt

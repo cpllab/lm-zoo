@@ -13,7 +13,7 @@ input_file = sys.argv[1]
 
 
 # Retrieve unk types from spec JSON.
-spec = json.loads(subprocess.check_output("spec"))
+spec = json.loads(subprocess.check_output("spec").decode("utf-8"))
 unk_types = spec["vocabulary"]["unk_types"]
 
 # Run `tokenize`, and compute mask using unk types list.

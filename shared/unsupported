@@ -1,0 +1,3 @@
+#!/bin/sh
+# Signal that this feature is unsupported by the current image.
+exit 99

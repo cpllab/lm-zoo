@@ -11,10 +11,10 @@ import sys
 VOCAB_PATH = "/opt/vocab"
 SPEC_TEMPLATE_PATH = "/opt/spec.template.json"
 
-with open(SPEC_TEMPLATE_PATH, "r") as spec_f:
+with open(SPEC_TEMPLATE_PATH, "r", encoding="utf-8") as spec_f:
     spec = json.load(spec_f)
 
-with open(VOCAB_PATH, "r") as vocab_f:
+with open(VOCAB_PATH, "r", encoding="utf-8") as vocab_f:
     vocab = [line.strip() for line in vocab_f]
 
 # Prepare vocabulary information.

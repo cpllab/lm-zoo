@@ -27,14 +27,18 @@ def main(args):
     registry = {}
     client = docker.from_env(timeout=60)
 
-    for docker_image in tqdm(args.docker_images):
+    for docker_image in tqdm(sorted(args.docker_images)):
         try:
             # HACK: Remove vocabulary from spec on guest-side to avoid
             # streaming huge amounts of data for each model. We'd delete it
             # host-side, anyway ..
             command = r"""bash -c "spec | python -c 'import json, sys; spec=json.load(sys.stdin); del spec[\"vocabulary\"]; json.dump(spec, sys.stdout);'" """
-            image_spec = client.containers.run(docker_image, command=command, remove=True,
-                                               detach=False, stdout=True, stderr=False)
+            container = client.containers.run(docker_image, command=command, detach=True)
+            container.wait(timeout=999999)
+
+            image_spec = container.logs(stdout=True, stderr=False)
+            container.remove()
+
             image_spec = json.loads(image_spec)
         except Exception as e:
             L.error("Error fetching spec from image %s", docker_image, exc_info=e)
@@ -46,13 +50,13 @@ def main(args):
         del image_spec["name"]
 
         reference_match = DOCKER_REFERENCE_RE.match(docker_image)
-        image_spec["image"] = {
+        image_spec["image"].update({
             "registry": DOCKER_DEFAULT_REGISTRY,
             "name": reference_match.group(1),
             "tag": reference_match.group(2) or DOCKER_DEFAULT_TAG,
             "size": image_obj.attrs["VirtualSize"],
             "datetime": image_obj.attrs["Created"],
-        }
+        })
 
         registry[image_spec["shortname"]] = image_spec
 

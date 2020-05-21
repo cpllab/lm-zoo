@@ -10,6 +10,12 @@
         "gpu": {
             "required": false,
             "supported": false
+        },
+        "supported_features": {
+            "tokenize": true,
+            "unkify": true,
+            "get_surprisals": true,
+            "get_predictions": false
         }
     },
 

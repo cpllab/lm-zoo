@@ -1,0 +1,2 @@
+Bootstrap: docker
+From: cpllab/language-models:gpt2

@@ -51,6 +51,7 @@ COPY test.py /opt/test.py
 COPY ${MODEL_ROOT}/bin /opt/bin
 COPY shared/unkify /opt/bin/unkify
 COPY shared/spec /opt/bin/spec
+COPY shared/unsupported /opt/bin/get_predictions.hdf5
 ENV PATH "/opt/bin:${PATH}"
 
 # Current git commit of build repository

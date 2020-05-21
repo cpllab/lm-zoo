@@ -7,11 +7,15 @@ Each language model in the LM Zoo is a Docker container which provides various
 binaries for running and probing the internal model. This document specifies
 the exact API for accessing and using these language models.
 
+.. contents::
+   :local:
+
+Language model binaries
+-----------------------
+
 Each container makes available the following binaries, which communicate via
 `stdout` and `stderr` with the host:
 
-.. contents::
-   :local:
 
 ``spec``
 ^^^^^^^^
@@ -24,6 +28,31 @@ Each container makes available the following binaries, which communicate via
 The ``spec`` binary outputs relevant metadata describing the language model image:
 
 .. jsonschema:: schemas/language_model_spec.json
+
+
+``get_predictions.hdf5``
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+:Arguments:
+  1. Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line
+  2. Path to which HDF5 prediction data should be written
+:stdout: Not specified
+:stderr: Not specified
+
+Extract word-level predictive distributions :math:`\log p(w_i \mid w_1, \dots,
+w_{i-1})` for each word of each sentence. Writes results in HDF5 format as a
+collection of matrices, along with prediction vocabulary metadata. The HDF5
+file should have the following groups::
+
+   /sentence/<i>/predictions: N_tokens_i * N_vocabulary array of
+      log-probabilities (rows are log-probability distributions)
+   /sentence/<i>/tokens: sequence of integer token IDs corresponding to
+      indices in ``/vocabulary``
+   /vocabulary: byte-encoded string array of vocabulary items (decode with
+      ``numpy.char.decode(vocabulary, "utf-8")``)
+
+where ``i`` is zero-indexed.
+
 
 
 ``get_surprisals``
@@ -82,14 +111,22 @@ The following constraints must hold on the output of ``unkify``:
    exactly the same number of tokens (when splitting on whitespace).
 
 
-.. ``get_predictions``
-.. ^^^^^^^^^^^^^^^^^^^
+Building models with partial feature support
+--------------------------------------------
 
-.. :Arguments:
-..    1. Path to a natural-language input text file, not pre-tokenized or unkified; one sentence per line
-.. :stdout: Description of full next-word predictive distributions for each token in the input
-.. :stdout format: JSON
-.. :stderr: Not specified
+Not all models in the LM Zoo need support all of the above interfaces. For
+example, some models do not support the ``get_predictions.hdf5`` command at the
+moment. Models explicitly mark which features they do and do not support. To do
+this in your own model, do the following:
 
-.. TODO JSON spec
+1. Set a ``false`` value for the relevant feature under the
+   ``supported_features`` key of your model's spec (see `spec`_).
+2. Define a dummy binary with the relevant feature's name which simply exits
+   with a status code ``99``. This status code will be interpreted by the LM
+   Zoo wrapper API and CLI tools to indicate that the requested feature is not
+   supported.
 
+   You can pull in the shared script ``shared/unsupported`` to do this for you.
+   See an example in `the Dockerfile for the RNNG model
+   <https://github.com/cpllab/lm-zoo/blob/5c72f5aa6a9b5e67f990d363c9ea4fc35c37679e/models/RNNG/Dockerfile#L58>`_,
+   which does not support ``get_predictions.hdf5``.
