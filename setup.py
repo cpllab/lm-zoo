@@ -3,9 +3,11 @@ from setuptools import setup
 
 # Source version from package source
 import re
+
 version_file = "lm_zoo/__init__.py"
-version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                          open(version_file).read(), re.M)
+version_match = re.search(
+    r"^__version__ = ['\"]([^'\"]*)['\"]", open(version_file).read(), re.M
+)
 if version_match:
     version_string = version_match.group(1)
 else:
@@ -27,7 +29,9 @@ setup(
         "python-dateutil==2.8.1",
         "pytz==2020.1",
         "requests==2.23.0",
+        "semver==2.10.1",
         "six==1.14.0",
+        "spython==0.0.80",
         "tqdm==4.46.0",
         "urllib3==1.25.9",
         "websocket-client==0.57.0",
@@ -35,7 +39,7 @@ setup(
     name="lm-zoo",
     packages=["lm_zoo"],
     scripts=["bin/lm-zoo"],
-    version="1.1b0",
+    version=version_string,
     python_requires=">=3.6",
     license="MIT",
     description="Command-line interface with state-of-the-art neural network language models",

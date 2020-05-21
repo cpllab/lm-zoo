@@ -19,7 +19,7 @@ import tqdm
 from lm_zoo import errors
 from lm_zoo.backends import get_backend, get_compatible_backend
 from lm_zoo.models import Registry, Model
-__version__ = "1.1b0"
+__version__ = "1.1"
 
 L = logging.getLogger("lm-zoo")
 
