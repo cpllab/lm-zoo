@@ -1,7 +1,7 @@
 #!/bin/sh
 MODEL_ROOT="/opt/Ordered-Neurons"
-MODEL_CHECKPOINT="/opt/Ordered-Neurons/model.pt"
-MODEL_CORPUS="/opt/Ordered-Neurons/corpus.data"
+MODEL_CHECKPOINT="${LMZOO_CHECKPOINT_PATH}/model.pt"
+MODEL_CORPUS="${LMZOO_CHECKPOINT_PATH}/corpus.data"
 INPUT_FILE="$1"
 
 /opt/bin/tokenize $1 > /tmp/input_tokenized
