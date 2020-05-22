@@ -31,7 +31,8 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx-jsonschema", 'sphinx.ext.mathjax', 'sphinx.ext.githubpages', "sphinx_click.ext"]
+extensions = ["sphinx-jsonschema", 'sphinx.ext.mathjax', 'sphinx.ext.githubpages',
+              "sphinx_click.ext", "sphinx.ext.autodoc", "sphinx.ext.napoleon"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
