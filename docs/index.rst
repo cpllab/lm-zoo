@@ -14,8 +14,9 @@ Welcome to LM Zoo
    quickstart
    commands
    models
+   python_api
    contributing
-   api
+   model_api
    thanks
    :hidden:
 
