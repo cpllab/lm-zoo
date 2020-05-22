@@ -1,4 +1,5 @@
 from setuptools import setup
+from setuptools import find_packages
 
 
 # Source version from package source
@@ -37,7 +38,7 @@ setup(
         "websocket-client==0.57.0",
     ],
     name="lm-zoo",
-    packages=["lm_zoo"],
+    packages=find_packages(exclude=["test"]),
     scripts=["bin/lm-zoo"],
     version=version_string,
     python_requires=">=3.6",
