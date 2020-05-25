@@ -1,3 +1,4 @@
+from copy import deepcopy
 import re
 
 import requests
@@ -48,6 +49,13 @@ class Registry(object):
 
 class Model(object):
 
+    checkpoint = None
+    """
+    If not ``None``, indicates that the current model should be run with a
+    custom checkpoint, stored at the host path indicated by this variable's
+    value.
+    """
+
     @property
     def platforms(self):
         """
@@ -55,6 +63,15 @@ class Model(object):
         subset of ``["docker", "singularity"]``.
         """
         raise NotImplementedError()
+
+    def with_checkpoint(self, host_path):
+        """
+        Indicate that this model should be used with a custom checkpoint,
+        stored at the indicated ``host_path``.
+        """
+        clone = deepcopy(self)
+        clone.checkpoint = host_path
+        return clone
 
 
 DOCKER_REGISTRY = "docker.io"

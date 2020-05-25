@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
+import os
+from pathlib import Path
 import sys
 
-LM_ROOT = "/opt/mylm"
-VOCAB_PATH = "/opt/vocab"
+LM_ROOT = Path(os.environ["LMZOO_CHECKPOINT_PATH"])
+VOCAB_PATH = LM_ROOT / Path(os.environ["LMZOO_VOCABULARY_PATH"])
 UNK_TOKEN = "<unk>"
 
-with open(VOCAB_PATH, "r") as vocab_f:
-  vocab = set(line.strip() for line in vocab_f)
 
+with VOCAB_PATH.open("r", encoding="utf-8") as vocab_f:
+  vocab = set(line.strip() for line in vocab_f)
 
 with open(sys.argv[1], "r") as inf:
   for line in inf:

@@ -4,8 +4,12 @@ word-level surprisals for the given pre-tokenized input. But for now, it just
 outputs random values :)
 """
 
+import os
 import random
 import sys
+
+
+checkpoint_path = os.environ["LMZOO_CHECKPOINT_PATH"]
 
 with open(sys.argv[1], "r") as inf:
     print("sentence_id\ttoken_id\ttoken\tsurprisal")

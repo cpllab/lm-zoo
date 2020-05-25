@@ -18,13 +18,15 @@ RUN mkdir ${HOME}/.ssh && echo "StrictHostKeyChecking no" >> ${HOME}/.ssh/config
       && echo "$CPL_SSH_PRV_KEY" > ${HOME}/.ssh/id_rsa \
       && chmod 600 ${HOME}/.ssh/id_rsa
 
-# Copy in source code + model parameters.
-RUN git clone cpl@45.79.223.150:rnng-incremental.git /opt/rnng-incremental
-RUN cd /opt/rnng-incremental && git checkout docker && cd -
+# Copy in source code.
+RUN git clone cpl@45.79.223.150:rnng-incremental.git /opt/rnng-incremental \
+      && cd /opt/rnng-incremental && git checkout docker
 
-# Add parameters + resources.
-RUN scp -To "StrictHostKeyChecking=no" \
-      cpl@45.79.223.150:/home/cpl/rnng-incremental/{ntparse_gen_D0.3_2_256_256_16_256-pid20681.params,train_gen.oracle} /opt/rnng-incremental/
+# Add checkpoint.
+ARG CHECKPOINT_PATH=cpl@45.79.223.150:/home/cpl/rnng-incremental/checkpoint
+RUN mkdir -p /opt/rnng-incremental/checkpoint && \
+      scp -To "StrictHostKeyChecking=no" \
+        "${CHECKPOINT_PATH}/{ntparse_gen.params,train_gen.oracle,clusters.txt}" /opt/rnng-incremental/checkpoint
 
 # Remove SSH information.
 RUN rm -rf ${HOME}/.ssh
@@ -56,14 +58,17 @@ COPY ${MODEL_ROOT}/vocab.pkl /opt/rnng-incremental/
 COPY shared/spec /opt/bin/spec
 COPY shared/unkify /opt/bin/unkify
 COPY shared/unsupported /opt/bin/get_predictions.hdf5
+
 ENV PATH "/opt/bin:${PATH}"
+ENV LMZOO_CHECKPOINT_PATH /opt/rnng-incremental/checkpoint
+ENV LMZOO_VOCABULARY_PATH vocab
 
 # Get model vocab from clusters file.
-RUN cut -f2 /opt/rnng-incremental/clusters-train-berk.txt > /opt/vocab
+RUN cut -f2 "${LMZOO_CHECKPOINT_PATH}/clusters.txt" \
+      > "${LMZOO_CHECKPOINT_PATH}/${LMZOO_VOCABULARY_PATH}"
 
 # Copy test dependencies.
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
+RUN pip install nose jsonschema
 COPY test.py /opt/test.py
 
 # Current git commit of build repository

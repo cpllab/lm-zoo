@@ -15,9 +15,11 @@ RUN mkdir /root/.ssh && echo "StrictHostKeyChecking no" >> /root/.ssh/config \
 
 # Copy in model parameters.
 ARG CHECKPOINT_NAME=fredashi-20190919
-RUN scp -o "StrictHostKeyChecking=no" \
-      cpl@45.79.223.150:/home/cpl/ordered-neurons/models/$CHECKPOINT_NAME/{model.pt,corpus.data} \
-      /opt/Ordered-Neurons
+ARG CHECKPOINT_SOURCE=cpl@45.79.223.150:/home/cpl/ordered-neurons/models/$CHECKPOINT_NAME
+RUN mkdir -p /opt/Ordered-Neurons/checkpoint && \
+          scp -o "StrictHostKeyChecking=no" \
+            "${CHECKPOINT_SOURCE}/{model.pt,corpus.data}" \
+            /opt/Ordered-Neurons/checkpoint
 # Remove SSH information.
 RUN rm -rf /root/.ssh
 
@@ -33,13 +35,7 @@ COPY --from=builder /opt/Ordered-Neurons /opt/Ordered-Neurons
 RUN pip install -q nltk
 
 # Add test dependencies.
-RUN pip install nose rednose jsonschema
-ENV NOSE_REDNOSE 1
-
-# Cache vocab list for easy access from `spec`, etc.
-RUN PYTHONPATH="/opt/Ordered-Neurons:$PYTHONPATH" python \
-                -c 'import torch; corpus = torch.load("/opt/Ordered-Neurons/corpus.data"); \
-                    f = open("/opt/vocab", "w"); f.write("\n".join(corpus.dictionary.word2idx.keys()));'
+RUN pip install nose jsonschema
 
 # Copy in custom file for surprisal evaluation
 COPY ${MODEL_ROOT}/get_surprisals.py /opt/Ordered-Neurons/get_surprisals.py
@@ -52,7 +48,16 @@ COPY ${MODEL_ROOT}/bin /opt/bin
 COPY shared/unkify /opt/bin/unkify
 COPY shared/spec /opt/bin/spec
 COPY shared/unsupported /opt/bin/get_predictions.hdf5
+
 ENV PATH "/opt/bin:${PATH}"
+
+ENV LMZOO_CHECKPOINT_PATH /opt/Ordered-Neurons/checkpoint
+ENV LMZOO_VOCABULARY_PATH vocab
+
+# Cache vocab list for easy access from `spec`, etc.
+RUN PYTHONPATH="/opt/Ordered-Neurons:$PYTHONPATH" python \
+                -c 'import os; import torch; corpus = torch.load(os.environ["LMZOO_CHECKPOINT_PATH"] + "/corpus.data"); \
+                    f = open(os.path.join(os.environ["LMZOO_CHECKPOINT_PATH"], os.environ["LMZOO_VOCABULARY_PATH"]), "w"); f.write("\n".join(corpus.dictionary.word2idx.keys()));'
 
 # Current git commit of build repository
 ARG COMMIT
