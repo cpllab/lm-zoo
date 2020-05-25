@@ -8,4 +8,4 @@ INPUT_FILE="$1"
 
 python ${MODEL_ROOT}/get_surprisals.py \
     "$MODEL_CHECKPOINT" /tmp/input_tokenized \
-    --corpus_file "$MODEL_CORPUS" --no-cuda
+    --corpus_file "$MODEL_CORPUS"

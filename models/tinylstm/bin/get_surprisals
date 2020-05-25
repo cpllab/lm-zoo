@@ -6,7 +6,7 @@ INPUT_FILE="$1"
 
 /opt/bin/tokenize $1 > /tmp/input_tokenized
 
-python ${MODEL_ROOT}/eval.py \
+python ${MODEL_ROOT}/get_surprisals.py \
     --checkpoint "$MODEL_CHECKPOINT" \
     --corpus "$MODEL_CORPUS" \
     --eval_data /tmp/input_tokenized \

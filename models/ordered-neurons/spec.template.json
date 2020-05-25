@@ -16,7 +16,7 @@
         },
         "gpu": {
             "required": false,
-            "supported": false
+            "supported": true
         }
     },
 

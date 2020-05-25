@@ -1,4 +1,5 @@
 import argparse
+import os
 from pathlib import Path
 import pickle
 import sys
@@ -20,30 +21,26 @@ parser.add_argument("--corpus_file", type=Path, required=True, help="saved Corpu
 parser.add_argument("--bptt", type=int, default=70, help="sequence length")
 parser.add_argument("--emsize", type=int, default=400, help="size of word embeddings")
 parser.add_argument("--seed", type=int, default=1111, help="random seed")
-parser.add_argument("--cuda", dest="cuda", action="store_true")
-parser.add_argument("--no-cuda", dest="cuda", action="store_false")
-parser.set_defaults(cuda=True)
 
 args = parser.parse_args()
+
+use_cuda = torch.cuda.is_available() and os.environ.get("LMZOO_USE_GPU", False)
+if use_cuda:
+    sys.stderr.write("Using GPU device.\n")
+device = "cuda" if use_cuda else "cpu"
 
 # Set the random seed manually for reproducibility.
 def set_seed(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        if not args.cuda:
-            print("WARNING: You have a CUDA device, so you should probably run with --cuda")
-        else:
-            torch.cuda.manual_seed(seed)
+    if use_cuda:
+        torch.cuda.manual_seed(seed)
 
 
 def model_load(fn):
     global model, criterion, optimizer
     with open(fn, 'rb') as f:
-        kwargs = {}
-        if not args.cuda:
-            kwargs["map_location"] = "cpu"
-        model, criterion, optimizer = torch.load(f, **kwargs)
+        model, criterion, optimizer = torch.load(f, map_location=device)
 
 
 def get_batch(data_source, i, window):
@@ -73,7 +70,7 @@ def get_surprisals(sentences, corpus, outf, seed):
                 raise RuntimeError("Internal error: Dictionary lookup failed. This should not happen with properly unked inputs.")
 
         # model expects T * batch_size array
-        data_source = data_source.unsqueeze(1)
+        data_source = data_source.unsqueeze(1).to(device)
 
         with torch.no_grad():
             hidden = model.init_hidden(1)
@@ -84,19 +81,15 @@ def get_surprisals(sentences, corpus, outf, seed):
                         torch.nn.functional.linear(output, model.decoder.weight, bias=model.decoder.bias),
                         dim=1)
 
-                # Convert to numpy and change to log2.
-                logprobs = logprobs.detach().numpy()
-                logprobs /= np.log(2)
-
-                # Retrieve relevant surprisal values.
-                targets = targets.numpy()
-                target_surprisals = -logprobs[np.arange(len(targets)), targets]
+                # Convert to surprisals and extract relevant surprisal value.
+                surprisals = - logprobs / np.log(2)
+                target_surprisals = surprisals[np.arange(len(targets)), targets].cpu()
 
                 for k, surp in enumerate(target_surprisals):
                     outf.write("%i\t%i\t%s\t%f\n" % (i + 1, j + k + 2, sentence[j + k + 1], surp))
 
 
-corpus = torch.load(args.corpus_file)
+corpus = torch.load(args.corpus_file, map_location=device)
 model_load(args.model_checkpoint)
 sentences = [line.strip().split(" ") for line in args.file.readlines() if line.strip()]
 get_surprisals(sentences, corpus, args.outf, args.seed)

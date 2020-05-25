@@ -31,6 +31,7 @@ ARG MODEL_ROOT=models/tinylstm
 COPY --from=builder /opt/tinylstm /opt/tinylstm
 
 RUN pip install -q nltk
+COPY ${MODEL_ROOT}/get_surprisals.py /opt/tinylstm
 
 # Add test dependencies.
 RUN pip install nose jsonschema
