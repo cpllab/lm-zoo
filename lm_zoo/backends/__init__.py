@@ -1,4 +1,5 @@
 import sys
+from typing import *
 
 from lm_zoo.models import Model
 
@@ -41,7 +42,7 @@ PROTOCOL_TO_BACKEND = {
 }
 
 
-def get_backend(backend_ref):
+def get_backend(backend_ref: Union[str, Type[Backend]]):
     """
     Load a `Backend` instance for the given reference (string or class).
     """
@@ -53,7 +54,7 @@ def get_backend(backend_ref):
         raise ValueError("invalid backend reference %s" % (backend_ref,))
 
 
-def get_compatible_backend(model, preferred_backends=None):
+def get_compatible_backend(model: Model, preferred_backends: Union[Type[Backend], List[Type[Backend]], None]=None):
     """
     Get a compatible backend for the given model.
     """

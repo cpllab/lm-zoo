@@ -25,8 +25,8 @@
       <link rel="shortcut icon" href="_static/favicon.ico"/>
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Language model Docker API" href="api.html" />
-  <link rel="prev" title="Official models" href="models.html" /> 
+  <link rel="next" title="Language model Docker API" href="model_api.html" />
+  <link rel="prev" title="Python API reference" href="python_api.html" /> 
   </head>
 
   <body>
@@ -42,6 +42,13 @@
 
 
 
+  
+    <div class="nav-item">
+      <a href="https://github.com/cpllab/lm-zoo"
+        class="nav-link external">
+          View on GitHub <outboundlink/>
+      </a>
+    </div>
   
     <div class="nav-item">
       <a href="http://cpl.mit.edu"
@@ -65,6 +72,13 @@
 
 
 
+  
+    <div class="nav-item">
+      <a href="https://github.com/cpllab/lm-zoo"
+        class="nav-link external">
+          View on GitHub <outboundlink/>
+      </a>
+    </div>
   
     <div class="nav-item">
       <a href="http://cpl.mit.edu"
@@ -112,6 +126,12 @@
           </li>
 
         
+          <li class="toctree-l1 "><a href="python_api.html" class="reference internal ">Python API reference</a>
+
+            
+          </li>
+
+        
           <li class="toctree-l1 current"><a href="#" class="reference internal current">Contributing to the LM Zoo</a>
 
             
@@ -128,7 +148,13 @@
           </li>
 
         
-          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model Docker API</a>
+          <li class="toctree-l1 "><a href="model_api.html" class="reference internal ">Language model Docker API</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="support.html" class="reference internal ">Support</a>
 
             
           </li>
@@ -158,11 +184,11 @@
 
   <ul class="page-nav">
   <li class="prev">
-    <a href="models.html"
-       title="previous chapter">← Official models</a>
+    <a href="python_api.html"
+       title="previous chapter">← Python API reference</a>
   </li>
   <li class="next">
-    <a href="api.html"
+    <a href="model_api.html"
        title="next chapter">Language model Docker API →</a>
   </li>
 </ul>
@@ -177,14 +203,14 @@
 creating a LM Zoo-friendly Docker image, and on submitting your image for Zoo
 review.</p>
 <p>Language models in the LM Zoo are Docker images which expose a set of binary
-programs conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model Docker API</span></a>. At a high level, the steps you’ll need
+programs conforming to the <a class="reference internal" href="model_api.html#model-api"><span class="std std-ref">Language model Docker API</span></a>. At a high level, the steps you’ll need
 to take to prepare such an image are</p>
 <ol class="arabic simple">
 <li><p>Acquire open source code and model checkpoints for the language model you’d
 like to contribute.</p></li>
 <li><p>Prepare a Docker image containing the code and model checkpoint, and verify
 that you can successfully run the model from within the container.  Write
-binary scripts conforming to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model Docker API</span></a> which invoke your model.</p></li>
+binary scripts conforming to the <a class="reference internal" href="model_api.html#model-api"><span class="std std-ref">Language model Docker API</span></a> which invoke your model.</p></li>
 <li><p>Submit your language model as a pull request to the <code class="docutils literal notranslate"><span class="pre">cpllab/lm-zoo</span></code> Github
 repository.</p></li>
 </ol>
@@ -208,7 +234,7 @@ you first read <a class="reference external" href="https://docs.docker.com/get-s
 <li><p>Create your own subdirectory in the <code class="docutils literal notranslate"><span class="pre">models</span></code> directory. We recommend
 copying from the <a class="reference external" href="https://github.com/cpllab/lm-zoo/tree/master/models/_template">template directory</a> for
 starters. Modify the <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> and add wrapper scripts as necessary
-until your model conforms to the <a class="reference internal" href="api.html#api"><span class="std std-ref">Language model Docker API</span></a>.</p></li>
+until your model conforms to the <a class="reference internal" href="model_api.html#model-api"><span class="std std-ref">Language model Docker API</span></a>.</p></li>
 <li><p>You can build and test your wrapper as necessary using the file
 <code class="docutils literal notranslate"><span class="pre">scripts/build_and_test.sh</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">build_and_test</span><span class="o">.</span><span class="n">sh</span> <span class="o">&lt;</span><span class="n">my_directory_name</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">docker_target</span><span class="o">&gt;</span>
@@ -250,11 +276,11 @@ request thread. Thanks for contributing!</p>
           <div class="page-nav">
             <div class="inner"><ul class="page-nav">
   <li class="prev">
-    <a href="models.html"
-       title="previous chapter">← Official models</a>
+    <a href="python_api.html"
+       title="previous chapter">← Python API reference</a>
   </li>
   <li class="next">
-    <a href="api.html"
+    <a href="model_api.html"
        title="next chapter">Language model Docker API →</a>
   </li>
 </ul><div class="footer" role="contentinfo">

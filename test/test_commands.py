@@ -6,7 +6,7 @@ import functools
 from io import StringIO
 from pathlib import Path
 from subprocess import CalledProcessError
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 import traceback
 
 from click.testing import CliRunner
@@ -27,12 +27,6 @@ def runner():
 @pytest.fixture(scope="module", params=["GRNN"])
 def lmzoo_model(request):
     return Z.get_registry()[request.param]
-
-@pytest.fixture(scope="module", params=[Path(__file__).parent / "lmzoo-template.sif"])
-def singularity_local_model(request):
-    if request.param.exists():
-        return request.param
-    pytest.skip("missing Singularity model")
 
 @pytest.fixture(scope="module", params=[(None, "GRNN"),
                                         (Path(__file__).parent / "lmzoo-template.sif",
@@ -121,3 +115,22 @@ def test_get_predictions(registry, runner, any_model, test_file):
 
     print(result, API_result)
     # pd.testing.assert_fragcm_equal(output, API_result.reset_index())
+
+
+def test_checkpoint_mounting(registry, runner, test_file, template_image, singularity_template_image):
+    """
+    Test runtime checkpoint mounting
+    """
+    references = ["docker://" + template_image.id, "singularity://" + str(singularity_template_image)]
+
+    dummy_vocab = "This is test".split()
+    with TemporaryDirectory() as checkpoint_dir:
+        with (Path(checkpoint_dir) / "vocab.txt").open("w") as vocab_f:
+            vocab_f.write("\n".join(dummy_vocab))
+
+        for reference in references:
+            result = invoke(runner, ["tokenize", "--checkpoint", str(checkpoint_dir), reference, test_file])
+
+            assert result.output.endswith("\n"), "Should have final trailing newline"
+            output = result.output.strip().split("\n")
+            assert output == ["This is <unk> test <unk>", "This is <unk> <unk> test <unk>"]

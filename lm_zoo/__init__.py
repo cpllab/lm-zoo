@@ -1,20 +1,14 @@
-from functools import lru_cache
-from io import StringIO
 import json
 import logging
-import os
-from pathlib import Path
-import re
 import sys
+from functools import lru_cache
+from io import StringIO
+from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Dict
+from typing import List
 
-import dateutil.parser
-import docker
 import h5py
 import pandas as pd
-import requests
-import tqdm
 
 from lm_zoo import errors
 from lm_zoo.backends import get_backend, get_compatible_backend
@@ -48,7 +42,7 @@ def spec(model: Model, backend=None):
     return json.loads(ret)
 
 
-def tokenize(model: Model, sentences, backend=None):
+def tokenize(model: Model, sentences: List[str], backend=None):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -65,11 +59,11 @@ def tokenize(model: Model, sentences, backend=None):
     ret = run_model_command_get_stdout(model, "tokenize /dev/stdin",
                                        stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
-    sentences = [sentence.split(" ") for sentence in sentences]
-    return sentences
+    sentences_tokenized = [sentence.split(" ") for sentence in sentences]
+    return sentences_tokenized
 
 
-def unkify(model: Model, sentences, backend=None):
+def unkify(model: Model, sentences: List[str], backend=None):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -88,11 +82,12 @@ def unkify(model: Model, sentences, backend=None):
     ret = run_model_command_get_stdout(model, "unkify /dev/stdin",
                                        stdin=in_file, backend=backend)
     sentences = ret.strip().split("\n")
-    sentences = [list(map(int, sentence.split(" "))) for sentence in sentences]
-    return sentences
+    sentences_tokenized = [list(map(int, sentence.split(" ")))
+                           for sentence in sentences]
+    return sentences_tokenized
 
 
-def get_surprisals(model: Model, sentences, backend=None):
+def get_surprisals(model: Model, sentences: List[str], backend=None):
     """
     Compute word-level surprisals from a language model for the given natural
     language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
@@ -117,12 +112,12 @@ def get_surprisals(model: Model, sentences, backend=None):
     out = StringIO()
     ret = run_model_command(model, "get_surprisals /dev/stdin",
                             stdin=in_file, stdout=out, backend=backend)
-    out = out.getvalue()
-    ret = pd.read_csv(StringIO(out), sep="\t").set_index(["sentence_id", "token_id"])
+    out_value = out.getvalue()
+    ret = pd.read_csv(StringIO(out_value), sep="\t").set_index(["sentence_id", "token_id"])
     return ret
 
 
-def get_predictions(model: Model, sentences, backend=None):
+def get_predictions(model: Model, sentences: List[str], backend=None):
     """
     Compute token-level predictive distributions from a language model for the
     given natural language sentences. Returns a h5py ``File`` object with the
@@ -154,56 +149,6 @@ def get_predictions(model: Model, sentences, backend=None):
         ret = h5py.File(host_path, "r")
 
     return ret
-
-
-
-
-def _update_progress(line, progress_bars):
-    """
-    Process a progress update line from the Docker API for push/pull
-    operations, writing to `progress_bars`.
-    """
-    # From https://github.com/neuromation/platform-client-python/pull/201/files#diff-2d85e2a65d4d047287bea6267bd3826dR771
-    try:
-        if "id" in line:
-            status = line["status"]
-            if status == "Pushed" or status == "Download complete":
-                if line["id"] in progress_bars:
-                    progress = progress_bars[line["id"]]
-                    delta = progress["total"] - progress["current"]
-                    if delta < 0:
-                        delta = 0
-                    progress["progress"].update(delta)
-                    progress["progress"].close()
-            elif status == "Pushing" or status == "Downloading":
-                if line["id"] not in progress_bars:
-                    if "progressDetail" in line:
-                        progress_details = line["progressDetail"]
-                        total_progress = progress_details.get(
-                            "total", progress_details.get("current", 1)
-                        )
-                        if total_progress > 0:
-                            progress_bars[line["id"]] = {
-                                "progress": tqdm.tqdm(
-                                    total=total_progress,
-                                    leave=False,
-                                    unit="B",
-                                    unit_scale=True,
-                                ),
-                                "current": 0,
-                                "total": total_progress,
-                            }
-                if "progressDetail" in line and "current" in line["progressDetail"]:
-                    delta = (
-                        line["progressDetail"]["current"]
-                        - progress_bars[line["id"]]["current"]
-                    )
-                    if delta < 0:
-                        delta = 0
-                    progress_bars[line["id"]]["current"] = line["progressDetail"]["current"]
-                    progress_bars[line["id"]]["progress"].update(delta)
-    except BaseException:
-        pass
 
 
 def run_model_command(model: Model, command_str,

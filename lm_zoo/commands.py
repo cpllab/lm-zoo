@@ -14,9 +14,15 @@ from lm_zoo.backends import BACKEND_DICT
 zoo = Z.get_registry()
 
 
-class ZooInstance(object):
-    def __init__(self, requested_backend):
-        self.requested_backend = requested_backend
+class State(object):
+    def __init__(self):
+        self.requested_backend = "docker"
+        self.verbose = False
+
+        self.model = None
+        self.model_checkpoint = None
+
+pass_state = click.make_pass_decorator(State, ensure=True)
 
 
 class CLIRunner(click.Group):
@@ -43,12 +49,11 @@ class CLIRunner(click.Group):
 
 @click.group(cls=CLIRunner,
              help="``lm-zoo`` provides black-box access to computing with state-of-the-art language models.")
-@click.option("--backend", type=click.Choice(list(BACKEND_DICT.keys()), case_sensitive=False),
-              help="Specify a backend (containerization platform) to run the specified model.")
 @click.option("--verbose", "-v", is_flag=True)
 @click.pass_context
-def lm_zoo(ctx, verbose, backend):
-    ctx.obj = ZooInstance(requested_backend=backend)
+def lm_zoo(ctx, verbose):
+    state = ctx.ensure_object(State)
+    state.verbose = verbose
 
 
 @lm_zoo.command()
@@ -90,11 +95,54 @@ def read_lines(fstream):
     return [line.strip() for line in fstream]
 
 
+### Shared options for model execution commands.
+def exec_options(f):
+    f = backend_option(f)
+    f = checkpoint_option(f)
+    f = pass_state(f)
+    return f
+
+def backend_option(f):
+    def callback(ctx, param, value):
+        state = ctx.ensure_object(State)
+        state.model = value
+        return value
+    return click.option("--backend", type=click.Choice(["docker", "singularity"],
+                                                       case_sensitive=False),
+                        expose_value=False,
+                        help=("Specify a backend (containerization platform) "
+                              "to run the specified model."),
+                        callback=callback)(f)
+
+def checkpoint_option(f):
+    def callback(ctx, param, value):
+        state = ctx.ensure_object(State)
+        state.model_checkpoint = value
+        return value
+    return click.option("--checkpoint", type=str, metavar="CHECKPOINT_PATH",
+                        expose_value=False,
+                        help=("Mount a custom model checkpoint at the given "
+                              "path"),
+                        callback=callback)(f)
+
+
+def _prepare_model(model, state):
+    """
+    Prepare a ``Model`` object from this reference and CLI option state.
+    """
+    model = zoo[model]
+
+    if state.model_checkpoint is not None:
+        model = model.with_checkpoint(state.model_checkpoint)
+
+    return model
+
+
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
-@click.pass_obj
-def tokenize(obj, model, in_file):
+@exec_options
+def tokenize(state, model, in_file):
     """
     Tokenize natural-language text according to a model's preprocessing
     standards.
@@ -106,18 +154,18 @@ def tokenize(obj, model, in_file):
     mapping between the tokens output by this command and the tokens used by
     the ``get-surprisals`` command.
     """
-    model = zoo[model]
+    model = _prepare_model(model, state)
     sentences = read_lines(in_file)
     sentences = Z.tokenize(model, sentences,
-                           backend=obj.requested_backend)
+                           backend=state.requested_backend)
     print("\n".join(" ".join(sentence) for sentence in sentences))
 
 
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
-@click.pass_obj
-def get_surprisals(obj, model, in_file):
+@exec_options
+def get_surprisals(state, model, in_file):
     """
     Get word-level surprisals from a language model for the given natural
     language text. Tab-separated results will be sent to standard output,
@@ -147,17 +195,17 @@ def get_surprisals(obj, model, in_file):
     There is guaranteed to be a one-to-one mapping, however, between the rows
     of this file and the tokens produced by ``lm-zoo tokenize``.
     """
-    model = zoo[model]
+    model = _prepare_model(model, state)
     sentences = read_lines(in_file)
-    ret = Z.get_surprisals(model, sentences, backend=obj.requested_backend)
+    ret = Z.get_surprisals(model, sentences, backend=state.requested_backend)
     ret.to_csv(sys.stdout, sep="\t")
 
 
 @lm_zoo.command()
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="FILE")
-@click.pass_obj
-def unkify(obj, model, in_file):
+@exec_options
+def unkify(state, model, in_file):
     """
     Detect unknown words for a language model for the given natural language
     text.
@@ -171,9 +219,9 @@ def unkify(obj, model, in_file):
     corresponding token is in the model's vocabulary; the value ``1`` indicates
     that the corresponding token is an unknown word for the model.
     """
-    model = zoo[model]
+    model = _prepare_model(model, state)
     sentences = read_lines(in_file)
-    masks = Z.unkify(model, sentences, backend=obj.requested_backend)
+    masks = Z.unkify(model, sentences, backend=state.requested_backend)
     print("\n".join(" ".join(map(str, masks_i)) for masks_i in masks))
 
 
@@ -181,8 +229,8 @@ def unkify(obj, model, in_file):
 @click.argument("model", metavar="MODEL")
 @click.argument("in_file", type=click.File("r"), metavar="INFILE")
 @click.argument("out_file", type=click.File("wb"), metavar="OUTFILE")
-@click.pass_obj
-def get_predictions(obj, model, in_file, out_file):
+@exec_options
+def get_predictions(state, model, in_file, out_file):
     """
     Compute token-level predictive distributions from a language model for the
     given natural language sentences.
@@ -199,9 +247,9 @@ def get_predictions(obj, model, in_file, out_file):
         /vocabulary: byte-encoded string array of vocabulary items (decode with
             ``numpy.char.decode(vocabulary, "utf-8")``)
     """
-    model = zoo[model]
+    model = _prepare_model(model, state)
     sentences = read_lines(in_file)
-    result = Z.get_predictions(model, sentences, backend=obj.requested_backend)
+    result = Z.get_predictions(model, sentences, backend=state.requested_backend)
 
     with h5py.File(out_file.name, "w") as out:
         result.copy("sentence", out)

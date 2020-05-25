@@ -14,6 +14,13 @@ template_image = build(path=str(build_context), dockerfile=str(template_dockerfi
                        rm=True, tag="lmzoo-template")
 
 @pytest.fixture(scope="session")
+def singularity_template_image():
+    path = Path(__file__).parent / "lmzoo-template.sif"
+    if not path.exists():
+        pytest.xfail("Missing singularity image")
+    return path
+
+@pytest.fixture(scope="session")
 def registry():
     return Z.get_registry()
 

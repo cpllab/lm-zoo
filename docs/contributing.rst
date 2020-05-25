@@ -9,14 +9,14 @@ review.
 
 
 Language models in the LM Zoo are Docker images which expose a set of binary
-programs conforming to the :ref:`api`. At a high level, the steps you'll need
+programs conforming to the :ref:`model_api`. At a high level, the steps you'll need
 to take to prepare such an image are
 
 1. Acquire open source code and model checkpoints for the language model you'd
    like to contribute.
 2. Prepare a Docker image containing the code and model checkpoint, and verify
    that you can successfully run the model from within the container.  Write
-   binary scripts conforming to the :ref:`api` which invoke your model.
+   binary scripts conforming to the :ref:`model_api` which invoke your model.
 3. Submit your language model as a pull request to the ``cpllab/lm-zoo`` Github
    repository.
 
@@ -46,7 +46,7 @@ you first read `the official Docker documentation
    copying from the `template directory
    <https://github.com/cpllab/lm-zoo/tree/master/models/_template>`_ for
    starters. Modify the ``Dockerfile`` and add wrapper scripts as necessary
-   until your model conforms to the :ref:`api`.
+   until your model conforms to the :ref:`model_api`.
 3. You can build and test your wrapper as necessary using the file
    ``scripts/build_and_test.sh``::
 
