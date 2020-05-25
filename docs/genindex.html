@@ -43,6 +43,13 @@
 
   
     <div class="nav-item">
+      <a href="https://github.com/cpllab/lm-zoo"
+        class="nav-link external">
+          View on GitHub <outboundlink/>
+      </a>
+    </div>
+  
+    <div class="nav-item">
       <a href="http://cpl.mit.edu"
         class="nav-link external">
           MIT CPL <outboundlink/>
@@ -64,6 +71,13 @@
 
 
 
+  
+    <div class="nav-item">
+      <a href="https://github.com/cpllab/lm-zoo"
+        class="nav-link external">
+          View on GitHub <outboundlink/>
+      </a>
+    </div>
   
     <div class="nav-item">
       <a href="http://cpl.mit.edu"
@@ -111,13 +125,25 @@
           </li>
 
         
+          <li class="toctree-l1 "><a href="python_api.html" class="reference internal ">Python API reference</a>
+
+            
+          </li>
+
+        
           <li class="toctree-l1 "><a href="contributing.html" class="reference internal ">Contributing to the LM Zoo</a>
 
             
           </li>
 
         
-          <li class="toctree-l1 "><a href="api.html" class="reference internal ">Language model Docker API</a>
+          <li class="toctree-l1 "><a href="model_api.html" class="reference internal ">Language model Docker API</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="support.html" class="reference internal ">Support</a>
 
             
           </li>
@@ -157,11 +183,18 @@
 
 <div class="genindex-jumpbox">
  <a href="#Symbols"><strong>Symbols</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#O"><strong>O</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  
 </div>
 <h2 id="Symbols">Symbols</h2>
@@ -174,8 +207,6 @@
         <li><a href="commands.html#cmdoption-lm-zoo-backend">lm-zoo command line option</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     --short
 
@@ -183,6 +214,42 @@
         <li><a href="commands.html#cmdoption-lm-zoo-list-short">lm-zoo-list command line option</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    --verbose
+
+      <ul>
+        <li><a href="commands.html#cmdoption-lm-zoo-v">lm-zoo command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -v
+
+      <ul>
+        <li><a href="commands.html#cmdoption-lm-zoo-v">lm-zoo command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.backends.Backend">Backend (class in lm_zoo.backends)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.backends.docker.DockerBackend">DockerBackend (class in lm_zoo.backends.docker)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.models.DockerModel">DockerModel (class in lm_zoo.models)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -200,6 +267,26 @@
         <li><a href="commands.html#cmdoption-lm-zoo-unkify-arg-FILE">lm-zoo-unkify command line option</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.models.OfficialModel.from_dict">from_dict() (lm_zoo.models.OfficialModel class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.backends.get_backend">get_backend() (in module lm_zoo.backends)</a>
+</li>
+      <li><a href="python_api.html#lm_zoo.backends.get_compatible_backend">get_compatible_backend() (in module lm_zoo.backends)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.get_predictions">get_predictions() (in module lm_zoo)</a>
+</li>
+      <li><a href="python_api.html#lm_zoo.get_surprisals">get_surprisals() (in module lm_zoo)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -225,6 +312,10 @@
       <ul>
         <li><a href="commands.html#cmdoption-lm-zoo-backend">--backend &lt;backend&gt;</a>
 </li>
+        <li><a href="commands.html#cmdoption-lm-zoo-v">--verbose</a>
+</li>
+        <li><a href="commands.html#cmdoption-lm-zoo-v">-v</a>
+</li>
       </ul></li>
       <li>
     lm-zoo-get-predictions command line option
@@ -246,8 +337,6 @@
         <li><a href="commands.html#cmdoption-lm-zoo-get-surprisals-arg-MODEL">MODEL</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     lm-zoo-list command line option
 
@@ -255,6 +344,8 @@
         <li><a href="commands.html#cmdoption-lm-zoo-list-short">--short</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     lm-zoo-tokenize command line option
 
@@ -271,6 +362,27 @@
         <li><a href="commands.html#cmdoption-lm-zoo-unkify-arg-FILE">FILE</a>
 </li>
         <li><a href="commands.html#cmdoption-lm-zoo-unkify-arg-MODEL">MODEL</a>
+</li>
+      </ul></li>
+      <li>
+    lm_zoo
+
+      <ul>
+        <li><a href="python_api.html#module-lm_zoo">module</a>
+</li>
+      </ul></li>
+      <li>
+    lm_zoo.backends
+
+      <ul>
+        <li><a href="python_api.html#module-lm_zoo.backends">module</a>
+</li>
+      </ul></li>
+      <li>
+    lm_zoo.models
+
+      <ul>
+        <li><a href="python_api.html#module-lm_zoo.models">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -293,10 +405,27 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="python_api.html#module-lm_zoo">lm_zoo</a>
+</li>
+        <li><a href="python_api.html#module-lm_zoo.backends">lm_zoo.backends</a>
+</li>
+        <li><a href="python_api.html#module-lm_zoo.models">lm_zoo.models</a>
+</li>
+      </ul></li>
+  </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.models.OfficialModel">OfficialModel (class in lm_zoo.models)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     OUTFILE
@@ -305,6 +434,44 @@
         <li><a href="commands.html#cmdoption-lm-zoo-get-predictions-arg-OUTFILE">lm-zoo-get-predictions command line option</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.run_model_command">run_model_command() (in module lm_zoo)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.backends.singularity.SingularityBackend">SingularityBackend (class in lm_zoo.backends.singularity)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.models.SingularityModel">SingularityModel (class in lm_zoo.models)</a>
+</li>
+      <li><a href="python_api.html#lm_zoo.spec">spec() (in module lm_zoo)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.tokenize">tokenize() (in module lm_zoo)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python_api.html#lm_zoo.unkify">unkify() (in module lm_zoo)</a>
+</li>
   </ul></td>
 </tr></table>
 

@@ -17,6 +17,7 @@ Welcome to LM Zoo
    python_api
    contributing
    model_api
+   support
    thanks
    :hidden:
 

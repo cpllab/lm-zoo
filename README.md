@@ -3,7 +3,7 @@
 ![zoo-logo](https://cpllab.github.io/lm-zoo/_images/logo.png)
 
 [![CircleCI](https://circleci.com/gh/cpllab/lm-zoo/tree/master.svg?style=svg&circle-token=d907824249db5ad63c03bfcc3b403c6d9ad845e2)](https://circleci.com/gh/cpllab/lm-zoo/tree/master)
-[![Gitter chat](https://badges.gitter.im/lm-zoo/community.png)](https://gitter.im/lm-zoo/community.png)
+[![Gitter chat](https://badges.gitter.im/lm-zoo/community.png)](https://gitter.im/lm-zoo/community)
 
 The Language Model Zoo is an open-source repository of state-of-the-art
 language models, designed to support black-box access to model predictions and
