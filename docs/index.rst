@@ -16,6 +16,7 @@ Welcome to LM Zoo
    models
    contributing
    api
+   support
    thanks
    :hidden:
 

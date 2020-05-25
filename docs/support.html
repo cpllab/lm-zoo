@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Welcome to LM Zoo</title>
+      <title>Support</title>
     
       <link rel="stylesheet" href="_static/pygments.css">
       <link rel="stylesheet" href="_static/theme.css">
@@ -24,13 +24,12 @@
     
       <link rel="shortcut icon" href="_static/favicon.ico"/>
   <link rel="index" title="Index" href="genindex.html" />
-  <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Quickstart" href="quickstart.html" /> 
+  <link rel="search" title="Search" href="search.html" /> 
   </head>
 
   <body>
     <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
-  <router-link to="#" class="home-link">
+  <router-link to="index.html" class="home-link">
     
       <img class="logo" src="_static/logo.png" alt="doit logo"/>
     
@@ -103,7 +102,7 @@
   
     <div class="sidebar-group">
       <p class="caption">
-        <span class="caption-text"><a href="#welcome-to-lm-zoo">welcome to lm zoo</a></span>
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">welcome to lm zoo</a></span>
       </p>
       <ul class="">
         
@@ -137,12 +136,6 @@
           </li>
 
         
-          <li class="toctree-l1 "><a href="support.html" class="reference internal ">Support</a>
-
-            
-          </li>
-
-        
           <li class="toctree-l1 "><a href="thanks.html" class="reference internal ">Acknowledgments</a>
 
             
@@ -159,79 +152,30 @@
           <div class="body-header" role="navigation" aria-label="navigation">
   
   <ul class="breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
+    <li><a href="index.html">Docs</a> &raquo;</li>
     
-    <li>Welcome to LM Zoo</li>
+    <li>Support</li>
   </ul>
   
 
   <ul class="page-nav">
-  <li class="next">
-    <a href="quickstart.html"
-       title="next chapter">Quickstart →</a>
-  </li>
 </ul>
   
 </div>
 <hr>
           <div class="content" role="main">
             
-  <div class="section" id="welcome-to-lm-zoo">
-<h1>Welcome to LM Zoo<a class="headerlink" href="#welcome-to-lm-zoo" title="Permalink to this headline">¶</a></h1>
-<div class="figure align-center">
-<a class="reference internal image-reference" href="_images/logo.png"><img alt="_images/logo.png" src="_images/logo.png" style="width: 80%;" /></a>
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<p>The Language Model Zoo (LM Zoo) is an open-source repository of
-state-of-the-art language models, designed to support black-box access to model
-predictions and representations. It provides the command line tool <code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code>,
-a standard interface for interacting with language models.</p>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">lm-zoo</span></code> to extract word-level surprisal data for natural
-language text:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://cpllab.github.io/lm-zoo/metamorphosis.txt -O metamorphosis.txt
-$ head -n3 metamorphosis.txt
-One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.
-He lay on his armour-like back, and if he lifted his head a little he could see his brown belly, slightly domed and divided by arches into stiff sections.
-The bedding was hardly able to cover it and seemed ready to slide off any moment.
-
-$ lm-zoo get-surprisals ngram metamorphosis.txt
-sentence_id     token_id        token   surprisal
-1       1       one     7.76847
-1       2       morning 9.40638
-1       3       ,       1.05009
-1       4       when    7.08489
-1       5       gregor  18.8963
-1       6       &lt;unk&gt;   4.27466
-...
-
-$ lm-zoo get-surprisals GRNN metamorphosis.txt
-sentence_id     token_id        token   surprisal
-1       1       One     0.000000
-1       2       morning 11.585580
-1       3       ,       2.359496
-1       4       when    6.319129
-1       5       Gregor  18.608147
-1       6       &lt;unk&gt;   3.706054
-...
-</pre></div>
-</div>
-<p>For more features and installation instructions, see our <a class="reference internal" href="quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> guide.</p>
-<p>LM Zoo is maintained by the
-<a class="reference external" href="http://cpl.mit.edu/">MIT Computational Psycholinguistics Laboratory</a>.</p>
+  <div class="section" id="support">
+<span id="id1"></span><h1>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h1>
+<p>Please file bugs and feature requests as <a class="reference external" href="https://github.com/cpllab/lm-zoo/issues">GitHub issues</a>.</p>
+<p>You can request extra help in installation, usage, etc. from the developers and
+community via our <a class="reference external" href="https://gitter.im/lm-zoo/community">Gitter chat</a>.</p>
 </div>
 
 
           </div>
           <div class="page-nav">
             <div class="inner"><ul class="page-nav">
-  <li class="next">
-    <a href="quickstart.html"
-       title="next chapter">Quickstart →</a>
-  </li>
 </ul><div class="footer" role="contentinfo">
       &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.
     <br>

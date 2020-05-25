@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Python API reference</title>
+    
+      <link rel="stylesheet" href="_static/pygments.css">
+      <link rel="stylesheet" href="_static/theme.css">
+      <link rel="stylesheet" href="_static/sphinx_press_theme.css">
+      
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+
+      <!-- sphinx script_files -->
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+      
+      <script src="_static/theme-vendors.js"></script>
+      <script src="_static/theme.js" defer></script>
+    
+      <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Contributing to the LM Zoo" href="contributing.html" />
+  <link rel="prev" title="Official models" href="models.html" /> 
+  </head>
+
+  <body>
+    <div id="app" class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <img class="logo" src="_static/logo.png" alt="doit logo"/>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+  
+    <div class="nav-item">
+      <a href="https//github.com/cpllab/lm-zoo"
+        class="nav-link external">
+          View on GitHub <outboundlink/>
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+  
+    <div class="nav-item">
+      <a href="https//github.com/cpllab/lm-zoo"
+        class="nav-link external">
+          View on GitHub <outboundlink/>
+      </a>
+    </div>
+  
+    <div class="nav-item">
+      <a href="http://cpl.mit.edu"
+        class="nav-link external">
+          MIT CPL <outboundlink/>
+      </a>
+    </div>
+  
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#welcome-to-lm-zoo">welcome to lm zoo</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 "><a href="quickstart.html" class="reference internal ">Quickstart</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="commands.html" class="reference internal ">lm-zoo commands</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="models.html" class="reference internal ">Official models</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current"><a href="#" class="reference internal current">Python API reference</a>
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#module-lm_zoo" class="reference internal">Major commands</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-lm_zoo.models" class="reference internal">Models</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-lm_zoo.backends" class="reference internal">Backends</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="contributing.html" class="reference internal ">Contributing to the LM Zoo</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="model_api.html" class="reference internal ">Language model Docker API</a>
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 "><a href="thanks.html" class="reference internal ">Acknowledgments</a>
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Python API reference</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="models.html"
+       title="previous chapter">← Official models</a>
+  </li>
+  <li class="next">
+    <a href="contributing.html"
+       title="next chapter">Contributing to the LM Zoo →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main">
+            
+  <div class="section" id="python-api-reference">
+<span id="python-api"></span><h1>Python API reference<a class="headerlink" href="#python-api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-lm_zoo">
+<span id="major-commands"></span><h2>Major commands<a class="headerlink" href="#module-lm_zoo" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="lm_zoo.get_predictions">
+<code class="sig-prename descclassname">lm_zoo.</code><code class="sig-name descname">get_predictions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">lm_zoo.models.Model</span></em>, <em class="sig-param"><span class="n">sentences</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute token-level predictive distributions from a language model for the
+given natural language sentences. Returns a h5py <code class="docutils literal notranslate"><span class="pre">File</span></code> object with the
+following structure:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>/sentence/&lt;i&gt;/predictions: N_tokens_i * N_vocabulary numpy ndarray of</dt><dd><p>log-probabilities (rows are log-probability distributions)</p>
+</dd>
+<dt>/sentence/&lt;i&gt;/tokens: sequence of integer token IDs corresponding to</dt><dd><p>indices in <code class="docutils literal notranslate"><span class="pre">/vocabulary</span></code></p>
+</dd>
+<dt>/vocabulary: byte-encoded ndarray of vocabulary items (decode with</dt><dd><p><code class="docutils literal notranslate"><span class="pre">numpy.char.decode(vocabulary,</span> <span class="pre">&quot;utf-8&quot;)</span></code>)</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – lm-zoo model reference</p></li>
+<li><p><strong>sentences</strong> – list of natural language sentence strings (not pre
+tokenized)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.get_surprisals">
+<code class="sig-prename descclassname">lm_zoo.</code><code class="sig-name descname">get_surprisals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">lm_zoo.models.Model</span></em>, <em class="sig-param"><span class="n">sentences</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.get_surprisals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute word-level surprisals from a language model for the given natural
+language sentences. Returns a data frame with a MultiIndex <code class="docutils literal notranslate"><span class="pre">`(sentence_id,</span>
+<span class="pre">token_id)</span></code> (both one-indexed) and columns <code class="docutils literal notranslate"><span class="pre">token</span></code> and <code class="docutils literal notranslate"><span class="pre">surprisal</span></code>.</p>
+<p>The surprisal of a token <span class="math notranslate nohighlight">\(w_i\)</span> is the negative logarithm of that
+token’s probability under a language model’s predictive distribution:</p>
+<div class="math notranslate nohighlight">
+\[S(w_i) = -\log_2 p(w_i \mid w_1, w_2, \ldots, w_{i-1})\]</div>
+<p>Note that surprisals are computed on the level of <strong>tokens</strong>, not words.
+Models that insert extra tokens (e.g., an end-of-sentence token as above)
+or which tokenize on the sub-word level (e.g. GPT2) will not have a
+one-to-one mapping between rows of surprisal output from this command and
+words.</p>
+<p>There is guaranteed to be a one-to-one mapping, however, between the rows
+of this file and the tokens produced by <code class="docutils literal notranslate"><span class="pre">lm-zoo</span> <span class="pre">tokenize</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.run_model_command">
+<code class="sig-prename descclassname">lm_zoo.</code><code class="sig-name descname">run_model_command</code><span class="sig-paren">(</span><em class="sig-param">model: lm_zoo.models.Model</em>, <em class="sig-param">command_str</em>, <em class="sig-param">backend=None</em>, <em class="sig-param">pull=False</em>, <em class="sig-param">mounts=None</em>, <em class="sig-param">stdin=None</em>, <em class="sig-param">stdout=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em>, <em class="sig-param">stderr=&lt;_io.TextIOWrapper name='&lt;stderr&gt;' mode='w' encoding='UTF-8'&gt;</em>, <em class="sig-param">progress_stream=&lt;_io.TextIOWrapper name='&lt;stderr&gt;' mode='w' encoding='UTF-8'&gt;</em>, <em class="sig-param">raise_errors=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.run_model_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the given shell command inside a container instantiating the given
+model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> – Backend platform on which to execute the model. May be any of
+the string keys of <cite>lm_zoo.backends.BACKEND_DICT</cite>, or a <cite>Backend</cite>
+class.</p></li>
+<li><p><strong>mounts</strong> – List of bind mounts described as tuples <cite>(guest_path,
+host_path, mode)</cite>, where <cite>mode</cite> is one of <code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">rw</span></code></p></li>
+<li><p><strong>raise_errors</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, monitor command status/output and raise
+errors when necessary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Docker API response as a Python dictionary. The key <code class="docutils literal notranslate"><span class="pre">StatusCode</span></code> may
+be of interest.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.spec">
+<code class="sig-prename descclassname">lm_zoo.</code><code class="sig-name descname">spec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">lm_zoo.models.Model</span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a language model specification as a dict.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.tokenize">
+<code class="sig-prename descclassname">lm_zoo.</code><code class="sig-name descname">tokenize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">lm_zoo.models.Model</span></em>, <em class="sig-param"><span class="n">sentences</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.tokenize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tokenize natural-language text according to a model’s preprocessing
+standards.</p>
+<p><cite>sentences</cite> should be a list of natural-language sentences.</p>
+<p>This command returns a list of tokenized sentences, with each sentence a
+list of token strings.
+For each sentence, there is a one-to-one
+mapping between the tokens output by this command and the tokens used by
+the <code class="docutils literal notranslate"><span class="pre">get-surprisals</span></code> command.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.unkify">
+<code class="sig-prename descclassname">lm_zoo.</code><code class="sig-name descname">unkify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">lm_zoo.models.Model</span></em>, <em class="sig-param"><span class="n">sentences</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">backend</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.unkify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detect unknown words for a language model for the given natural language
+text.</p>
+<p><cite>sentences</cite> should be a list of natural-language sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of sentence masks, each a list of <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> values.  These
+values correspond one-to-one with the model’s tokenization of the
+sentence (as returned by <code class="docutils literal notranslate"><span class="pre">lm-zoo.tokenize</span></code>). The value <code class="docutils literal notranslate"><span class="pre">0</span></code>
+indicates that the corresponding token is in the model’s vocabulary;
+the value <code class="docutils literal notranslate"><span class="pre">1</span></code> indicates that the corresponding token is an unknown
+word for the model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-lm_zoo.models">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-lm_zoo.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="lm_zoo.models.DockerModel">
+<em class="property">class </em><code class="sig-prename descclassname">lm_zoo.models.</code><code class="sig-name descname">DockerModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reference</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.models.DockerModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a model reference stored on Docker Hub.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="lm_zoo.models.OfficialModel">
+<em class="property">class </em><code class="sig-prename descclassname">lm_zoo.models.</code><code class="sig-name descname">OfficialModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.models.OfficialModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a model stored in the official registry.</p>
+<dl class="py method">
+<dt id="lm_zoo.models.OfficialModel.from_dict">
+<em class="property">classmethod </em><code class="sig-name descname">from_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.models.OfficialModel.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a Model instance from a registry dict entry.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="lm_zoo.models.SingularityModel">
+<em class="property">class </em><code class="sig-prename descclassname">lm_zoo.models.</code><code class="sig-name descname">SingularityModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">repository</span></em>, <em class="sig-param"><span class="n">reference</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.models.SingularityModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a model reference stored in a Singularity repository.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-lm_zoo.backends">
+<span id="backends"></span><h2>Backends<a class="headerlink" href="#module-lm_zoo.backends" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="lm_zoo.backends.Backend">
+<em class="property">class </em><code class="sig-prename descclassname">lm_zoo.backends.</code><code class="sig-name descname">Backend</code><a class="headerlink" href="#lm_zoo.backends.Backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract class defining an interface between LM Zoo models and a
+containerization platform.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.backends.get_backend">
+<code class="sig-prename descclassname">lm_zoo.backends.</code><code class="sig-name descname">get_backend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">backend_ref</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>Type<span class="p">[</span><a class="reference internal" href="#lm_zoo.backends.Backend" title="lm_zoo.backends.Backend">lm_zoo.backends.Backend</a><span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.backends.get_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a <cite>Backend</cite> instance for the given reference (string or class).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="lm_zoo.backends.get_compatible_backend">
+<code class="sig-prename descclassname">lm_zoo.backends.</code><code class="sig-name descname">get_compatible_backend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">lm_zoo.models.Model</span></em>, <em class="sig-param"><span class="n">preferred_backends</span><span class="p">:</span> <span class="n">Union[Type[lm_zoo.backends.Backend], List[Type[lm_zoo.backends.Backend]], None]</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#lm_zoo.backends.get_compatible_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a compatible backend for the given model.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="lm_zoo.backends.docker.DockerBackend">
+<em class="property">class </em><code class="sig-prename descclassname">lm_zoo.backends.docker.</code><code class="sig-name descname">DockerBackend</code><a class="headerlink" href="#lm_zoo.backends.docker.DockerBackend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="lm_zoo.backends.singularity.SingularityBackend">
+<em class="property">class </em><code class="sig-prename descclassname">lm_zoo.backends.singularity.</code><code class="sig-name descname">SingularityBackend</code><a class="headerlink" href="#lm_zoo.backends.singularity.SingularityBackend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="models.html"
+       title="previous chapter">← Official models</a>
+  </li>
+  <li class="next">
+    <a href="contributing.html"
+       title="next chapter">Contributing to the LM Zoo →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2020, MIT Computational Psycholinguistics Laboratory.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a>.
+</div>
+            </div>
+          </div>
+      </page>
+    </div>
+    
+    
+  </body>
+</html>
