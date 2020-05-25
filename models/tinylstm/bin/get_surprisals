@@ -1,0 +1,13 @@
+#!/bin/sh
+MODEL_ROOT="/opt/tinylstm"
+MODEL_CHECKPOINT="${LMZOO_CHECKPOINT_PATH}/model.pt"
+MODEL_CORPUS="${LMZOO_CHECKPOINT_PATH}/corpus.pt"
+INPUT_FILE="$1"
+
+/opt/bin/tokenize $1 > /tmp/input_tokenized
+
+python ${MODEL_ROOT}/eval.py \
+    --checkpoint "$MODEL_CHECKPOINT" \
+    --corpus "$MODEL_CORPUS" \
+    --eval_data /tmp/input_tokenized \
+    --outf /dev/stdout

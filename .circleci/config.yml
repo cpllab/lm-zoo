@@ -159,6 +159,27 @@ jobs:
             #     name: Push to Docker Hub
             #     command: docker push cpllab/language-models:transformer-xl
 
+    tinylstm:
+        machine:
+            image: circleci/classic:latest
+        steps:
+            - checkout
+            - run:
+                name: Check for relevant code updates
+                command: ./scripts/check_for_updates.sh $CIRCLE_JOB << pipeline.git.base_revision >> << pipeline.git.revision >>
+
+            - run:
+                <<: *docker_login
+            - add_ssh_keys:
+                fingerprints:
+                    - "88:36:05:01:d6:98:05:43:e3:e4:e3:d3:a3:67:e9:29"
+            - run:
+                name: Build
+                command: docker build -t cpllab/language-models:tinylstm -f models/tinylstm/Dockerfile --build-arg CPL_SSH_PRV_KEY="$(cat ~/.ssh/id_rsa_88360501d6980543e3e4e3d3a367e929)" .
+            - run:
+                name: Run tests
+                command: docker run --rm -v `pwd`/test.py:/test.py -v `pwd`/docs/schemas:/schemas cpllab/language-models:tinylstm python /test.py
+
 
 
 workflows:
@@ -172,3 +193,4 @@ workflows:
             - ordered-neurons
             - gpt2
             - transformer-xl
+            - tinylstm
