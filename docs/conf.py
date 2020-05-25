@@ -93,6 +93,7 @@ html_favicon = '_static/favicon.ico'
 #
 html_theme_options = {
   "external_links": [
+    ("View on GitHub", "https://github.com/cpllab/lm-zoo"),
       ("MIT CPL", "http://cpl.mit.edu")
   ]
 }
