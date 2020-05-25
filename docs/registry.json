@@ -121,9 +121,9 @@
     "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "ca867981a9bd1ac987447ab6f77e0850236f604d",
-      "checksum": "f302550ef5bd6f45c6adbbd98eefc56db7f0dd73",
-      "datetime": "2020-05-25T17:43:02.573233114Z",
+      "version": "0d042cffeebbec17cc6dd8729ab805e39e0ebc7e",
+      "checksum": "7e1edbbe949c47933978572cc666648052e00a6c",
+      "datetime": "2020-05-25T20:00:54.469411391Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -133,12 +133,12 @@
       },
       "gpu": {
         "required": false,
-        "supported": false
+        "supported": true
       },
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "ordered-neurons",
-      "size": 3218739014
+      "size": 3218738720
     },
     "tokenizer": {
       "type": "word",
@@ -179,9 +179,9 @@
     "ref_url": "https://github.com/cpllab/tinylstm",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "3ee853277f636efd11b77c5572728a2aeec7f7cd",
-      "checksum": "ad49307002c24954c8fc9aa0e4c63f805862ae2b",
-      "datetime": "2020-05-25T18:15:23.979397297Z",
+      "version": "0d042cffeebbec17cc6dd8729ab805e39e0ebc7e",
+      "checksum": "f53db46ca34d796f1710a0fae193c0d538c32c46",
+      "datetime": "2020-05-25T20:01:15.019868616Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -191,12 +191,12 @@
       },
       "gpu": {
         "required": false,
-        "supported": false
+        "supported": true
       },
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "tinylstm",
-      "size": 3295281522
+      "size": 3295284373
     },
     "tokenizer": {
       "type": "word",
