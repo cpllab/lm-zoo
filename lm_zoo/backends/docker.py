@@ -4,6 +4,7 @@ platform.
 """
 
 import os
+from pathlib import Path
 import sys
 from typing import *
 
@@ -64,9 +65,11 @@ class DockerBackend(Backend):
 
         # Support custom checkpoint loading
         if model.checkpoint is not None:
+            host_checkpoint_path = Path(model.checkpoint).absolute()
+
             # Mount given checkpoint read-only within the guest
             guest_checkpoint_path = "/opt/lmzoo_checkpoint"
-            mounts.append((model.checkpoint, guest_checkpoint_path, "ro"))
+            mounts.append((host_checkpoint_path, guest_checkpoint_path, "ro"))
 
             # Update relevant environment variable
             environment["LMZOO_CHECKPOINT_PATH"] = guest_checkpoint_path
