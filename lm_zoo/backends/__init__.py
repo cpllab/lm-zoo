@@ -22,7 +22,8 @@ class Backend(object):
     def pull_image(self, model: Model, progress_stream=sys.stderr):
         raise NotImplementedError()
 
-    def run_command(self, model: Model, command_str, mounts=None,
+    def run_command(self, model: Model, command_str,
+                    mounts=None, environment=None,
                     stdin=None, stdout=sys.stdout, stderr=sys.stderr,
                     raise_errors=True):
         raise NotImplementedError()
