@@ -179,9 +179,9 @@
     "ref_url": "https://github.com/cpllab/tinylstm",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "3ee853277f636efd11b77c5572728a2aeec7f7cd",
-      "checksum": "ad49307002c24954c8fc9aa0e4c63f805862ae2b",
-      "datetime": "2020-05-25T18:15:23.979397297Z",
+      "version": "75a97862cbbade0574d9a03ddd60103b7fe07363",
+      "checksum": "ac57eb3c8b19985978b61df9415e3a95be6ae7b4",
+      "datetime": "2020-05-26T18:32:16.22094886Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -196,7 +196,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "tinylstm",
-      "size": 3295281522
+      "size": 3295284385
     },
     "tokenizer": {
       "type": "word",

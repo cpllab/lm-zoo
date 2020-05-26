@@ -20,4 +20,4 @@ from get_raw import unkify
 for line in codecs.open(sys.argv[1], encoding="utf-8"):
     tokens = tokenizer.tokenize(line.strip())
     tokens = unkify(tokens, vocab)
-    print(" ".join(tokens))
+    print(" ".join(tokens + ["<eos>"]))
