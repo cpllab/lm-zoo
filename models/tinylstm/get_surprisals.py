@@ -59,7 +59,7 @@ input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
 # read eval data
 with open(args.eval_data, 'r') as f:
     lines = f.readlines()
-sents = [line.strip().split() + ["<eos>"] for line in lines]
+sents = [line.strip().split() for line in lines]
 
 
 with args.outf as f:
