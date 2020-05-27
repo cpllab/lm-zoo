@@ -92,9 +92,9 @@
     "ref_url": "http://www.speech.sri.com/projects/srilm",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "ca867981a9bd1ac987447ab6f77e0850236f604d",
-      "checksum": "7cdb266af3d7c0cd55b3358673e32182b20a07bf",
-      "datetime": "2020-05-25T17:41:24.168534461Z",
+      "version": "960a916a6a5425499035735db661c894b3a43ab7",
+      "checksum": "17d96e641074fdcebf932c6c8765c4faf0d4fa37",
+      "datetime": "2020-05-27T17:42:33.609856965Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -109,7 +109,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "ngram",
-      "size": 880207473
+      "size": 880261703
     },
     "tokenizer": {
       "type": "word",
@@ -121,9 +121,9 @@
     "ref_url": "https://github.com/yikangshen/Ordered-Neurons",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "ca867981a9bd1ac987447ab6f77e0850236f604d",
-      "checksum": "f302550ef5bd6f45c6adbbd98eefc56db7f0dd73",
-      "datetime": "2020-05-25T17:43:02.573233114Z",
+      "version": "7c51f5f336c85addad5fc0cef4b5466bc86a2f2a",
+      "checksum": "4993e00d6b31f7493cfe6fa9867ef4eedf44af60",
+      "datetime": "2020-05-27T21:38:33.515783684Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -138,7 +138,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "ordered-neurons",
-      "size": 3218739014
+      "size": 3218739006
     },
     "tokenizer": {
       "type": "word",
@@ -179,9 +179,9 @@
     "ref_url": "https://github.com/cpllab/tinylstm",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "75a97862cbbade0574d9a03ddd60103b7fe07363",
-      "checksum": "ac57eb3c8b19985978b61df9415e3a95be6ae7b4",
-      "datetime": "2020-05-26T18:32:16.22094886Z",
+      "version": "9d8db666f1fe9fa22cbd37ab6eff7c15a0fb6a8a",
+      "checksum": "344a20e0e67a8ee39c38e34ae1a015f2eb8e99d3",
+      "datetime": "2020-05-26T18:39:22.988852042Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -191,12 +191,12 @@
       },
       "gpu": {
         "required": false,
-        "supported": false
+        "supported": true
       },
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "tinylstm",
-      "size": 3295284385
+      "size": 3295284357
     },
     "tokenizer": {
       "type": "word",
