@@ -31,7 +31,7 @@ setup(
         "pytz==2020.1",
         "requests==2.23.0",
         "semver==2.10.1",
-        "six==1.14.0",
+        "six==1.15.0",
         "spython==0.0.80",
         "tqdm==4.46.0",
         "urllib3==1.25.9",
