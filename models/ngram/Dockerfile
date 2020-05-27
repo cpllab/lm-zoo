@@ -9,7 +9,9 @@ RUN mkdir ${HOME}/.ssh && echo "StrictHostKeyChecking no" >> ${HOME}/.ssh/config
       && chmod 600 ${HOME}/.ssh/id_rsa
 RUN mkdir -p /opt/srilm \
         && scp -To "StrictHostKeyChecking=no" \
-        cpl@syntaxgym.org:/home/cpl/srilm/{srilm-1.7.2.tar.gz,wiki_kn_5gram.lm} /opt/srilm
+            cpl@syntaxgym.org:/home/cpl/srilm/{srilm-1.7.2.tar.gz,wiki_kn_5gram.lm} /opt/srilm \
+        && mkdir /opt/srilm/checkpoint \
+        && mv /opt/srilm/wiki_kn_5gram.lm /opt/srilm/checkpoint/model.lm
 RUN rm -rf ${HOME}/.ssh
 
 RUN cd /opt/srilm && tar -xvzf srilm-1.7.2.tar.gz && \
@@ -35,11 +37,15 @@ RUN conda install -qy --freeze-installed numpy nomkl \
         && pip install nose jsonschema
 COPY test.py /opt/test.py
 
-COPY ${MODEL_ROOT}/vocab.txt /opt/vocab.txt
+ENV LMZOO_CHECKPOINT_PATH /opt/srilm/checkpoint
+ENV LMZOO_VOCABULARY_PATH vocab
+
+COPY ${MODEL_ROOT}/vocab.txt "$LMZOO_CHECKPOINT_PATH/$LMZOO_VOCABULARY_PATH"
 COPY ${MODEL_ROOT}/get_surprisals.awk /opt/get_surprisals.awk
 COPY ${MODEL_ROOT}/tokenizer /opt/tokenizer
 COPY ${MODEL_ROOT}/bin /opt/bin
 COPY shared/unkify /opt/bin/unkify
+COPY shared/spec /opt/bin/spec
 COPY shared/unsupported /opt/bin/get_predictions.hdf5
 
 ENV PATH "/opt/bin:${PATH}"
@@ -54,4 +60,4 @@ ARG FILES_SHA1
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
 RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
             sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
-            > /opt/spec.json
+            > /opt/spec.template.json
