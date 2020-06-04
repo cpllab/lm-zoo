@@ -103,7 +103,7 @@ class DockerBackend(Backend):
             os.close(in_stream._sock.fileno())
 
         # Stop container and collect results.
-        result = client.wait(container, timeout=999999999)
+        result = client.wait(container, timeout=99999999)
 
         if raise_errors:
             if result["StatusCode"] == STATUS_CODES["unsupported_feature"]:
