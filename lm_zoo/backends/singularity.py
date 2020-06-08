@@ -137,8 +137,15 @@ class SingularityBackend(Backend):
 
         try:
             with modified_environ(**environment):
+                exec_options = []
+
+                # Maximally isolate container from host -- this resolves some
+                # parallel execution issues we've observed in the past.
+                exec_options.append("--containall")
+
                 result = Client.execute(image=model.reference, command=command,
-                                        nv=nv, bind=binds, stream=True)
+                                        nv=nv, bind=binds, stream=True,
+                                        options=exec_options)
 
                 for line in result:
                     stdout.write(line)
