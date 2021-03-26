@@ -26,7 +26,7 @@ with open("/schemas/language_model_spec.json", "r") as spec_f:
     LANGUAGE_MODEL_SPEC_SCHEMA = json.load(spec_f)
 
 SURPRISAL_RE = re.compile(r"sentence_id\ttoken_id\ttoken\tsurprisal\n"
-                           "(\d+\s+\d+\s+[\w.<>]+\s+[-\d.]+\n)+(\d+\s+\d+\s+[\w.<>]+\s+[-\d.]+)",
+                           "(\d+\s+\d+\s+[\w.<>\u2581]+\s+[-\d.]+\n)+(\d+\s+\d+\s+[\w.<>\u2581]+\s+[-\d.]+)",
                           flags=re.MULTILINE)
 
 

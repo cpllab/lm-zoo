@@ -2,7 +2,8 @@ import contextlib
 import logging
 import os
 from pathlib import Path
-from subprocess import CalledProcessError
+import shutil
+from subprocess import CalledProcessError, check_output
 import sys
 from tempfile import NamedTemporaryFile
 from typing import cast
@@ -47,6 +48,20 @@ def modified_environ(*remove, **update):
     finally:
         env.update(update_after)
         [env.pop(k) for k in remove_after]
+
+
+def is_cuda_available():
+    """
+    Hacky method to check whether CUDA is available for use on this host.
+    """
+    if shutil.which("nvidia-smi") is None:
+        return False
+    try:
+        output = check_output(["nvidia-smi", "-L"])
+        has_gpus = bool(output.strip())
+        return has_gpus
+    except CalledProcessError:
+        return False
 
 
 class SingularityBackend(Backend):
@@ -100,7 +115,8 @@ class SingularityBackend(Backend):
         binds = ["%s:%s:%s" % (host, guest, mode)
                 for host, guest, mode in mounts]
 
-        nv = False # TODO
+        # TODO make configurable
+        nv = is_cuda_available()
 
         command = command_str.split(" ")
 
@@ -121,8 +137,15 @@ class SingularityBackend(Backend):
 
         try:
             with modified_environ(**environment):
+                exec_options = []
+
+                # Maximally isolate container from host -- this resolves some
+                # parallel execution issues we've observed in the past.
+                exec_options.append("--containall")
+
                 result = Client.execute(image=model.reference, command=command,
-                                        bind=binds, stream=True)
+                                        nv=nv, bind=binds, stream=True,
+                                        options=exec_options)
 
                 for line in result:
                     stdout.write(line)

@@ -68,7 +68,7 @@ def get_surprisals(sentences, corpus, outf, seed):
         data_source = torch.LongTensor(len(sentence))
         for j, token in enumerate(sentence):
             try:
-                data_source[j] = corpus.dictionary.word2idx[token.lower()]
+                data_source[j] = corpus.dictionary.word2idx[token]
             except KeyError:
                 raise RuntimeError("Internal error: Dictionary lookup failed. This should not happen with properly unked inputs.")
 

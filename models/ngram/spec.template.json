@@ -12,7 +12,7 @@
             "unkify": true,
             "get_surprisals": true,
             "get_predictions": false,
-            "mount_checkpoint": false
+            "mount_checkpoint": true
         },
         "gpu": {
             "required": false,
