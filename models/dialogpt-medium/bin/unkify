@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+python /opt/dialogpt-medium/tokenizer.py -m unkify \
+       "$1"

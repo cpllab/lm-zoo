@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+python /opt/dialogpt-medium/get_surprisals.py --mode surprisal "$1"
