@@ -25,6 +25,10 @@ DOCKER_REFERENCE_RE = re.compile(r"^((?:[a-z0-9._-]*)(?<![._-])(?:/(?![._-])[a-z
 
 def main(args):
     registry = {}
+    if args.existing_registry:
+        with Path(args.existing_registry).open() as registry_f:
+            registry = json.load(registry_f)
+
     client = docker.from_env(timeout=60)
 
     for docker_image in tqdm(sorted(args.docker_images)):
@@ -66,5 +70,7 @@ def main(args):
 if __name__ == "__main__":
     p = ArgumentParser()
     p.add_argument("docker_images", nargs="+")
+    p.add_argument("-r", "--existing-registry", 
+                   help="Registry with which new image information should be merged.")
 
     main(p.parse_args())
