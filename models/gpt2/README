@@ -1,0 +1,8 @@
+This directory specifies a GPT2 model using the Huggingface implementation.
+The model parameters exactly match the Huggingface `gpt2` model
+(12 layers, 768-dim hidden layer, 12 attention heads).
+
+One notable feature of this implementation is that sentence boundary tokens
+(BOS/EOS) are added to each input sentence. This allows us to compute
+probability estimates of the first given token of each input sentence, which
+is useful for `lm-zoo` applications.
