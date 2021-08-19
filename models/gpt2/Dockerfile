@@ -24,9 +24,12 @@ ARG COMMIT
 # sha1 checksum of build directory
 ARG FILES_SHA1
 
+# Override model code.
+COPY ${MODEL_ROOT}/get_surprisals.py /opt/transformers/get_surprisals.py
+COPY ${MODEL_ROOT}/tokenizer.py /opt/transformers/tokenizer.py
+
 # Prepare spec.
 COPY ${MODEL_ROOT}/spec.template.json /tmp/spec.template.json
 RUN BUILD_DATETIME="$(date)" cat /tmp/spec.template.json | \
             sed "s/<image\.sha1>/$COMMIT/g; s/<image\.files_sha1>/${FILES_SHA1}/g; s/<image\.datetime>/${BUILD_DATETIME}/g" \
             > /opt/spec.json
-
