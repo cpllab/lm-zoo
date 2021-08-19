@@ -3,9 +3,9 @@
     "ref_url": "https://openai.com/blog/better-language-models/",
     "image": {
       "maintainer": "jon@gauthiers.net",
-      "version": "ca867981a9bd1ac987447ab6f77e0850236f604d",
-      "checksum": "c76ef0bc52a318ba26595f794f5e6f634c329abe",
-      "datetime": "2020-05-25T17:27:51.143189018Z",
+      "version": "12dd835452de55577e94d29ac7dc9b48e3832929",
+      "checksum": "411be282788feba44a60abb31afe080452f338a7",
+      "datetime": "2021-08-19T16:31:07.168140757Z",
       "supported_features": {
         "tokenize": true,
         "unkify": true,
@@ -20,7 +20,7 @@
       "registry": "docker.io",
       "name": "cpllab/language-models",
       "tag": "gpt2",
-      "size": 3747338861
+      "size": 7872262150
     },
     "tokenizer": {
       "type": "subword",
