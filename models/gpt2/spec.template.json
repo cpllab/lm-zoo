@@ -22,8 +22,8 @@
 
     "vocabulary": {
         "unk_types": [],
-        "prefix_types": [],
-        "suffix_types": ["</s>"],
+        "prefix_types": ["<|endoftext|>"],
+        "suffix_types": ["<|endoftext|>"],
         "special_types": []
     },
 
