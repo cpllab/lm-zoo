@@ -32,7 +32,12 @@ def tokenize_sentence(sentence, tokenizer):
 def unkify_sentence(sentence, tokenizer):
     sent_token_ids = tokenizer.encode(sentence)
     unk_id = tokenizer.convert_tokens_to_ids(tokenizer.unk_token)
-    return ["1" if idx == unk_id else "0" for idx in sent_token_ids]
+
+    # hack -- unk token is also sentence boundary token .. but avoid marking
+    # UNK at every sentence start/end
+    return ["0"] + \
+        ["1" if idx == unk_id else "0" for idx in sent_token_ids[1:-1]] + \
+        ["0"]
 
 def main(args):
     logger.info("Loading tokenizer")
