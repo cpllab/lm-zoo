@@ -1,8 +1,11 @@
-FROM pytorch/pytorch:latest
+FROM continuumio/miniconda3:4.10.3
 
 # Root of model directory relative to the build context.
 ARG MODEL_ROOT=models/transformers-base
 ARG COMMIT
+
+RUN conda install -y -c pytorch pytorch=1.9 torchvision cpuonly && \
+        conda clean -ya
 
 # Test dependencies
 RUN pip install nose jsonschema
