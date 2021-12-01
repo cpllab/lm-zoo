@@ -23,7 +23,10 @@ class DockerBackend(Backend):
     name = "docker"
 
     def __init__(self):
-        self._client = docker.from_env().api
+        try:
+            self._client = docker.from_env().api
+        except docker.errors.DockerException as exc:
+            raise errors.BackendConnectionError(self, exception=exc)
 
     def image_exists(self, model):
         try:
