@@ -86,7 +86,7 @@ def get_surprisals(model: Model, sentences: List[str], backend=None):
     token's probability under a language model's predictive distribution:
 
     .. math::
-        S(w_i) = -\log_2 p(w_i \mid w_1, w_2, \ldots, w_{i-1})
+        S(w_i) = -\\log_2 p(w_i \\mid w_1, w_2, \\ldots, w_{i-1})
 
     Note that surprisals are computed on the level of **tokens**, not words.
     Models that insert extra tokens (e.g., an end-of-sentence token as above)
