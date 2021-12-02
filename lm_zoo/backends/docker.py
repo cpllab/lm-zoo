@@ -13,12 +13,12 @@ import requests
 import tqdm
 
 from lm_zoo import errors
-from lm_zoo.backends import Backend
+from lm_zoo.backends import ContainerBackend
 from lm_zoo.constants import STATUS_CODES
 from lm_zoo.models import Model, DockerModel
 
 
-class DockerBackend(Backend):
+class DockerBackend(ContainerBackend):
 
     name = "docker"
 
