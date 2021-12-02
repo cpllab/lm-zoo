@@ -1,4 +1,7 @@
-from typing import *
+from typing import List, Dict, Union, Type
+
+import h5py
+import pandas as pd
 
 from lm_zoo.models import Model
 
@@ -17,7 +20,7 @@ class Backend(object):
         """
         raise NotImplementedError()
 
-    def tokenize(self, model: Model, sentences: List[str]):
+    def tokenize(self, model: Model, sentences: List[str]) -> List[List[str]]:
         """
         Tokenize natural-language text according to a model's preprocessing
         standards.
@@ -32,7 +35,7 @@ class Backend(object):
         """
         raise NotImplementedError()
 
-    def unkify(self, model: Model, sentences: List[str]):
+    def unkify(self, model: Model, sentences: List[str]) -> List[List[int]]:
         """
         Detect unknown words for a language model for the given natural language
         text.
@@ -49,7 +52,7 @@ class Backend(object):
         """
         raise NotImplementedError()
 
-    def get_surprisals(self, model: Model, sentences: List[str]):
+    def get_surprisals(self, model: Model, sentences: List[str]) -> pd.DataFrame:
         """
         Compute word-level surprisals from a language model for the given natural
         language sentences. Returns a data frame with a MultiIndex ```(sentence_id,
@@ -72,7 +75,7 @@ class Backend(object):
         """
         raise NotImplementedError()
 
-    def get_predictions(self, model: Model, sentences: List[str]):
+    def get_predictions(self, model: Model, sentences: List[str]) -> h5py.File:
         """
         Compute token-level predictive distributions from a language model for the
         given natural language sentences. Returns a h5py ``File`` object with the
