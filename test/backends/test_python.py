@@ -13,7 +13,7 @@ def dummy_results():
 
     ret = {}
     ret["tokenize"] = [s.split(" ") for s in sentences]
-    ret["unkify"] = [[1 for tok in sentence] for sentence in ret["tokenize"]]
+    ret["unkify"] = [[0 for tok in sentence] for sentence in ret["tokenize"]]
     return sentences, ret
 
 
@@ -27,3 +27,12 @@ def test_dummy_backend(dummy_results):
             pd.testing.assert_frame_equal(ret, result)
         else:
             assert ret == result
+
+
+def test_dummy_no_unks(dummy_results):
+    sentences, results = dummy_results
+    backend = DummyBackend(sentences, no_unks=True,
+                           tokenize=results["tokenize"])
+
+    assert backend.unkify(None, sentences) == \
+        [[0 for tok in sentence] for sentence in results["tokenize"]]

@@ -2,6 +2,7 @@
 Defines language model backends implemented natively in Python.
 """
 
+import logging
 from typing import List, Optional
 
 import h5py
@@ -9,6 +10,9 @@ import pandas as pd
 
 from lm_zoo.backends import Backend
 from lm_zoo.models import Model
+
+
+L = logging.getLogger("lm-zoo")
 
 
 class DummyBackend(Backend):
@@ -22,9 +26,22 @@ class DummyBackend(Backend):
     _allowed_methods = ["spec", "tokenize", "unkify", "get_surprisals",
                         "get_predictions"]
 
-    def __init__(self, sentences: List[str], **args):
+    def __init__(self, sentences: List[str], no_unks=False, **args):
+        """
+        Args:
+            sentences: List of sentences used to generate LM data
+            no_unks: If ``True``, simulate an ``unkify`` response which maps
+                all tokens (as given by ``tokenize`` kwarg) to 0
+                (known/in-vocabulary).
+        """
         self.sentences = sentences
         self._sentences_hash = hash(tuple(sentences))
+
+        self.no_unks = no_unks
+        if self.no_unks and "unkify" in args:
+            L.warning("DummyBackend received both `no_unks` flag and also a "
+                      "result value for `unkify`. Will skip simulating "
+                      "`unkify` response and use provided result instead.")
 
         self._values = {}
         for key, value in args.items():
@@ -55,6 +72,10 @@ class DummyBackend(Backend):
         return self._call_method("tokenize", model, sentences)
 
     def unkify(self, model: Model, sentences: List[str]) -> List[List[int]]:
+        if self.no_unks and "unkify" not in self._values:
+            tokenized = self.tokenize(model, sentences)
+            return [[0 for token in sentence] for sentence in tokenized]
+
         return self._call_method("unkify", model, sentences)
 
     def get_surprisals(self, model: Model, sentences: List[str]) -> pd.DataFrame:
