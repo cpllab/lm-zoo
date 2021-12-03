@@ -35,7 +35,7 @@ setup(
         "six==1.15.0",
         "spython==0.1.11",
         "tqdm==4.59.0",
-        "urllib3==1.26.4",
+        "urllib3>=1.26.5",
         "websocket-client==0.58.0",
     ],
     name="lm-zoo",
