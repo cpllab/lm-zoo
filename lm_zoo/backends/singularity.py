@@ -11,7 +11,7 @@ from typing import cast
 from spython.main import Client
 
 from lm_zoo import errors
-from lm_zoo.backends import ContainerBackend
+from lm_zoo.backends.container import ContainerBackend
 from lm_zoo.constants import STATUS_CODES
 from lm_zoo.models import Model, SingularityModel
 

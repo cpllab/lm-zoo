@@ -1,6 +1,3 @@
-from lm_zoo.backends.singularity import SingularityBackend
-from lm_zoo.backends.docker import DockerBackend
-from lm_zoo.backends.container import ContainerBackend
 from typing import List, Dict, Union, Type
 
 import h5py
@@ -105,6 +102,10 @@ class Backend(object):
         """
         raise NotImplementedError()
 
+
+from lm_zoo.backends.container import ContainerBackend
+from lm_zoo.backends.singularity import SingularityBackend
+from lm_zoo.backends.docker import DockerBackend
 
 BACKEND_DICT = {"docker": DockerBackend, "singularity": SingularityBackend}
 BACKENDS = list(BACKEND_DICT.values())
