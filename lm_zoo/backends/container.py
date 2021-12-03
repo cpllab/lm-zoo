@@ -70,7 +70,8 @@ class ContainerBackend(Backend):
         ret = self._run_model_command(model, "get_surprisals /dev/stdin",
                                       stdin=in_file, stdout=out)
         out_value = out.getvalue()
-        ret = pd.read_csv(StringIO(out_value), sep="\t").set_index(["sentence_id", "token_id"])
+        ret = pd.read_csv(StringIO(out_value), sep="\t").set_index(
+            ["sentence_id", "token_id"])
         return ret
 
     def get_predictions(self, model: Model, sentences: List[str]):
