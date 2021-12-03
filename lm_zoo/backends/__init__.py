@@ -1,3 +1,6 @@
+from lm_zoo.backends.singularity import SingularityBackend
+from lm_zoo.backends.docker import DockerBackend
+from lm_zoo.backends.container import ContainerBackend
 from typing import List, Dict, Union, Type
 
 import h5py
@@ -13,6 +16,13 @@ class Backend(object):
     """
 
     name = "ABSTRACT"
+
+    @classmethod
+    def is_compatible(cls, model):
+        """
+        Return ``True`` if the given model can be executed by this platform.
+        """
+        return cls.name in model.platforms
 
     def spec(self, model: Model):
         """
@@ -96,10 +106,6 @@ class Backend(object):
         raise NotImplementedError()
 
 
-from lm_zoo.backends.container import ContainerBackend
-from lm_zoo.backends.docker import DockerBackend
-from lm_zoo.backends.singularity import SingularityBackend
-
 BACKEND_DICT = {"docker": DockerBackend, "singularity": SingularityBackend}
 BACKENDS = list(BACKEND_DICT.values())
 
@@ -123,12 +129,13 @@ def get_backend(backend_ref: Union[str, Type[Backend]]):
         raise ValueError("invalid backend reference %s" % (backend_ref,))
 
 
-def get_compatible_backend(model: Model, preferred_backends: Union[str, Type[Backend], List[Union[str, Type[Backend]]], None]=None):
+def get_compatible_backend(model: Model, preferred_backends: Union[str, Type[Backend], List[Union[str, Type[Backend]]], None] = None):
     """
     Get a compatible backend for the given model.
     """
     if preferred_backends is not None:
-        preferred_backends = [preferred_backends] if not isinstance(preferred_backends, (tuple, list)) else preferred_backends
+        preferred_backends = [preferred_backends] if not isinstance(
+            preferred_backends, (tuple, list)) else preferred_backends
     else:
         preferred_backends = []
 

@@ -20,7 +20,7 @@ class Registry(object):
     def _pull_registry(self):
         return requests.get(self._registry_uri).json()
 
-    def __getitem__(self, model_ref) -> "Model":
+    def __getitem__(self, model_ref: str) -> "Model":
         """
         Retrieve a ``Model`` instance from the given string reference.
 

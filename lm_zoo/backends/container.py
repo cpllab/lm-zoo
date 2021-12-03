@@ -31,10 +31,6 @@ class ContainerBackend(Backend):
 
     name = "ABSTRACT_CONTAINER"
 
-    @classmethod
-    def is_compatible(cls, model):
-        return cls.name in model.platforms
-
     def image_exists(self, model):
         raise NotImplementedError()
 
