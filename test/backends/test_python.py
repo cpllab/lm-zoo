@@ -55,7 +55,7 @@ def dummy_model_file(dummy_results, request):
 
 def test_dummy_model_file_backend(dummy_model_file, dummy_results):
     sentences, results = dummy_results
-    model = DummyModel(dummy_model_file, sentences)
+    model = DummyModel(dummy_model_file, sentences=sentences)
     backend = DummyBackend()
 
     for command, result in results.items():
@@ -68,7 +68,7 @@ def test_dummy_model_file_backend(dummy_model_file, dummy_results):
 
 def test_dummy_no_unks(dummy_model_file, dummy_results):
     sentences, results = dummy_results
-    model = DummyModel(dummy_model_file, sentences, no_unks=True)
+    model = DummyModel(dummy_model_file, sentences=sentences, no_unks=True)
     backend = DummyBackend()
 
     assert backend.unkify(model, sentences) == \

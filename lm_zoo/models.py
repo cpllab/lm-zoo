@@ -201,19 +201,23 @@ class DummyModel(Model):
     # reconsider this split.
     platforms = ("dummy",)
 
-    def __init__(self, reference: Union[str, Path], sentences: List[str],
-                 no_unks=False):
+    def __init__(self, reference: Union[str, Path],
+                 no_unks=False,
+                 sentences: Optional[List[str]] = None):
         """
         Args:
             reference: Path to model JSON. See main class documentation for
                 more details.
-            sentences: List of sentences used to generate LM data
+            sentences: List of sentences used to generate LM data. Opitonal;
+                used to guarantee consistency with downstream calls to the model
             no_unks: If ``True``, simulate an ``unkify`` response which maps
                 all tokens (as given by ``tokenize`` kwarg) to 0
                 (known/in-vocabulary).
         """
         self.reference = Path(reference)
-        self._sentences_hash = hash(tuple(sentences))
+
+        self._sentences_hash = hash(tuple(sentences)) \
+            if sentences is not None else None
 
         self.no_unks = no_unks
 
@@ -221,7 +225,7 @@ class DummyModel(Model):
         self._data = None
 
     def get_result(self, command: str, sentences: Optional[List[str]]):
-        if sentences is not None and \
+        if sentences is not None and self._sentences_hash is not None and \
           hash(tuple(sentences)) != self._sentences_hash:
             raise ValueError("DummyBackend called with a different set of "
                              "sentences than the one provided at "
@@ -263,7 +267,8 @@ class DummyModel(Model):
 
                 return ret
             elif command == "get_surprisals":
-                return pd.read_csv(result_path)
+                return pd.read_csv(result_path, sep="\t",
+                                   index_col=["sentence_id", "token_id"])
             elif command == "get_predictions":
                 return h5py.File(result_path)
 

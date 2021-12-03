@@ -23,6 +23,8 @@ class DummyBackend(Backend):
     but still use the LM Zoo API.
     """
 
+    name = "dummy"
+
     def spec(self, model: DummyModel):
         return model.get_result("spec")
 

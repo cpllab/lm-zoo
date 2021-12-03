@@ -4,6 +4,7 @@ Test Click application
 
 import functools
 from io import StringIO
+import json
 from pathlib import Path
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile, TemporaryDirectory
@@ -28,15 +29,6 @@ def runner():
 def lmzoo_model(request):
     return Z.get_registry()[request.param]
 
-@pytest.fixture(scope="module", params=[(None, "GRNN"),
-                                        (Path(__file__).parent / "lmzoo-template.sif",
-                                         "singularity://%s" % (Path(__file__).parent / "lmzoo-template.sif"))])
-def any_model(registry, request):
-    # HACK: combine registry models and other models into a single stream
-    check_path, model_ref = request.param
-    if check_path is not None and not check_path.exists():
-        pytest.skip("missing model %s at path %s" % (model_ref, check_path))
-    return model_ref
 
 @pytest.fixture(scope="function")
 def test_file():
@@ -45,6 +37,53 @@ def test_file():
         f.flush()
 
         yield f.name
+
+
+@pytest.fixture(scope="function", params=[(None, "dummy://"),
+                                          (None, "GRNN"),
+                                          (Path(__file__).parent / "lmzoo-template.sif",
+                                           "singularity://%s" % (Path(__file__).parent / "lmzoo-template.sif"))])
+def any_model(registry, test_file, request):
+    # HACK: combine registry models and other models into a single stream
+    check_path, model_ref = request.param
+    if check_path is not None and not check_path.exists():
+        pytest.skip("missing model %s at path %s" % (model_ref, check_path))
+    if model_ref.startswith("dummy://"):
+        # Prepare a dummy directory for use in commands.
+        with TemporaryDirectory() as model_dir:
+            with open(test_file) as test_f:
+                sentences = test_f.read().strip().split("\n")
+
+            with (Path(model_dir) / "tokenize.txt").open("w") as f:
+                f.write("\n".join(sentences))
+            with (Path(model_dir) / "unkify.txt").open("w") as f:
+                f.write("\n".join(" ".join("0" for tok in sentence.split(" "))
+                                  for sentence in sentences))
+
+            surprisals_df = [
+                (sentence_idx + 1, token_idx + 1, token, float(hash(token)))
+                for sentence_idx, sentence in enumerate(sentences)
+                for token_idx, token in enumerate(sentence.split(" "))
+            ]
+            surprisals_df = pd.DataFrame(
+                surprisals_df,
+                columns=["sentence_id", "token_id", "token", "surprisal"]) \
+                .set_index(["sentence_id", "token_id"])
+            surprisals_df.to_csv(Path(model_dir) / "surprisals.tsv", sep="\t")
+
+            model_json = {
+                "tokenize": "tokenize.txt",
+                "unkify": "unkify.txt",
+                "get_surprisals": "surprisals.tsv",
+            }
+            model_json_path = Path(model_dir) / "model.json"
+            with model_json_path.open("w") as model_f:
+                json.dump(model_json, model_f)
+
+            ref = f"dummy://{model_json_path}"
+            yield ref
+    else:
+        yield model_ref
 
 
 def invoke(runner, cmd, *args, **kwargs):
@@ -69,6 +108,7 @@ def test_tokenize(registry, runner, any_model, test_file):
     API_result = Z.tokenize(registry[any_model], test_text.strip().split("\n"))
     assert lines == API_result
 
+
 def test_unkify(registry, runner, any_model, test_file):
     result = invoke(runner, ["unkify", any_model, test_file])
 
@@ -85,24 +125,25 @@ def test_unkify(registry, runner, any_model, test_file):
 
 def test_get_surprisals(registry, runner, any_model, test_file):
     if "lmzoo-template" in any_model:
-        pytest.skip("Test not relevant for lmzoo-template, which outputs random surprisals")
+        pytest.skip("Test not relevant for this model, which outputs random surprisals")
 
     result = invoke(runner, ["get-surprisals", any_model, test_file])
 
     assert result.output.endswith("\n"), "Should have final trailing newline"
     output = result.output[:-1]
-    output = pd.read_csv(StringIO(output), sep="\t")
+    output = pd.read_csv(StringIO(output), sep="\t") \
+        .set_index(["sentence_id", "token_id"])
 
     # API as ground truth
     with open(test_file) as test_f:
         test_text = test_f.read()
     API_result = Z.get_surprisals(registry[any_model], test_text.strip().split("\n"))
-    pd.testing.assert_frame_equal(output, API_result.reset_index())
+    pd.testing.assert_frame_equal(output, API_result)
 
 
 def test_get_predictions(registry, runner, any_model, test_file):
-    if "lmzoo-template" in any_model:
-        pytest.skip("Test not relevant for lmzoo-template, which doesn't support get_predictions")
+    if "lmzoo-template" in any_model or "dummy" in any_model:
+        pytest.skip("Test not relevant for this model, which doesn't support get_predictions")
 
     with NamedTemporaryFile() as preds_f_cli:
         invoke(runner, ["get-predictions", any_model, test_file, preds_f_cli.name])

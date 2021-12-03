@@ -106,8 +106,10 @@ class Backend(object):
 from lm_zoo.backends.container import ContainerBackend
 from lm_zoo.backends.singularity import SingularityBackend
 from lm_zoo.backends.docker import DockerBackend
+from lm_zoo.backends.python import DummyBackend
 
-BACKEND_DICT = {"docker": DockerBackend, "singularity": SingularityBackend}
+BACKEND_DICT = {"docker": DockerBackend, "singularity": SingularityBackend,
+                "dummy": DummyBackend}
 BACKENDS = list(BACKEND_DICT.values())
 
 # TODO document
