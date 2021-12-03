@@ -19,14 +19,6 @@ def dummy_model():
     return r[next(iter(r))]
 
 
-@pytest.mark.parametrize("method,method_args",
-                         [("image_exists", {}),
-                          ("pull_image", {}),
-                          ("run_command", dict(command_str="ls"))])
-def test_docker_offline(dummy_model, method, method_args, bad_client):
-    backend = DockerBackend()
-    method = getattr(backend, method)
-    method_args["model"] = dummy_model
-
+def test_docker_offline(dummy_model, bad_client):
     with pytest.raises(errors.BackendConnectionError):
-        method(**method_args)
+        backend = DockerBackend()
