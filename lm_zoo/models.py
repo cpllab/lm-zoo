@@ -267,6 +267,8 @@ class DummyModel(Model):
             elif command == "get_predictions":
                 return h5py.File(result_path)
 
+        return result
+
 
     def __str__(self):
         return "dummy://%s" % (self.reference,)

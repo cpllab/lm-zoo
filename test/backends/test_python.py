@@ -22,25 +22,30 @@ def dummy_results():
     return sentences, ret
 
 
-@pytest.fixture(scope="function")
-def dummy_model_file(dummy_results):
+@pytest.fixture(scope="function",
+                params=[True, False])
+def dummy_model_file(dummy_results, request):
     sentences, results = dummy_results
+    lists_as_literals = request.param
 
     with TemporaryDirectory() as model_dir:
-        for command, result in results.items():
-            with (Path(model_dir) / f"{command}.txt").open("w") as f:
-                if isinstance(result, list):
-                    # token or unk list
-                    f.write("\n".join(" ".join(str(x) for x in sent)
-                                      for sent in result))
-                else:
-                    # TODO
-                    pass
+        model_json = {}
 
-        model_json = {
-            command: str(Path(model_dir) / f"{command}.txt")
-            for command in results.keys()
-        }
+        for command, result in results.items():
+            if isinstance(result, list):
+                # token or unk list
+                if lists_as_literals:
+                    model_json[command] = result
+                else:
+                    command_result_path = Path(model_dir) / f"{command}.txt"
+                    with command_result_path.open("w") as f:
+                        f.write("\n".join(" ".join(str(x) for x in sent)
+                                          for sent in result))
+                    model_json[command] = str(command_result_path)
+            else:
+                # TODO
+                pass
+
         model_json_path = Path(model_dir) / "model.json"
         with model_json_path.open("w") as model_f:
             json.dump(model_json, model_f)
