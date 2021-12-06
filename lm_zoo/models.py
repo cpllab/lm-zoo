@@ -36,12 +36,16 @@ class Registry(object):
         remote_model_match = self._remote_model_reference_re.match(model_ref)
         if remote_model_match is not None:
             platform, remote_ref = remote_model_match.groups()
+
+            # TODO use backends.PROTOCOL_TO_BACKEND?
             if platform == "docker":
                 return DockerModel(remote_ref)
             elif platform in ["singularity", "shub", "library"]:
                 return SingularityModel(platform, remote_ref)
             elif platform == "dummy":
                 return DummyModel(remote_ref)
+            elif platform == "huggingface":
+                return HuggingFaceModel(remote_ref)
             else:
                 raise ValueError("Unknown platform URI %s://" % (platform,))
 
@@ -70,7 +74,7 @@ class Model(object):
     def platforms(self):
         """
         A list of the supported backend platforms for this model. A
-        subset of ``["docker", "singularity", "dummy"]``.
+        subset of ``["docker", "singularity", "dummy", "huggingface"]``.
         """
         raise NotImplementedError()
 
@@ -277,3 +281,44 @@ class DummyModel(Model):
 
     def __str__(self):
         return "dummy://%s" % (self.reference,)
+
+
+try:
+    import transformers
+except ImportError as e:
+    transformers = e
+
+class HuggingFaceModel(Model):
+
+    platforms = ("huggingface",)
+
+    # TODO checkpointing
+    # TODO unclear division of labor between here and backend. recheck design.
+
+    def __init__(self, model_ref: str):
+        if isinstance(transformers, ImportError):
+            # HF was not available for import. Quit.
+            raise transformers
+
+        self.model_ref = model_ref
+
+        self._model = None
+        self._tokenizer = None
+
+    @property
+    def model(self) -> "transformers.PreTrainedModel":
+        if self._model is None:
+            self._model = transformers.AutoModelForCausalLM.from_pretrained(self.model_ref)
+
+            # TODO CUDA
+            # model.to(device)
+
+            self._model.eval()
+            
+        return self._model
+
+    @property
+    def tokenizer(self) -> "transformers.PreTrainedModel":
+        if self._tokenizer is None:
+            self._tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_ref)
+        return self._tokenizer

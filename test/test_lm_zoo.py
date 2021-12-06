@@ -37,7 +37,8 @@ def singularity_local_model(request):
 
 @pytest.fixture(scope="module", params=[(None, "GRNN"),
                                         (Path(__file__).parent / "lmzoo-template.sif",
-                                         "singularity://%s" % (Path(__file__).parent / "lmzoo-template.sif"))])
+                                         "singularity://%s" % (Path(__file__).parent / "lmzoo-template.sif")),
+                                        (None, "huggingface://hf-internal-testing/tiny-xlm-roberta")])
 def any_model(registry, request):
     # HACK: combine registry models and other models into a single stream
     check_path, model_ref = request.param
@@ -64,8 +65,10 @@ def test_unkify(registry):
 
 @may_raise(Z.errors.UnsupportedFeatureError)
 def test_get_predictions(registry, any_model):
-    result = Z.get_predictions(registry[any_model], ["This is a test sentence"])
-    assert result["/sentence/0/predictions"].shape[0] == len("This is a test sentence <eos>".split(" "))
+    model = registry[any_model]
+    tokenized = Z.tokenize(model, ["This is a test sentence"])[0]
+    result = Z.get_predictions(model, ["This is a test sentence"])
+    assert result["/sentence/0/predictions"].shape[0] == len(tokenized)
 
 def test_unsupported_feature(template_model):
     with pytest.raises(Z.errors.UnsupportedFeatureError):

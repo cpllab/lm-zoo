@@ -42,7 +42,8 @@ def test_file():
 @pytest.fixture(scope="function", params=[(None, "dummy://"),
                                           (None, "GRNN"),
                                           (Path(__file__).parent / "lmzoo-template.sif",
-                                           "singularity://%s" % (Path(__file__).parent / "lmzoo-template.sif"))])
+                                           "singularity://%s" % (Path(__file__).parent / "lmzoo-template.sif")),
+                                          (None, "huggingface://hf-internal-testing/tiny-xlm-roberta"),])
 def any_model(registry, test_file, request):
     # HACK: combine registry models and other models into a single stream
     check_path, model_ref = request.param

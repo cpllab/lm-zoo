@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from lm_zoo.backends.python import DummyBackend
-from lm_zoo.models import DummyModel
+from lm_zoo.models import DummyModel, HuggingFaceModel
 
 
 @pytest.fixture(scope="module")
@@ -73,3 +73,11 @@ def test_dummy_no_unks(dummy_model_file, dummy_results):
 
     assert backend.unkify(model, sentences) == \
         [[0 for tok in sentence] for sentence in results["tokenize"]]
+
+
+# @pytest.fixture(scope="module",
+#                 params=["hf-internal-testing/tiny-xlm-roberta"])
+# def huggingface_model(request):
+#     model_ref = request.param
+#     model = HuggingFaceModel(model_ref)
+#     return model
