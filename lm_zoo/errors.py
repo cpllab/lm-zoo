@@ -52,3 +52,22 @@ class IncompatibleBackendError(RuntimeError):
         return ("Model %s is not compatible with backend %s%s"
                 % (self.model, self.backend,
                    "\n%s" % self.message if self.message is not None else ""))
+
+
+class UnsupportedModelError(RuntimeError):
+    """
+    This error is raised when an LM-Zoo-external model (e.g. a model from the
+    HuggingFace hub) not compatible with the assumptions of LM Zoo is specified.
+    For example, non-causal LMs are not compatible with the assumptions of LM
+    Zoo.
+    """
+
+    def __init__(self, model_ref: str, message: str = None):
+        super().__init__()
+        self.model_ref = model_ref
+        self.message = message
+
+    def __str__(self):
+        return ("Model %s is not usable with LM Zoo.%s"
+                % (self.model_ref,
+                   "\n%s" % self.message if self.message is not None else ""))

@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 import pandas as pd
 import pytest
 
+import lm_zoo as Z
 from lm_zoo.backends.python import DummyBackend
 from lm_zoo.models import DummyModel, HuggingFaceModel
 
@@ -81,3 +82,45 @@ def test_dummy_no_unks(dummy_model_file, dummy_results):
 #     model_ref = request.param
 #     model = HuggingFaceModel(model_ref)
 #     return model
+
+def huggingface_model_fixture(request):
+    """
+    Defines a generic fixture to be parameterized in a few different ways
+    """
+    model_ref = request.param
+    model = HuggingFaceModel(model_ref)
+    return model
+
+
+# TODO find / mock a word-level model
+
+
+huggingface_model_subword = pytest.fixture(
+    huggingface_model_fixture,
+    scope="module",
+    params=["hf-internal-testing/tiny-xlm-roberta"])
+"""Subword-tokenization HF models"""
+
+
+# TODO find / mock a char-level model
+huggingface_model_character = pytest.fixture(
+    huggingface_model_fixture,
+    scope="module",
+    params=[])
+"""Character-level HF models"""
+
+
+def test_hf_subword_detected(huggingface_model_subword):
+    spec = Z.spec(huggingface_model_subword)
+    assert spec["tokenizer"]["type"] == "subword"
+
+
+def test_hf_character_detected(huggingface_model_character):
+    spec = Z.spec(huggingface_model_character)
+    assert spec["tokenizer"]["type"] == "character"
+
+
+@pytest.mark.parametrize("model_ref", ["hf-internal-testing/tiny-random-t5"])
+def test_hf_incompatible(model_ref):
+    with pytest.raises(Z.errors.UnsupportedModelError):
+        HuggingFaceModel(model_ref)

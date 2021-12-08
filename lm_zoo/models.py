@@ -8,6 +8,8 @@ import h5py
 import pandas as pd
 import requests
 
+from lm_zoo.errors import UnsupportedModelError
+
 
 class Registry(object):
 
@@ -301,9 +303,15 @@ class HuggingFaceModel(Model):
             raise transformers
 
         self.model_ref = model_ref
+        self._check_compatible()
 
         self._model = None
         self._tokenizer = None
+
+    def _check_compatible(self):
+        config = transformers.AutoConfig.from_pretrained(self.model_ref)
+        if type(config) not in transformers.AutoModelForCausalLM._model_mapping:
+            raise UnsupportedModelError(self.model_ref)
 
     @property
     def model(self) -> "transformers.PreTrainedModel":
@@ -314,7 +322,7 @@ class HuggingFaceModel(Model):
             # model.to(device)
 
             self._model.eval()
-            
+
         return self._model
 
     @property
