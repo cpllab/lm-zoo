@@ -99,13 +99,13 @@ class HuggingFaceBackend(Backend):
         for i, sentence in enumerate(sentences):
             predictions = self._get_predictions_inner(model, sentence)
 
-            for word, word_idx, preds in predictions:
+            for j, (word, word_idx, preds) in enumerate(predictions):
                 if preds is None:
                     surprisal = 0.0
                 else:
                     surprisal = -preds[word_idx].item() / np.log(2)
 
-                df.append((i + 1, word_idx + 1, word, surprisal))
+                df.append((i + 1, j + 1, word, surprisal))
 
         return pd.DataFrame(df, columns=columns) \
             .set_index(["sentence_id", "token_id"])
