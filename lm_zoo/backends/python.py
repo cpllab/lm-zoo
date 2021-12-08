@@ -82,6 +82,85 @@ class HuggingFaceBackend(Backend):
         model_name = model.model.config.name_or_path
         tokenizer = model.tokenizer
 
+        def listify_special_token(special_token):
+            if special_token is None:
+                return []
+            else:
+                return [special_token]
+
+        ret = {
+            "name": model_name,
+
+            # TODO what about local models? this will be incorrect
+            "ref_url": f"https://huggingface.co/{model_name}",
+
+            "image": {
+                "supported_features": {
+                    "tokenize": True,
+                    "unkify": True,
+                    "get_surprisals": True,
+                    "get_predictions": True,
+                    "mount_checkpoint": False,
+                },
+
+                "gpu": {
+                    "required": False,
+                    "supported": False,
+                },
+            },
+
+            "vocabulary": {
+                "items": list(tokenizer.get_vocab().keys()),
+
+                "unk_types": listify_special_token(tokenizer.unk_token),
+                "prefix_types": listify_special_token(tokenizer.bos_token),
+                "suffix_types": listify_special_token(tokenizer.eos_token),
+                "special_types":
+                    set(tokenizer.all_special_tokens) - \
+                        {tokenizer.bos_token, tokenizer.eos_token,
+                         tokenizer.unk_token}
+            },
+
+            "tokenizer": {
+                "type": "subword",
+                "cased": True,
+                "sentinel_position": "initial",
+                "sentinel_pattern": "_",
+            },
+        }
+
+        # TODO HACK: construct tokenizer information by post-hoc inspection.
+        # ideally we could do this by introspecting on tokenizer config ..
+        tokenizer_info = {}
+        test_str = "Testing"
+        # Tokenize without EOS/BOS/etc.
+        tokenized = tokenizer.tokenize(test_str, add_special_tokens=False)
+
+        if len(tokenized) == 1:
+            tokenizer_info["type"] = "word"
+        elif len(tokenized) == len(test_str):
+            tokenizer_info["type"] = "character"
+        else:
+            tokenizer_info["type"] = "subword"
+
+        if tokenizer_info["type"] == "subword":
+            # determine subword sentinel setup
+            word_start = tokenized[0].lower().index(test_str[0].lower())
+            if word_start > 0:
+                # word-initial sentinel.
+                tokenizer_info.update({
+                    "sentinel_position": "initial",
+                    "sentinel_pattern": tokenized[0][:word_start],
+                    "cased": tokenized[0][word_start].isupper(),
+                })
+            else:
+                pass
+                # TODO handle word-final sentinels. if that's a thing.
+        else:
+            tokenizer_info["cased"] = tokenized[0][0].isupper()
+
+        ret["tokenizer"] = tokenizer_info
+        return ret
 
     def tokenize(self, model: HuggingFaceModel, sentences: List[str]) -> List[List[str]]:
         return [model.tokenizer.tokenize(sentence, add_special_tokens=True)
