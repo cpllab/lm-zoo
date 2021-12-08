@@ -63,7 +63,7 @@ class HuggingFaceBackend(Backend):
         # TODO batch
         # TODO remove torch dependency
 
-        sent_tokens = model.tokenizer.tokenize(sentence)
+        sent_tokens = model.tokenizer.tokenize(sentence, add_special_tokens=True)
         indexed_tokens = model.tokenizer.convert_tokens_to_ids(sent_tokens)
         # create 1 * T input token tensor
         tokens_tensor = torch.tensor(indexed_tokens).unsqueeze(0)
@@ -79,10 +79,13 @@ class HuggingFaceBackend(Backend):
                         (None,) + log_probs.unbind()))
 
     def spec(self, model: HuggingFaceModel):
-        return model.get_result("spec")
+        model_name = model.model.config.name_or_path
+        tokenizer = model.tokenizer
+
 
     def tokenize(self, model: HuggingFaceModel, sentences: List[str]) -> List[List[str]]:
-        return [model.tokenizer.tokenize(sentence) for sentence in sentences]
+        return [model.tokenizer.tokenize(sentence, add_special_tokens=True)
+                for sentence in sentences]
 
     def unkify(self, model: HuggingFaceModel, sentences: List[str]) -> List[List[int]]:
         unk_id = model.tokenizer.convert_tokens_to_ids(model.tokenizer.unk_token)
