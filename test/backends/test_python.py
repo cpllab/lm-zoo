@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import jsonschema
 import pandas as pd
 import pytest
 
@@ -98,7 +99,8 @@ def huggingface_model_fixture(request):
 huggingface_model_subword = pytest.fixture(
     huggingface_model_fixture,
     scope="module",
-    params=["hf-internal-testing/tiny-xlm-roberta"])
+    params=["hf-internal-testing/tiny-xlm-roberta",
+            "hf-internal-testing/tiny-random-gpt_neo"])
 """Subword-tokenization HF models"""
 
 
@@ -108,6 +110,13 @@ huggingface_model_character = pytest.fixture(
     scope="module",
     params=[])
 """Character-level HF models"""
+
+
+def test_hf_spec(huggingface_model_subword):
+    schema_path = Path(__file__).parent.parent.parent / "docs" / "schemas" / "language_model_spec.json"
+    with schema_path.open() as schema_f:
+        schema = json.load(schema_f)
+    jsonschema.validate(Z.spec(huggingface_model_subword), schema)
 
 
 def test_hf_subword_detected(huggingface_model_subword):

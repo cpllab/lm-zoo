@@ -2,6 +2,7 @@
 Defines language model backends implemented natively in Python.
 """
 
+import datetime
 import io
 import logging
 import operator
@@ -62,7 +63,6 @@ class HuggingFaceBackend(Backend):
     def _get_predictions_inner(self, model: HuggingFaceModel, sentence: str):
         # TODO handle sentence maxlen
         # TODO batch
-        # TODO remove torch dependency
 
         sent_tokens = model.tokenizer.tokenize(sentence, add_special_tokens=True)
         indexed_tokens = model.tokenizer.convert_tokens_to_ids(sent_tokens)
@@ -96,6 +96,12 @@ class HuggingFaceBackend(Backend):
             "ref_url": f"https://huggingface.co/{model_name}",
 
             "image": {
+                "maintainer": "huggingface@huggingface.co",
+
+                # Hacky, just to satisfy schema.
+                "version": str(getattr(model, "_version", "NA")),
+                "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+
                 "supported_features": {
                     "tokenize": True,
                     "unkify": True,
@@ -117,9 +123,10 @@ class HuggingFaceBackend(Backend):
                 "prefix_types": listify_special_token(tokenizer.bos_token),
                 "suffix_types": listify_special_token(tokenizer.eos_token),
                 "special_types":
-                    set(tokenizer.all_special_tokens) - \
-                        {tokenizer.bos_token, tokenizer.eos_token,
-                         tokenizer.unk_token}
+                    list(
+                        set(tokenizer.all_special_tokens) - \
+                            {tokenizer.bos_token, tokenizer.eos_token,
+                             tokenizer.unk_token})
             },
 
             "tokenizer": {
@@ -155,8 +162,9 @@ class HuggingFaceBackend(Backend):
                     "cased": tokenized[0][word_start].isupper(),
                 })
             else:
-                pass
-                # TODO handle word-final sentinels. if that's a thing.
+                tokenizer_info["cased"] = tokenized[0][0].isupper()
+
+            # TODO handle word-final sentinels. if that's a thing.
         else:
             tokenizer_info["cased"] = tokenized[0][0].isupper()
 
