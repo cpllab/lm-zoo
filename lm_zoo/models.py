@@ -228,9 +228,9 @@ class DummyModel(Model):
         self.no_unks = no_unks
 
         # lazy-load model data
-        self._data = None
+        self._data = {}
 
-    def get_result(self, command: str, sentences: Optional[List[str]]):
+    def get_result(self, command: str, sentences: Optional[List[str]] = None):
         if sentences is not None and self._sentences_hash is not None and \
           hash(tuple(sentences)) != self._sentences_hash:
             raise ValueError("DummyBackend called with a different set of "
@@ -241,7 +241,7 @@ class DummyModel(Model):
             tokenized = self.get_result("tokenize", sentences)
             return [[0 for token in sentence] for sentence in tokenized]
 
-        if self._data is None:
+        if not self._data:
             with self.reference.open("r", encoding="utf-8") as f:
                 self._data = json.load(f)
 
@@ -280,7 +280,6 @@ class DummyModel(Model):
 
         return result
 
-
     def __str__(self):
         return "dummy://%s" % (self.reference,)
 
@@ -289,6 +288,7 @@ try:
     import transformers
 except ImportError as e:
     transformers = e
+
 
 class HuggingFaceModel(Model):
 
@@ -305,8 +305,8 @@ class HuggingFaceModel(Model):
         self.model_ref = model_ref
         self._check_compatible()
 
-        self._model = None
-        self._tokenizer = None
+        self._model: Optional["transformers.PreTrainedModel"] = None
+        self._tokenizer: Optional["transformers.PreTrainedTokenizer"] = None
 
     def _check_compatible(self):
         config = transformers.AutoConfig.from_pretrained(self.model_ref)

@@ -49,6 +49,7 @@ try:
 except ImportError as e:
     torch = e
 
+
 class HuggingFaceBackend(Backend):
 
     name = "huggingface"

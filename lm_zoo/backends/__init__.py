@@ -142,8 +142,8 @@ def get_compatible_backend(model: Model, preferred_backends: Union[str, Type[Bac
     else:
         preferred_backends = []
 
-    for backend in preferred_backends + BACKENDS:
-        backend = get_backend(backend)
+    for backend_ref in preferred_backends + BACKENDS:
+        backend = get_backend(backend_ref)
         if backend.is_compatible(model):
             return backend()
 
