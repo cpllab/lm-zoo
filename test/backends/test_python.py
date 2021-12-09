@@ -129,6 +129,16 @@ def test_hf_character_detected(huggingface_model_character):
     assert spec["tokenizer"]["type"] == "character"
 
 
+def test_hf_gpt_tokenizer_spec():
+    spec = Z.spec(HuggingFaceModel("hf-internal-testing/tiny-random-gpt_neo"))
+    assert spec["tokenizer"] == {
+        "type": "subword",
+        "sentinel_position": "initial",
+        "sentinel_pattern": "Ġ",
+        "cased": True,
+    }
+
+
 @pytest.mark.parametrize("model_ref", ["hf-internal-testing/tiny-random-t5"])
 def test_hf_incompatible(model_ref):
     with pytest.raises(Z.errors.UnsupportedModelError):

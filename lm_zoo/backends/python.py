@@ -47,8 +47,10 @@ class DummyBackend(Backend):
 
 try:
     import torch
+    import transformers
 except ImportError as e:
     torch = e
+    transformers = e
 
 
 class HuggingFaceBackend(Backend):
@@ -57,8 +59,9 @@ class HuggingFaceBackend(Backend):
 
     def __init__(self):
         if isinstance(torch, ImportError):
-            raise NotImplementedError("Huggingface backend requires Pytorch to be installed.") \
-                from torch
+            raise NotImplementedError(
+                "Huggingface backend requires `transformers` and Pytorch to be "
+                "installed.") from torch
 
     def _get_predictions_inner(self, model: HuggingFaceModel, sentence: str):
         # TODO handle sentence maxlen
@@ -144,29 +147,42 @@ class HuggingFaceBackend(Backend):
         # Tokenize without EOS/BOS/etc.
         tokenized = tokenizer.tokenize(test_str, add_special_tokens=False)
 
-        if len(tokenized) == 1:
-            tokenizer_info["type"] = "word"
-        elif len(tokenized) == len(test_str):
-            tokenizer_info["type"] = "character"
-        else:
-            tokenizer_info["type"] = "subword"
+        word_start = tokenized[0].lower().index(test_str[0].lower())
+        tokenizer_info["cased"] = tokenized[0][0].isupper()
 
-        if tokenizer_info["type"] == "subword":
-            # determine subword sentinel setup
-            word_start = tokenized[0].lower().index(test_str[0].lower())
-            if word_start > 0:
-                # word-initial sentinel.
-                tokenizer_info.update({
-                    "sentinel_position": "initial",
-                    "sentinel_pattern": tokenized[0][:word_start],
-                    "cased": tokenized[0][word_start].isupper(),
-                })
+        # Infer directly from model class if possible.
+        if isinstance(tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)):
+            tokenizer_info.update({
+                "type": "subword",
+                "sentinel_position": "initial",
+                "sentinel_pattern": "Ġ",
+                "cased": tokenized[0][0].isupper()
+            })
+        else:
+            if len(tokenized) == 1:
+                tokenizer_info["type"] = "word"
+            elif len(tokenized) == len(test_str):
+                tokenizer_info["type"] = "character"
             else:
-                tokenizer_info["cased"] = tokenized[0][0].isupper()
+                tokenizer_info["type"] = "subword"
 
-            # TODO handle word-final sentinels. if that's a thing.
-        else:
-            tokenizer_info["cased"] = tokenized[0][0].isupper()
+            if tokenizer_info["type"] == "subword":
+                # determine subword sentinel setup
+
+                if word_start > 0:
+                    # word-initial sentinel.
+                    tokenizer_info.update({
+                        "sentinel_position": "initial",
+                        "sentinel_pattern": tokenized[0][:word_start],
+                        "cased": tokenized[0][word_start].isupper(),
+                    })
+                else:
+                    pass
+
+                # TODO handle word-final sentinels. if that's a thing.
+            else:
+                # TODO anything else to handle here?
+                pass
 
         ret["tokenizer"] = tokenizer_info
         return ret
