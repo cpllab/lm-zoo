@@ -89,7 +89,13 @@ def huggingface_model_fixture(request):
     Defines a generic fixture to be parameterized in a few different ways
     """
     model_ref = request.param
-    model = HuggingFaceModel(model_ref)
+
+    # Avoid making lots of HTTP requests if possible, just use local files.
+    try:
+        model = HuggingFaceModel(model_ref, offline=True)
+    except OSError:
+        model = HuggingFaceModel(model_ref, offline=False)
+
     return model
 
 
@@ -170,3 +176,15 @@ def test_hf_gpt_tokenizer_spec():
 def test_hf_incompatible(model_ref):
     with pytest.raises(Z.errors.UnsupportedModelError):
         HuggingFaceModel(model_ref)
+
+
+@pytest.mark.parametrize("model_ref", [huggingface_model_subword_refs[0]])
+def test_hf_offline(model_ref):
+    # make sure model is available in the cache by loading first
+    HuggingFaceModel(model_ref, offline=False)
+    # should not raise an exception
+    HuggingFaceModel(model_ref, offline=True)
+
+    nonexistent_model_ref = "not_a_model"
+    with pytest.raises(OSError):
+        HuggingFaceModel(nonexistent_model_ref, offline=True)

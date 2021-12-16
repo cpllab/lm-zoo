@@ -297,26 +297,37 @@ class HuggingFaceModel(Model):
     # TODO checkpointing
     # TODO unclear division of labor between here and backend. recheck design.
 
-    def __init__(self, model_ref: str):
+    def __init__(self, model_ref: str, offline=False):
+        """
+        Args:
+            offline: Iff ``True`` then load model with
+                ``local_files_only=True``. May cause exceptions to be thrown
+                if models are missing.
+        """
+
         if isinstance(transformers, ImportError):
             # HF was not available for import. Quit.
             raise transformers
 
         self.model_ref = model_ref
+        self.offline = offline
+
         self._check_compatible()
 
         self._model: Optional["transformers.PreTrainedModel"] = None
         self._tokenizer: Optional["transformers.PreTrainedTokenizer"] = None
 
     def _check_compatible(self):
-        config = transformers.AutoConfig.from_pretrained(self.model_ref)
+        config = transformers.AutoConfig.from_pretrained(
+            self.model_ref, local_files_only=self.offline)
         if type(config) not in transformers.AutoModelForCausalLM._model_mapping:
             raise UnsupportedModelError(self.model_ref)
 
     @property
     def model(self) -> "transformers.PreTrainedModel":
         if self._model is None:
-            self._model = transformers.AutoModelForCausalLM.from_pretrained(self.model_ref)
+            self._model = transformers.AutoModelForCausalLM.from_pretrained(
+                self.model_ref, local_files_only=self.offline)
 
             # TODO CUDA
             # model.to(device)
@@ -328,5 +339,6 @@ class HuggingFaceModel(Model):
     @property
     def tokenizer(self) -> "transformers.PreTrainedModel":
         if self._tokenizer is None:
-            self._tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_ref)
+            self._tokenizer = transformers.AutoTokenizer.from_pretrained(
+                self.model_ref, local_files_only=self.offline)
         return self._tokenizer
