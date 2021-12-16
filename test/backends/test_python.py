@@ -93,30 +93,57 @@ def huggingface_model_fixture(request):
     return model
 
 
-# TODO find / mock a word-level model
+huggingface_model_word_refs = [
+    "hf-internal-testing/tiny-random-transfo-xl",
+]
+"""Word-level-tokenization HF models"""
 
+huggingface_model_word = pytest.fixture(
+    huggingface_model_fixture,
+    scope="module",
+    params=huggingface_model_word_refs)
+
+
+huggingface_model_subword_refs = [
+    "hf-internal-testing/tiny-xlm-roberta",
+    "hf-internal-testing/tiny-random-gpt_neo"
+]
+"""Subword-tokenization HF models"""
 
 huggingface_model_subword = pytest.fixture(
     huggingface_model_fixture,
     scope="module",
-    params=["hf-internal-testing/tiny-xlm-roberta",
-            "hf-internal-testing/tiny-random-gpt_neo"])
-"""Subword-tokenization HF models"""
+    params=huggingface_model_subword_refs)
 
 
 # TODO find / mock a char-level model
+huggingface_model_character_refs = []
+"""Character-level HF models"""
+
 huggingface_model_character = pytest.fixture(
     huggingface_model_fixture,
     scope="module",
-    params=[])
-"""Character-level HF models"""
+    params=huggingface_model_character_refs)
 
 
-def test_hf_spec(huggingface_model_subword):
+huggingface_model = pytest.fixture(
+    huggingface_model_fixture,
+    scope="module",
+    params=(huggingface_model_word_refs +
+            huggingface_model_subword_refs +
+            huggingface_model_character_refs))
+
+
+def test_hf_spec(huggingface_model):
     schema_path = Path(__file__).parent.parent.parent / "docs" / "schemas" / "language_model_spec.json"
     with schema_path.open() as schema_f:
         schema = json.load(schema_f)
-    jsonschema.validate(Z.spec(huggingface_model_subword), schema)
+    jsonschema.validate(Z.spec(huggingface_model), schema)
+
+
+def test_hf_word_detected(huggingface_model_word):
+    spec = Z.spec(huggingface_model_word)
+    assert spec["tokenizer"]["type"] == "word"
 
 
 def test_hf_subword_detected(huggingface_model_subword):
