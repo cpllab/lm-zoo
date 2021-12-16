@@ -84,19 +84,22 @@ def test_dummy_no_unks(dummy_model_file, dummy_results):
 #     model = HuggingFaceModel(model_ref)
 #     return model
 
+def _load_hf_model(ref):
+    # Avoid making lots of HTTP requests if possible, just use local files.
+    try:
+        model = HuggingFaceModel(ref, offline=True)
+    except OSError:
+        model = HuggingFaceModel(ref, offline=False)
+
+    return model
+
+
 def huggingface_model_fixture(request):
     """
     Defines a generic fixture to be parameterized in a few different ways
     """
     model_ref = request.param
-
-    # Avoid making lots of HTTP requests if possible, just use local files.
-    try:
-        model = HuggingFaceModel(model_ref, offline=True)
-    except OSError:
-        model = HuggingFaceModel(model_ref, offline=False)
-
-    return model
+    return _load_hf_model(model_ref)
 
 
 huggingface_model_word_refs = [
@@ -163,7 +166,7 @@ def test_hf_character_detected(huggingface_model_character):
 
 
 def test_hf_gpt_tokenizer_spec():
-    spec = Z.spec(HuggingFaceModel("hf-internal-testing/tiny-random-gpt_neo"))
+    spec = Z.spec(_load_hf_model("hf-internal-testing/tiny-random-gpt_neo"))
     assert spec["tokenizer"] == {
         "type": "subword",
         "sentinel_position": "initial",
