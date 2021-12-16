@@ -127,6 +127,13 @@
                 },
                 "drop_token_pattern": {
                     "type": ["string", "null"]
+                },
+                "behaviors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["moses", "ptb"]
+                    }
                 }
             },
             "required": [

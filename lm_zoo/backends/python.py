@@ -158,6 +158,12 @@ class HuggingFaceBackend(Backend):
                 "sentinel_pattern": "Ġ",
                 "cased": tokenized[0][0].isupper()
             })
+        elif isinstance(tokenizer, (transformers.TransfoXLTokenizer)):
+            tokenizer_info.update({
+                "type": "word",
+                "cased": tokenized[0][0].isupper(),
+                "behaviors": ["moses"],
+            })
         else:
             if len(tokenized) == 1:
                 tokenizer_info["type"] = "word"

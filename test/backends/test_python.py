@@ -191,3 +191,10 @@ def test_hf_offline(model_ref):
     nonexistent_model_ref = "not_a_model"
     with pytest.raises(OSError):
         HuggingFaceModel(nonexistent_model_ref, offline=True)
+
+
+def test_hf_moses_detected():
+    model = _load_hf_model("hf-internal-testing/tiny-random-transfo-xl")
+    spec = Z.spec(model)
+    assert spec["tokenizer"]["type"] == "word"
+    assert spec["tokenizer"]["behaviors"] == ["moses"]
