@@ -13,7 +13,7 @@ import pandas as pd
 from lm_zoo import errors
 from lm_zoo.backends import get_backend, get_compatible_backend
 from lm_zoo.models import Registry, Model
-__version__ = "1.3"
+__version__ = "1.4a1"
 
 L = logging.getLogger("lm-zoo")
 
