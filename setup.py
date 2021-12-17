@@ -29,7 +29,7 @@ setup(
     extras_require={
         "docker": ["docker~=5.0.3"],
         "singularity": ["spython~=0.1.17"],
-        "huggingface": ["transformers~=4.12", "torch"],
+        "huggingface": ["transformers >= 4.5, < 5.0", "torch"],
     },
     name="lm-zoo",
     packages=find_packages(exclude=["test"]),
