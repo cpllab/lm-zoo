@@ -313,21 +313,23 @@ class HuggingFaceModel(Model):
         self.offline = offline
 
         self._check_compatible()
+        self._config.is_decoder = True
 
         self._model: Optional["transformers.PreTrainedModel"] = None
         self._tokenizer: Optional["transformers.PreTrainedTokenizer"] = None
 
     def _check_compatible(self):
-        config = transformers.AutoConfig.from_pretrained(
+        self._config = transformers.AutoConfig.from_pretrained(
             self.model_ref, local_files_only=self.offline)
-        if type(config) not in transformers.AutoModelForCausalLM._model_mapping:
+        if type(self._config) not in transformers.AutoModelForCausalLM._model_mapping:
             raise UnsupportedModelError(self.model_ref)
 
     @property
     def model(self) -> "transformers.PreTrainedModel":
         if self._model is None:
             self._model = transformers.AutoModelForCausalLM.from_pretrained(
-                self.model_ref, local_files_only=self.offline)
+                self.model_ref, local_files_only=self.offline,
+                config=self._config)
 
             # TODO CUDA
             # model.to(device)
