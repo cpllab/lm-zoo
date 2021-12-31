@@ -134,6 +134,9 @@
                         "type": "string",
                         "enum": ["moses", "ptb"]
                     }
+                },
+                "metaspace": {
+                    "type": "string"
                 }
             },
             "required": [
