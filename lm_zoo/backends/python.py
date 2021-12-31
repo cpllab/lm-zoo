@@ -147,7 +147,10 @@ class HuggingFaceBackend(Backend):
         # Tokenize without EOS/BOS/etc.
         tokenized = tokenizer.tokenize(test_str, add_special_tokens=False)
 
-        word_start = tokenized[0].lower().index(test_str[0].lower())
+        try:
+            word_start = tokenized[0].lower().index(test_str[0].lower())
+        except ValueError:
+            word_start = -1
         tokenizer_info["cased"] = tokenized[0][0].isupper()
 
         # Infer directly from model class if possible.
@@ -163,6 +166,15 @@ class HuggingFaceBackend(Backend):
                 "type": "word",
                 "cased": tokenized[0][0].isupper(),
                 "behaviors": ["moses"],
+            })
+        elif isinstance(tokenizer, (transformers.ReformerTokenizer, transformers.ReformerTokenizerFast,
+                                    transformers.PegasusTokenizer, transformers.PegasusTokenizerFast)):
+            tokenizer_info.update({
+                "type": "subword",
+                "sentinel_position": "initial",
+                "sentinel_pattern": "",
+                "cased": True,
+                "metaspace": "▁",
             })
         else:
             if len(tokenized) == 1:
