@@ -115,7 +115,8 @@ huggingface_model_word = pytest.fixture(
 
 huggingface_model_subword_refs = [
     "hf-internal-testing/tiny-xlm-roberta",
-    "hf-internal-testing/tiny-random-gpt_neo"
+    "hf-internal-testing/tiny-random-gpt_neo",
+    "hf-internal-testing/tiny-random-reformer",
 ]
 """Subword-tokenization HF models"""
 
