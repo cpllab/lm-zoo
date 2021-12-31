@@ -16,7 +16,7 @@ zoo = Z.get_registry()
 
 class State(object):
     def __init__(self):
-        self.requested_backend = "docker"
+        self.requested_backend = None
         self.verbose = False
 
         self.model = None
@@ -107,8 +107,10 @@ def backend_option(f):
         state = ctx.ensure_object(State)
         state.model = value
         return value
-    return click.option("--backend", type=click.Choice(["docker", "singularity"],
-                                                       case_sensitive=False),
+    return click.option("--backend",
+                        default=None,
+                        type=click.Choice(["docker", "singularity"],
+                                          case_sensitive=False),
                         expose_value=False,
                         help=("Specify a backend (containerization platform) "
                               "to run the specified model."),
