@@ -44,7 +44,7 @@ class ContainerBackend(Backend):
         raise NotImplementedError()
 
     def spec(self, model: Model):
-        ret = self._run_model_command_get_stdout("spec")
+        ret = self._run_model_command_get_stdout(model, "spec")
         return json.loads(ret)
 
     def tokenize(self, model: Model, sentences: List[str]):
