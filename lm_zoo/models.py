@@ -344,3 +344,7 @@ class HuggingFaceModel(Model):
             self._tokenizer = transformers.AutoTokenizer.from_pretrained(
                 self.model_ref, local_files_only=self.offline)
         return self._tokenizer
+
+    @property
+    def provides_token_offsets(self) -> bool:
+        return isinstance(self.tokenizer, transformers.PreTrainedTokenizerFast)
