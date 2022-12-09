@@ -17,7 +17,7 @@ else:
 
 setup(
     install_requires=[
-        "certifi==2022.6.15; python_full_version >= '3.6.0'",
+        "certifi==2022.12.7; python_full_version >= '3.6.0'",
         "charset-normalizer==2.1.0; python_full_version >= '3.6.0'",
         'click~=8.1.3', "colorama==0.4.5; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
         'crayons==0.4.0',
