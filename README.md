@@ -1,5 +1,16 @@
 # Language Model Zoo
 
+⚠️⚠️⚠️ **This project is no longer actively maintained by the Computational Psycholinguistics Laboratory.** ⚠️⚠️⚠️
+
+We do not guarantee the functionality or accuracy of the LM Zoo framework — use at your own risk!
+
+You may be interested in the following active projects (as of June 2023):
+- [`minicons`](https://github.com/kanishkamisra/minicons) enables easy Python access to neural network language model representations and probability/surprisal estimates.
+- the [Brain Score Language](https://github.com/brain-score/language) project provides tools for extracting behavioral and representational quantities from computational language models, and many benchmarks for evaluating the human-likeness of these models
+- [an experimental SyntaxGym implementation](https://huggingface.co/spaces/cpllab/syntaxgym) built directly into the Huggingface `evaluate` framework
+
+----
+
 ![zoo-logo](https://cpllab.github.io/lm-zoo/_images/logo.png)
 
 [![CircleCI](https://circleci.com/gh/cpllab/lm-zoo/tree/master.svg?style=svg&circle-token=d907824249db5ad63c03bfcc3b403c6d9ad845e2)](https://circleci.com/gh/cpllab/lm-zoo/tree/master)
