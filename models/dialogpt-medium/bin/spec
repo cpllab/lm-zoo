@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+
+import json
+import os
+import sys
+
+import torch
+
+from transformers import AutoTokenizer
+
+# Load spec template.
+with open("/opt/spec.json", "r") as spec_f:
+    spec = json.load(spec_f)
+
+# Load tokenizer.
+#model_path = os.environ["TRANSFORMER_MODEL_PATH"]
+tokenizer = AutoTokenizer.from_pretrained("/opt/dialogpt-medium")
+
+def filter_none(xs):
+    return [x for x in xs if x is not None]
+
+# Set spec vocabulary information from tokenizer.
+special_tokens = set(tokenizer.all_special_tokens) - \
+        {tokenizer.bos_token, tokenizer.eos_token, tokenizer.unk_token}
+
+spec["vocabulary"] = {
+    "items": list(tokenizer.get_vocab().keys()),
+
+    "prefix_types": filter_none([tokenizer.bos_token]),
+    "suffix_types": filter_none([tokenizer.eos_token]),
+    "unk_types": filter_none([tokenizer.unk_token]),
+    "special_types": list(special_tokens),
+}
+#spec["supported_features"]["get_predictions"] = False
+spec["image"]["supported_features"]["get_predictions"] = False
+spec["tokenizer"]["type"] = "subword"
+spec["tokenizer"]["sentinel_position"] = "initial"
+spec["tokenizer"]["sentinel_pattern"] = "Ġ"
+
+
+spec["image"]["gpu"]["supported"] = True
+spec["image"]["maintainer"] = "anne.beyer@uni-potsdam.de"
+spec["ref_url"] = "https://huggingface.co/microsoft/DialoGPT-medium"
+spec["name"] = "DialoGPT-medium"
+
+json.dump(spec, sys.stdout)
